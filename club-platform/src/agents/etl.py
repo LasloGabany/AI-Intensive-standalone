@@ -291,6 +291,7 @@ async def build_arpu_by_segment(db: AsyncSession):
             select(
                 func.avg(Subscription.monthly_price).label("avg_rev"),
                 func.count(Subscription.user_id).label("cnt"),
+                func.avg(UserHealth.tenure_days).label("avg_tenure"),
             )
             .join(UserHealth, UserHealth.user_id == Subscription.user_id)
             .where(Subscription.status == "active", UserHealth.risk_segment == health_seg)
@@ -300,5 +301,6 @@ async def build_arpu_by_segment(db: AsyncSession):
             activity_segment=arpu_seg,
             avg_revenue=r.avg_rev,
             user_count=r.cnt,
+            avg_tenure=r.avg_tenure,
         ))
     await db.commit()
