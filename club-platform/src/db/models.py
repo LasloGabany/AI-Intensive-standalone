@@ -35,9 +35,9 @@ class MemberRaw(Base):
     user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
     name: Mapped[Optional[str]] = mapped_column(Text)
     username: Mapped[Optional[str]] = mapped_column(Text)
-    join_date: Mapped[Optional[datetime]]
+    join_date: Mapped[Optional[datetime]] = mapped_column(nullable=True)
     status: Mapped[Optional[str]] = mapped_column(Text)
-    subscription_until: Mapped[Optional[datetime]]
+    subscription_until: Mapped[Optional[datetime]] = mapped_column(nullable=True)
     chat_member: Mapped[bool] = mapped_column(Boolean, default=True)
     raw_json: Mapped[Optional[dict]] = mapped_column(JSON)
     ingested_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
