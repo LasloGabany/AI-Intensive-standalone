@@ -92,3 +92,14 @@ class PaymentNormalized(Base):
     period_end: Mapped[Optional[date_type]] = mapped_column(nullable=True)
     months_covered: Mapped[int] = mapped_column(Integer, default=1)
     source: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+
+
+class KpiSnapshot(Base):
+    __tablename__ = "kpi_snapshot"
+    date: Mapped[date_type] = mapped_column(primary_key=True)
+    active_subscriptions: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    mrr: Mapped[Optional[float]] = mapped_column(Numeric(12, 2), nullable=True)
+    chat_active_30: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    chat_active_7: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    chat_never_wrote: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    chat_silent_paying: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
