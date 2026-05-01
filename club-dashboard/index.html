@@ -766,11 +766,29 @@ const FINANCES = {
      CORE JS
 ═══════════════════════════════════════════ -->
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('logo-text').innerHTML = `${CLUB.emoji} <span>${CLUB.name}</span>`;
-  document.title = `${CLUB.name} — Дашборд`;
-  initAll();
-});
+const API_URL = 'https://your-app.railway.app';  // ← update after Railway deploy
+
+async function loadData() {
+  try {
+    const res = await fetch(`${API_URL}/api/dashboard`, { signal: AbortSignal.timeout(5000) });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    if (data.KPI) Object.assign(KPI, data.KPI);
+    if (data.RETENTION?.cohorts?.length) Object.assign(RETENTION, data.RETENTION);
+    if (data.FINANCES?.revenueByMonth?.length) Object.assign(FINANCES, data.FINANCES);
+    if (data.SILENT_DATA?.length) SILENT_DATA.splice(0, SILENT_DATA.length, ...data.SILENT_DATA);
+    if (data.LEADERBOARD_DATA?.length) LEADERBOARD_DATA.splice(0, LEADERBOARD_DATA.length, ...data.LEADERBOARD_DATA);
+    if (data.EMOTIONS_DATA?.months) Object.assign(EMOTIONS_DATA, data.EMOTIONS_DATA);
+  } catch (e) {
+    console.warn('[Dashboard] API unavailable, using local DATA ZONE:', e.message);
+  } finally {
+    document.getElementById('logo-text').innerHTML = `${CLUB.emoji} <span>${CLUB.name}</span>`;
+    document.title = `${CLUB.name} — Дашборд`;
+    initAll();
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadData);
 
 function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
