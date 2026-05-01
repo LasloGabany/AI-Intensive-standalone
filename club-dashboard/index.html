@@ -459,7 +459,87 @@ const FINANCES = {
 </nav>
 
 <main class="main">
-  <div id="overview" class="section active"><!-- Task 2 --></div>
+  <div id="overview" class="section active">
+  <div class="page-title">📊 Обзор клуба</div>
+  <div class="page-subtitle" id="overview-subtitle"></div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid">
+    <div class="stat-card">
+      <div class="stat-label">Активных подписок <span class="badge badge-blue badge-src">PBI</span></div>
+      <div class="stat-value" id="kpi-subs"></div>
+      <div class="stat-sub" id="kpi-subs-sub"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">MRR <span class="badge badge-blue badge-src">PBI</span></div>
+      <div class="stat-value c-pink" id="kpi-mrr"></div>
+      <div class="stat-sub" id="kpi-mrr-sub"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">CR Заказ→Оплата <span class="badge badge-blue badge-src">PBI</span></div>
+      <div class="stat-value c-yellow" id="kpi-cr"></div>
+      <div class="stat-sub" id="kpi-cr-sub"></div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Активность чата <span class="badge badge-blue badge-src">TG</span></div>
+      <div class="stat-value c-yellow" id="kpi-chat"></div>
+      <div class="stat-sub" id="kpi-chat-sub"></div>
+    </div>
+  </div>
+
+  <!-- ALERT BANNER -->
+  <div class="alert-banner" id="alert-banner" style="display:none">
+    <div class="alert-nums">
+      <div class="alert-num"><div class="val" id="al-expiring"></div><div class="lbl">истекают</div></div>
+      <div class="alert-num"><div class="val" id="al-renewed" style="color:var(--green)"></div><div class="lbl">продлили</div></div>
+      <div class="alert-num"><div class="val" id="al-left"></div><div class="lbl">осталось</div></div>
+    </div>
+    <div class="alert-progress">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px" id="al-title"></div>
+      <div class="progress-bar"><div class="progress-fill" id="al-bar"></div></div>
+      <div style="font-size:11px;color:var(--text2)" id="al-pct"></div>
+    </div>
+    <div class="alert-timer" id="al-timer"></div>
+  </div>
+
+  <div class="two-col">
+    <!-- COHORT RETENTION -->
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px">Когортный ретеншн <span class="badge badge-blue badge-src">PBI</span></div>
+      <div class="table-wrap"><table class="cohort-table" id="cohort-table"></table></div>
+      <div style="font-size:11px;color:var(--text2);margin-top:8px" id="cohort-note"></div>
+    </div>
+    <!-- CHAT PULSE -->
+    <div class="card">
+      <div style="font-size:14px;font-weight:700;margin-bottom:16px">Пульс чата <span class="badge badge-blue badge-src">TG</span></div>
+      <div style="height:140px;margin-bottom:16px"><canvas id="chatChart"></canvas></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="stat-card" style="padding:12px">
+          <div class="stat-label" style="font-size:10px">Активных 7 дн</div>
+          <div class="stat-value c-yellow" style="font-size:22px" id="chat-7d"></div>
+        </div>
+        <div class="stat-card" style="padding:12px">
+          <div class="stat-label" style="font-size:10px">Активных 30 дн</div>
+          <div class="stat-value c-orange" style="font-size:22px" id="chat-30d"></div>
+        </div>
+        <div class="stat-card" style="padding:12px">
+          <div class="stat-label" style="font-size:10px">Никогда не писали</div>
+          <div class="stat-value" style="font-size:22px" id="chat-never"></div>
+        </div>
+        <div class="stat-card" style="padding:12px;cursor:pointer" onclick="showSection('silent')">
+          <div class="stat-label" style="font-size:10px">Платят, но молчат ⚠️ →</div>
+          <div class="stat-value c-red" style="font-size:22px" id="chat-silent"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TREND CHART -->
+  <div class="card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:16px">Тренд активности (7-дневное среднее)</div>
+    <div style="height:200px"><canvas id="trendChart"></canvas></div>
+  </div>
+</div>
   <div id="insights" class="section"><!-- Task 3 --></div>
   <div id="mechanics" class="section"><!-- Task 4 --></div>
   <div id="retention" class="section"><!-- Task 5 --></div>
@@ -572,6 +652,74 @@ function mkChart(id, cfg) {
   const existing = Chart.getChart(id);
   if (existing) existing.destroy();
   return new Chart(el.getContext('2d'), cfg);
+}
+
+function initOverview() {
+  document.getElementById('overview-subtitle').textContent =
+    `Дашборд обновлён: ${new Date().toLocaleDateString('ru-RU')}`;
+
+  document.getElementById('kpi-subs').textContent = fmt(KPI.activeSubscriptions);
+  document.getElementById('kpi-subs-sub').textContent = KPI.activeSubscriptionsSub;
+  document.getElementById('kpi-mrr').textContent = KPI.mrr + ' ' + CLUB.currency;
+  document.getElementById('kpi-mrr-sub').textContent = KPI.mrrSub;
+  document.getElementById('kpi-cr').textContent = KPI.cr + '%';
+  document.getElementById('kpi-cr-sub').textContent = KPI.crSub;
+  document.getElementById('kpi-chat').textContent = fmt(KPI.chatActive30);
+  document.getElementById('kpi-chat-sub').textContent = `${KPI.chatActive7} за 7 дн / ${KPI.chatTotal} в чате`;
+
+  if (RETENTION.alertActive) {
+    document.getElementById('alert-banner').style.display = 'flex';
+    document.getElementById('al-expiring').textContent = fmt(RETENTION.alertExpiring);
+    document.getElementById('al-renewed').textContent = fmt(RETENTION.alertRenewed);
+    document.getElementById('al-left').textContent = fmt(RETENTION.alertLeft);
+    document.getElementById('al-title').textContent = `${RETENTION.alertMonth} — критический месяц продлений`;
+    const pct = Math.round(RETENTION.alertRenewed / RETENTION.alertExpiring * 100);
+    document.getElementById('al-bar').style.width = pct + '%';
+    document.getElementById('al-pct').textContent = pct + '% продлили';
+    document.getElementById('al-timer').textContent = `⏱ ${RETENTION.alertDaysLeft} дн. осталось`;
+  }
+
+  const months = ['М+0','М+1','М+2','М+3','М+4','М+5','М+6'];
+  let th = '<tr><th>КОГОРТА</th><th>СТАРТ</th>' + months.slice(1).map(m => `<th>${m}</th>`).join('') + '</tr>';
+  let rows = RETENTION.cohorts.map(c => {
+    let tds = c.values.map((v, i) => {
+      const star = c.anomaly.includes(i) ? '★' : '';
+      const cls = i === 0 ? 'heat-pivot' : cohortHeatClass(v);
+      const disp = i === 0 ? '100%' : v + '%' + star;
+      return `<td class="${cls}">${disp}</td>`;
+    }).join('');
+    while (tds.split('<td').length - 1 < 7) tds += '<td></td>';
+    return `<tr><td class="cohort-label">${c.label} (${c.n})</td>${tds}</tr>`;
+  }).join('');
+  document.getElementById('cohort-table').innerHTML = th + rows;
+  document.getElementById('cohort-note').textContent = RETENTION.anomalyNote;
+
+  const chatCtx = document.getElementById('chatChart');
+  if (chatCtx) {
+    const grad = chatCtx.getContext('2d').createLinearGradient(0, 0, 0, 140);
+    grad.addColorStop(0, 'rgba(233,69,96,0.4)');
+    grad.addColorStop(1, 'rgba(233,69,96,0)');
+    mkChart('chatChart', { type: 'line', data: {
+      labels: RETENTION.trendDates.slice(-14),
+      datasets: [{ data: RETENTION.trendValues.slice(-14), borderColor: '#e94560', backgroundColor: grad, fill: true, tension: 0.4, pointRadius: 0, borderWidth: 2 }]
+    }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } });
+  }
+
+  document.getElementById('chat-7d').textContent = fmt(KPI.chatActive7);
+  document.getElementById('chat-30d').textContent = fmt(KPI.chatActive30);
+  document.getElementById('chat-never').textContent = fmt(KPI.chatNeverWrote);
+  document.getElementById('chat-silent').textContent = fmt(KPI.chatSilentPaying);
+
+  const trendCtx = document.getElementById('trendChart');
+  if (trendCtx) {
+    const grad2 = trendCtx.getContext('2d').createLinearGradient(0, 0, 0, 200);
+    grad2.addColorStop(0, 'rgba(233,69,96,0.25)');
+    grad2.addColorStop(1, 'rgba(233,69,96,0)');
+    mkChart('trendChart', { type: 'line', data: {
+      labels: RETENTION.trendDates,
+      datasets: [{ label: 'Среднее (7 дн)', data: RETENTION.trendValues, borderColor: '#e94560', backgroundColor: grad2, fill: true, tension: 0.4, pointRadius: 2, borderWidth: 2 }]
+    }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top', align: 'end' } }, scales: { x: { ticks: { maxTicksLimit: 14, font: { size: 10 } } }, y: { min: 0 } } } });
+  }
 }
 
 function initAll() {
