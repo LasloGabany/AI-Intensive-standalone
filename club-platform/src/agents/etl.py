@@ -6,7 +6,8 @@ from sqlalchemy import select, func, not_, exists
 from dateutil.relativedelta import relativedelta
 from src.db.models import (
     Subscription, UserActivityDaily, UserLastActivity,
-    MemberRaw, KpiSnapshot, PaymentNormalized, Cohort, RetentionFact, UserHealth
+    MemberRaw, KpiSnapshot, PaymentNormalized, Cohort, RetentionFact, UserHealth,
+    MrrDailySnapshot, ChurnEvent, ChurnProbability, ArpuBySegment
 )
 
 
@@ -216,3 +217,88 @@ async def build_user_health(db: AsyncSession) -> int:
         count += 1
     await db.commit()
     return count
+
+
+async def build_mrr_snapshot(db: AsyncSession):
+    kpi = await build_kpi_snapshot(db)
+    await db.merge(MrrDailySnapshot(
+        date=date_type.today(), mrr=kpi.mrr, active_users=kpi.active_subscriptions
+    ))
+    await db.commit()
+
+
+async def build_churn_events(db: AsyncSession) -> int:
+    result = await db.execute(
+        select(Subscription)
+        .where(Subscription.status.in_(["canceled", "expired", "past_due"]))
+    )
+    count = 0
+    for sub in result.scalars():
+        last = await db.execute(
+            select(UserLastActivity).where(UserLastActivity.user_id == sub.user_id)
+        )
+        activity = last.scalar_one_or_none()
+        churn_date = (
+            sub.canceled_at.date()
+            if sub.canceled_at and hasattr(sub.canceled_at, 'date')
+            else date_type.today()
+        )
+        tenure = None
+        if sub.current_period_start:
+            start = sub.current_period_start
+            start_date = start.date() if hasattr(start, 'date') else start
+            tenure = (date_type.today() - start_date).days
+        await db.merge(ChurnEvent(
+            user_id=sub.user_id,
+            churn_date=churn_date,
+            tenure_days=tenure,
+            last_activity=activity.last_message_date if activity else None,
+        ))
+        count += 1
+    await db.commit()
+    return count
+
+
+async def build_churn_probability(db: AsyncSession) -> int:
+    """Empirical P(churn | silent_days). No ML — rule-based buckets (PRD §6.7)."""
+    RATES = [(0, 14, 0.05), (14, 30, 0.22), (30, 60, 0.48), (60, 9999, 0.71)]
+    result = await db.execute(
+        select(UserHealth).where(UserHealth.risk_segment != "expired")
+    )
+    count = 0
+    for h in result.scalars():
+        silent = h.silent_days or 0
+        prob = 0.05
+        for lo, hi, rate in RATES:
+            if lo <= silent < hi:
+                prob = rate
+                break
+        await db.merge(ChurnProbability(
+            user_id=h.user_id,
+            probability_30d=round(prob, 2),
+            contributing_factors={"silent_days": silent, "risk_segment": h.risk_segment},
+        ))
+        count += 1
+    await db.commit()
+    return count
+
+
+async def build_arpu_by_segment(db: AsyncSession):
+    """Activity → Revenue cross-table. Updated daily."""
+    segment_map = {"ghost": "ghost", "high_risk": "low", "medium": "medium", "healthy": "high"}
+    for health_seg, arpu_seg in segment_map.items():
+        result = await db.execute(
+            select(
+                func.avg(Subscription.monthly_price).label("avg_rev"),
+                func.count(Subscription.user_id).label("cnt"),
+            )
+            .join(UserHealth, UserHealth.user_id == Subscription.user_id)
+            .where(Subscription.status == "active", UserHealth.risk_segment == health_seg)
+        )
+        r = result.one()
+        await db.merge(ArpuBySegment(
+            activity_segment=arpu_seg,
+            avg_revenue=r.avg_rev,
+            user_count=r.cnt,
+        ))
+    await db.commit()

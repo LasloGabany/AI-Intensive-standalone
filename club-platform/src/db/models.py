@@ -133,3 +133,59 @@ class UserHealth(Base):
     risk_score: Mapped[Optional[float]] = mapped_column(Numeric(6, 2), nullable=True)
     risk_segment: Mapped[Optional[str]] = mapped_column(Text, index=True, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+
+class MrrDailySnapshot(Base):
+    __tablename__ = "mrr_daily_snapshot"
+    date: Mapped[date_type] = mapped_column(primary_key=True)
+    mrr: Mapped[Optional[float]] = mapped_column(Numeric(12, 2), nullable=True)
+    active_users: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+
+class ChurnEvent(Base):
+    __tablename__ = "churn_events"
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    churn_date: Mapped[date_type] = mapped_column(primary_key=True)
+    tenure_days: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    last_activity: Mapped[Optional[date_type]] = mapped_column(nullable=True)
+
+
+class ExpansionEvent(Base):
+    __tablename__ = "expansion_events"
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    event_date: Mapped[date_type] = mapped_column(primary_key=True)
+    old_mrr: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
+    new_mrr: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
+
+
+class RetentionByActivity(Base):
+    __tablename__ = "retention_by_activity"
+    activity_bucket: Mapped[str] = mapped_column(Text, primary_key=True)
+    cohort_month: Mapped[date_type] = mapped_column(primary_key=True)
+    retention_30d: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+    retention_90d: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+
+
+class ChurnProbability(Base):
+    __tablename__ = "churn_probability"
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    probability_30d: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+    contributing_factors: Mapped[Optional[dict]] = mapped_column(JSON, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+
+class ArpuBySegment(Base):
+    __tablename__ = "arpu_by_segment"
+    activity_segment: Mapped[str] = mapped_column(Text, primary_key=True)
+    avg_revenue: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
+    user_count: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    avg_tenure: Mapped[Optional[float]] = mapped_column(Numeric(6, 1), nullable=True)
+
+
+class AnalyzedOutput(Base):
+    __tablename__ = "analyzed_output"
+    analysis_type: Mapped[str] = mapped_column(Text, primary_key=True)
+    period: Mapped[str] = mapped_column(Text, primary_key=True)
+    json_data: Mapped[dict] = mapped_column(JSON, nullable=False)
+    prompt_version: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
