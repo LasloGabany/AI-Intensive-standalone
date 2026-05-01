@@ -63,14 +63,16 @@ async def run(db: AsyncSession, checkpoint: int = 0) -> int:
         sender_id = (msg.get("from") or {}).get("id") or (msg.get("sender_chat") or {}).get("id")
         if not sender_id:
             continue
+        topic_id = msg.get("message_thread_id")
+        topic_name = settings.diary_topic_name if (topic_id and topic_id == settings.diary_topic_id) else None
         to_insert.append({
             "message_id": msg["message_id"],
             "date": datetime.fromtimestamp(msg["date"], tz=timezone.utc),
             "from_id": sender_id,
             "text": msg.get("text") or msg.get("caption"),
             "chat_id": msg["chat"]["id"],
-            "topic_id": msg.get("message_thread_id"),
-            "topic_name": None,  # resolved separately via getForumTopicInfo
+            "topic_id": topic_id,
+            "topic_name": topic_name,
         })
         new_checkpoint = max(new_checkpoint, update["update_id"] + 1)
     await upsert_messages(db, to_insert)

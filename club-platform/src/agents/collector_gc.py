@@ -80,6 +80,7 @@ async def run(db: AsyncSession) -> int:
         if not orders:
             break
         total += await upsert_payments(db, orders)
+        await upsert_members_from_gc(db, orders)
         if len(orders) < 100:
             break
         page += 1

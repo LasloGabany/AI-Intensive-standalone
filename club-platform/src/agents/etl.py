@@ -123,14 +123,20 @@ async def build_retention(db: AsyncSession) -> int:
         user_ids = [r[0] for r in cohort_users_result]
         if not user_ids:
             continue
+        cohort_user_ids = user_ids
         check_month = cohort.cohort_month
         offset = 0
         while check_month <= today:
             next_month = check_month + relativedelta(months=1)
-            sub_n = (await db.execute(
-                select(func.count(func.distinct(Subscription.user_id)))
-                .where(Subscription.user_id.in_(user_ids), Subscription.status == "active")
-            )).scalar() or 0
+            sub_n = await db.scalar(
+                select(func.count(func.distinct(UserActivityDaily.user_id)))
+                .where(
+                    UserActivityDaily.user_id.in_(cohort_user_ids),
+                    UserActivityDaily.date >= check_month,
+                    UserActivityDaily.date < next_month,
+                    UserActivityDaily.active_flag == 1,
+                )
+            ) or 0
             bill_n = (await db.execute(
                 select(func.count(func.distinct(PaymentNormalized.user_id)))
                 .where(

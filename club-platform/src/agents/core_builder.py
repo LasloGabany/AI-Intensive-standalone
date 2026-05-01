@@ -127,6 +127,8 @@ async def build_activity_daily(db: AsyncSession, since: _date_type | None = None
 
 
 async def build_payments_normalized(db: AsyncSession) -> int:
+    await db.execute(text("DELETE FROM payments_normalized"))
+    await db.commit()
     subs = await db.execute(select(Subscription))
     count = 0
     for sub in subs.scalars():
