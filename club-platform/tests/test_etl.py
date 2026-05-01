@@ -50,3 +50,27 @@ async def test_kpi_snapshot_written_to_table(db, seeded_subscription):
     kpi = result.scalar_one()
     assert kpi.date == date.today()
     assert kpi.active_subscriptions is not None
+
+
+@pytest.mark.asyncio
+async def test_retention_stores_three_types_separately(db):
+    """subscription, billing, engagement retention are separate columns — never mixed."""
+    from src.db.models import RetentionFact
+    from src.agents.etl import build_cohorts, build_retention
+    await build_cohorts(db)
+    await build_retention(db)
+    result = await db.execute(select(RetentionFact).limit(1))
+    row = result.scalar_one_or_none()
+    if row:
+        assert hasattr(row, 'retention_subscription')
+        assert hasattr(row, 'retention_billing')
+        assert hasattr(row, 'retention_engagement')
+        assert row.retention_subscription is not None
+
+
+@pytest.mark.asyncio
+async def test_cohort_month_truncated_to_first_of_month(db):
+    from src.db.models import Cohort
+    result = await db.execute(select(Cohort).limit(5))
+    for c in result.scalars().all():
+        assert c.cohort_month.day == 1

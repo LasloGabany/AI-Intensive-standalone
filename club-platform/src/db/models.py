@@ -103,3 +103,21 @@ class KpiSnapshot(Base):
     chat_active_7: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     chat_never_wrote: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
     chat_silent_paying: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+
+
+class Cohort(Base):
+    __tablename__ = "cohorts"
+    cohort_month: Mapped[date_type] = mapped_column(primary_key=True)
+    cohort_size: Mapped[int] = mapped_column(Integer)
+    first_payment_date: Mapped[Optional[date_type]] = mapped_column(nullable=True)
+
+
+class RetentionFact(Base):
+    __tablename__ = "retention_fact"
+    cohort_month: Mapped[date_type] = mapped_column(primary_key=True)
+    month_offset: Mapped[int] = mapped_column(Integer, primary_key=True)
+    users_active: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    users_paid: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    retention_subscription: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+    retention_billing: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+    retention_engagement: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
