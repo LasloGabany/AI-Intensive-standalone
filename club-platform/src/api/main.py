@@ -1,10 +1,19 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.db.connection import get_db
 from src.api.routes import kpi, retention, health, finance, insights
+from src.scheduler import start as start_scheduler
 
-app = FastAPI(title="Club Platform API", version="1.0.0")
+
+@asynccontextmanager
+async def lifespan(app):
+    start_scheduler()
+    yield
+
+
+app = FastAPI(title="Club Platform API", version="1.0.0", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
