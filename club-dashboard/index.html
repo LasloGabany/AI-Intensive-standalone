@@ -540,18 +540,226 @@ const FINANCES = {
     <div style="height:200px"><canvas id="trendChart"></canvas></div>
   </div>
 </div>
-  <div id="insights" class="section"><!-- Task 3 --></div>
-  <div id="mechanics" class="section"><!-- Task 4 --></div>
-  <div id="retention" class="section"><!-- Task 5 --></div>
-  <div id="churn" class="section"><!-- Task 6 --></div>
-  <div id="silent" class="section"><!-- Task 7 --></div>
-  <div id="leaderboard" class="section"><!-- Task 8 --></div>
-  <div id="activity" class="section"><!-- Task 9 --></div>
-  <div id="emotions" class="section"><!-- Task 10 --></div>
-  <div id="finances" class="section"><!-- Task 11 --></div>
+  <div id="insights" class="section">
+<div class="page-title">💡 Инсайты: проблемы и скрытые потребности</div>
+<div class="page-subtitle" id="insights-subtitle"></div>
+
+<h3 style="font-size:15px;margin-bottom:14px">Топ тем</h3>
+<div id="insights-topics"></div>
+
+<h3 style="font-size:15px;margin:24px 0 14px">Скрытые потребности участниц</h3>
+<div id="insights-needs" style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px"></div>
+
+<h3 style="font-size:15px;margin-bottom:14px">ТОП рекомендации для владельца</h3>
+<div class="card" id="insights-recs"></div>
+
+<h3 style="font-size:15px;margin:24px 0 14px">🔥 Драйверы вовлечения</h3>
+<div id="insights-drivers" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px"></div>
+</div>
+  <div id="mechanics" class="section">
+<div class="page-title">⚙️ Механики клуба</div>
+<div class="page-subtitle">AI-анализ текущих механик + рекомендации. Основано на 16К+ сообщений + трендах платных сообществ 2025–2026.</div>
+
+<div class="card" style="margin-bottom:20px">
+  <div style="font-size:14px;font-weight:700;margin-bottom:12px">🔄 Обновить анализ через отчёт лучших практик</div>
+  <div class="upload-box" id="upload-box">
+    <div style="font-size:32px;margin-bottom:8px">📄</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:12px">Загрузите файл отчёта лучших практик (.txt или .md)</div>
+    <input type="file" id="reportInput" accept=".txt,.md" style="display:none">
+    <button class="btn btn-primary" onclick="document.getElementById('reportInput').click()">Загрузить отчёт</button>
+    <div id="upload-status" style="margin-top:8px;font-size:12px;color:var(--green)"></div>
+  </div>
+  <div id="prompt-area" style="display:none">
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px">Готовый промпт для Claude / ChatGPT:</div>
+    <div class="prompt-box" id="prompt-box"></div>
+    <button class="btn btn-secondary" onclick="copyPrompt()">📋 Скопировать промпт</button>
+    <div style="margin-top:16px;font-size:13px;font-weight:600;margin-bottom:6px">После получения ответа от LLM вставьте JSON:</div>
+    <textarea id="jsonInput" style="width:100%;height:100px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:10px;color:var(--text);font-size:12px;font-family:monospace" placeholder='{"microGroups":...}'></textarea>
+    <button class="btn btn-green" style="margin-top:8px" onclick="applyMechanicsJSON()">✅ Применить JSON</button>
+    <button class="btn btn-secondary" style="margin-top:8px" onclick="resetMechanics()">↩ Сбросить к defaults</button>
+  </div>
+</div>
+
+<div class="mech-card" id="mech-microgroups"></div>
+
+<div class="two-col" style="margin-bottom:20px">
+  <div><div style="font-size:14px;font-weight:700;color:var(--red);margin-bottom:12px">❌ Что убрать / изменить</div><div id="mech-remove"></div></div>
+  <div><div style="font-size:14px;font-weight:700;color:var(--green);margin-bottom:12px">✅ Что добавить</div><div id="mech-add"></div></div>
+</div>
+
+<div style="font-size:14px;font-weight:700;margin-bottom:14px">🤖 Возможности бота</div>
+<div id="mech-bots" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-bottom:24px"></div>
+
+<div style="font-size:14px;font-weight:700;margin-bottom:14px">👥 Peer-механики</div>
+<div id="mech-peers" style="display:grid;grid-template-columns:repeat(2,1fr);gap:14px"></div>
+</div>
+  <div id="retention" class="section">
+<div class="page-title">⚠️ Удержание и реактивация</div>
+<div class="kpi-grid">
+  <div class="stat-card"><div class="stat-label">Группа риска</div><div class="stat-value c-red" id="ret-risk"></div><div class="stat-sub">Были активны, замолчали 14+ дн</div></div>
+  <div class="stat-card"><div class="stat-label">Потеряно сообщений</div><div class="stat-value c-yellow" id="ret-lost"></div><div class="stat-sub">От участниц группы риска</div></div>
+  <div class="stat-card"><div class="stat-label">Ср. активность до ухода</div><div class="stat-value" id="ret-avg"></div><div class="stat-sub">дней</div></div>
+  <div class="stat-card"><div class="stat-label">Никогда не писали</div><div class="stat-value c-pink" id="ret-never"></div><div class="stat-sub">«мёртвые души»</div></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:4px">🔥 Группа риска: были активны, замолчали</div>
+  <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Участницы с 5+ сообщениями, молчащие более 14 дней</div>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>ИМЯ</th><th>USERNAME</th><th>БЫЛО СООБЩЕНИЙ</th><th>БЫЛА АКТИВНА (ДН)</th><th>МОЛЧИТ (ДН)</th><th>ПРИОРИТЕТ</th></tr></thead><tbody id="ret-table"></tbody></table></div>
+  <div class="pagination" id="ret-pagin"></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:16px">Воронка потерь</div>
+  <div style="height:180px"><canvas id="funnelChart"></canvas></div>
+</div>
+</div>
+  <div id="churn" class="section">
+<div class="page-title">📉 Отток: покинувшие клуб</div>
+<div style="font-size:13px;font-weight:600;margin-bottom:16px" id="churn-summary"></div>
+<div class="kpi-grid">
+  <div class="stat-card"><div class="stat-label">Всего отписалось</div><div class="stat-value c-red" id="ch-unsub"></div></div>
+  <div class="stat-card"><div class="stat-label">Покинули чат</div><div class="stat-value c-yellow" id="ch-left"></div></div>
+  <div class="stat-card"><div class="stat-label">Призраки в чате</div><div class="stat-value" id="ch-ghost"></div><div class="stat-sub">не платят, но сидят</div></div>
+  <div class="stat-card"><div class="stat-label">Болезненные потери</div><div class="stat-value c-pink" id="ch-pain"></div><div class="stat-sub">30+ сообщений</div></div>
+</div>
+<div class="card" style="border-left:4px solid var(--orange)">
+  <div style="font-size:14px;font-weight:700;margin-bottom:12px">👻 Призраки и расхождения <span class="badge badge-orange badge-src" id="ch-src-badge"></span></div>
+  <div class="crosscheck-grid" id="ch-cross"></div>
+  <div class="ai-block" id="ch-insight"></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:16px">Динамика оттока по месяцам</div>
+  <div style="height:180px"><canvas id="churnChart"></canvas></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:4px">🔥 Самые болезненные потери (30+ сообщений)</div>
+  <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Активные участницы, которые ушли. Возможные кандидаты на возврат.</div>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>ИМЯ</th><th>USERNAME</th><th>СООБЩЕНИЙ</th><th>ДНЕЙ АКТИВНОСТИ</th><th>ПЕРИОД</th><th>СЕГМЕНТ</th></tr></thead><tbody id="ch-pain-table"></tbody></table></div>
+</div>
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div style="font-size:14px;font-weight:700">Все покинувшие чат</div>
+    <select id="ch-seg-filter" onchange="filterChurnAll()" style="background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px">
+      <option value="">Все</option><option value="active">Активная</option><option value="moderate">Умеренная</option><option value="quiet">Тихая</option>
+    </select>
+  </div>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>ИМЯ</th><th>USERNAME</th><th>СООБЩЕНИЙ</th><th>ДНЕЙ АКТИВНОСТИ</th><th>ПЕРВОЕ СООБЩ.</th><th>ПОСЛЕДНЕЕ СООБЩ.</th><th>СЕГМЕНТ</th></tr></thead><tbody id="ch-all-table"></tbody></table></div>
+  <div class="pagination" id="ch-all-pagin"></div>
+</div>
+<div class="card" id="ch-deep-analysis"></div>
+</div>
+  <div id="silent" class="section">
+<div class="page-title">🤐 Молчуны</div>
+<div class="page-subtitle">Модераторский триаж — кому писать в первую очередь.</div>
+<div class="kpi-grid">
+  <div class="stat-card"><div class="stat-label">Платит + молчит 30+</div><div class="stat-value c-red" id="sil-red"></div><div class="stat-sub">реактивация в приоритете</div></div>
+  <div class="stat-card"><div class="stat-label">Платит + никогда не писала</div><div class="stat-value c-yellow" id="sil-ghost"></div><div class="stat-sub">зачем им клуб?</div></div>
+  <div class="stat-card"><div class="stat-label">Платит + 14–30д</div><div class="stat-value c-orange" id="sil-yellow"></div><div class="stat-sub">ранний сигнал</div></div>
+  <div class="stat-card"><div class="stat-label">Всего молчунов</div><div class="stat-value c-muted" id="sil-total"></div></div>
+</div>
+<div class="card">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px">
+    <div class="filter-pills" id="sil-pills">
+      <button class="pill active" data-filter="priority" onclick="filterSilent('priority',this)">🔥 По приоритету</button>
+      <button class="pill" data-filter="red" onclick="filterSilent('red',this)">🔴 Платит 30+</button>
+      <button class="pill" data-filter="ghost" onclick="filterSilent('ghost',this)">👻 Никогда не писала ⭐</button>
+      <button class="pill" data-filter="yellow" onclick="filterSilent('yellow',this)">🟡 14–30д</button>
+      <button class="pill" data-filter="paying" onclick="filterSilent('paying',this)">💳 Все платящие</button>
+      <button class="pill" data-filter="expired" onclick="filterSilent('expired',this)">❌ Истекла</button>
+      <button class="pill" data-filter="all" onclick="filterSilent('all',this)">Все</button>
+    </div>
+    <button class="btn btn-orange" onclick="exportSilentCSV()">📥 Скачать CSV</button>
+  </div>
+  <div class="table-wrap"><table><thead><tr>
+    <th><input type="checkbox" id="sil-select-all" onchange="toggleSelectAll(this)"></th>
+    <th>УЧАСТНИЦА</th><th>ПОДПИСКА</th><th>ДО</th><th>ПОСТОВ</th><th>ПОСЛЕДНЕЕ</th><th>МОЛЧИТ</th><th>РИСК</th><th>МИНИАП</th><th>ДЕЙСТВИЯ</th>
+  </tr></thead><tbody id="sil-table"></tbody></table></div>
+  <div class="pagination" id="sil-pagin"></div>
+</div>
+</div>
+  <div id="leaderboard" class="section">
+<div class="page-title">🏆 Лидерборд активности</div>
+<div class="chart-grid-2" style="margin-bottom:20px">
+  <div class="card"><div style="font-size:14px;font-weight:700;margin-bottom:14px">Топ-20 по сообщениям (всего)</div><div style="height:300px"><canvas id="lbChart1"></canvas></div></div>
+  <div class="card"><div style="font-size:14px;font-weight:700;margin-bottom:14px">Топ-20 в Дневнике успеха</div><div style="height:300px"><canvas id="lbChart2"></canvas></div></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px">Детальный лидерборд</div>
+  <div class="table-wrap"><table><thead><tr><th>#</th><th>ИМЯ</th><th>USERNAME</th><th>ВСЕГО</th><th>ДНЕВНИК</th><th>ДНЕЙ/30</th><th>СЕРИЯ</th><th>АКТИВНОСТЬ (30 ДН)</th></tr></thead><tbody id="lb-table"></tbody></table></div>
+  <div class="pagination" id="lb-pagin"></div>
+</div>
+</div>
+  <div id="activity" class="section">
+<div class="page-title">⚡ Паттерны активности</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px">Тепловая карта: часы × дни недели (UTC+3)</div>
+  <div class="table-wrap"><table class="heatmap-table" id="heatmap-table"></table></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px">Распределение по дням недели</div>
+  <div style="height:200px"><canvas id="dowChart"></canvas></div>
+</div>
+</div>
+  <div id="emotions" class="section">
+<div class="page-title">💜 Эмоциональный монитор клуба</div>
+<div class="page-subtitle" id="emo-subtitle"></div>
+<div class="kpi-grid" style="grid-template-columns:repeat(6,1fr)">
+  <div class="stat-card" style="padding:14px"><div class="stat-label" style="font-size:10px">ВАЛЕНТНОСТЬ</div><div class="stat-value c-green" id="emo-valence" style="font-size:22px"></div><div class="stat-sub">−1→+1</div></div>
+  <div class="stat-card" style="padding:14px"><div class="stat-label" style="font-size:10px">ВОЗБУЖДЕНИЕ</div><div class="stat-value" id="emo-arousal" style="font-size:22px"></div><div class="stat-sub">0→1</div></div>
+  <div class="stat-card" style="padding:14px"><div class="stat-label" style="font-size:10px">ДЕЙСТВИЕ+ПОДДЕРЖАНИЕ</div><div class="stat-value c-green" id="emo-action" style="font-size:22px"></div></div>
+  <div class="stat-card" style="padding:14px"><div class="stat-label" style="font-size:10px">САМОЭФФЕКТИВНОСТЬ</div><div class="stat-value c-yellow" id="emo-selfe" style="font-size:22px"></div></div>
+  <div class="stat-card" style="padding:14px"><div class="stat-label" style="font-size:10px">ГЛУБОКОЕ РАСКРЫТИЕ</div><div class="stat-value" id="emo-deep" style="font-size:22px"></div></div>
+  <div class="stat-card" style="padding:14px"><div class="stat-label" style="font-size:10px">ДАЮТ ПОДДЕРЖКУ</div><div class="stat-value c-green" id="emo-support" style="font-size:22px"></div></div>
+</div>
+<div class="timeline-wrap">
+  <div class="timeline-label" id="emo-cur-label"></div>
+  <input type="range" id="emo-slider" min="0" step="1" oninput="onEmoSlider(this.value)">
+  <button class="btn btn-secondary" id="emo-play-btn" onclick="toggleEmoPlay()">▶ Играть</button>
+</div>
+<div class="portrait-card" id="emo-portrait"></div>
+<div class="chart-grid-2">
+  <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">Колесо эмоций Плутчика</div><div style="height:280px"><canvas id="plutchikChart"></canvas></div></div>
+  <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">Траектория на циркумплексе Рассела</div><div style="height:280px"><canvas id="russellChart"></canvas></div></div>
+</div>
+<div class="chart-grid-2">
+  <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">Стадии изменений (Прохаска)</div><div style="height:220px"><canvas id="prochaskaChart"></canvas></div></div>
+  <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">Глубина самораскрытия</div><div style="height:220px"><canvas id="disclosureChart"></canvas></div></div>
+</div>
+<div class="chart-grid-2">
+  <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">Маркеры роста</div><div style="height:220px"><canvas id="growthChart"></canvas></div></div>
+  <div class="card"><div style="font-size:13px;font-weight:700;margin-bottom:12px">Тип поддержки</div><div style="height:220px"><canvas id="supportChart"></canvas></div></div>
+</div>
+</div>
+  <div id="finances" class="section">
+<div class="page-title">💰 Финансы</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:16px">Выручка по месяцам <span class="badge badge-orange badge-src">GetCourse</span></div>
+  <div style="height:200px"><canvas id="revChart"></canvas></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:16px">Выручка и заказы по месяцам <span class="badge badge-orange badge-src">GK</span></div>
+  <div style="height:200px"><canvas id="revOrdersChart"></canvas></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px">📋 Когортная таблица: заказы <span class="badge badge-blue badge-src">PBI</span></div>
+  <div class="table-wrap" id="cohort-orders-wrap"></div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px">💰 Когортная таблица: выручка <span class="badge badge-blue badge-src">PBI</span></div>
+  <div class="table-wrap" id="cohort-revenue-wrap"></div>
+</div>
+</div>
   <div id="subscriptions" class="section"><div class="page-title">📋 Подписки</div><p style="color:var(--text2);margin-top:12px">Раздел будет добавлен в следующей версии.</p></div>
   <div id="crossanalytics" class="section"><div class="page-title">🔗 Сквозная аналитика</div><p style="color:var(--text2);margin-top:12px">Раздел будет добавлен в следующей версии.</p></div>
-  <div id="datasources" class="section"><!-- Task 12 --></div>
+  <div id="datasources" class="section">
+<div class="page-title">📂 Источники данных</div>
+<div class="page-subtitle">Справочник по DATA ZONE — где брать данные для каждой переменной и как генерировать через LLM.</div>
+<div class="card">
+  <table style="width:100%;font-size:13px;border-collapse:collapse">
+    <thead><tr style="border-bottom:1px solid var(--border)"><th style="padding:10px;text-align:left">Переменная</th><th style="padding:10px;text-align:left">Раздел</th><th style="padding:10px;text-align:left">Источник</th><th style="padding:10px;text-align:left">Как получить</th></tr></thead>
+    <tbody id="ds-table"></tbody>
+  </table>
+</div>
+</div>
 </main>
 
 <!-- ═══════════════════════════════════════════
@@ -722,10 +930,505 @@ function initOverview() {
   }
 }
 
+function initInsights() {
+  document.getElementById('insights-subtitle').textContent =
+    `Консолидированный анализ ${fmt(INSIGHTS.totalMessages)} сообщений. Темы ранжированы по критичности.`;
+
+  document.getElementById('insights-topics').innerHTML = INSIGHTS.topics.map(t => `
+    <div class="insight-card" style="border-left-color:${t.borderColor}">
+      <div class="insight-header">
+        <div class="insight-title">${t.title}</div>
+        <span class="badge badge-pink">${fmt(t.mentions)} упоминаний</span>
+      </div>
+      <div class="insight-desc">${t.description}</div>
+      <div class="ai-block">${t.aiInsight}</div>
+      <div class="quotes">${t.quotes.map(q => `<div class="quote">${q}</div>`).join('')}</div>
+    </div>`).join('');
+
+  const impactMap = { high: ['high','c-red','ВЫСШИЙ ИМПАКТ'], medium: ['medium','c-yellow','СРЕДНИЙ ИМПАКТ'], low: ['low','c-muted','НИЗКИЙ ИМПАКТ'] };
+  document.getElementById('insights-needs').innerHTML = INSIGHTS.hiddenNeeds.map(n => {
+    const [cls, col, lbl] = impactMap[n.impact] || impactMap.low;
+    return `<div class="need-card ${cls}"><div class="need-impact ${col}">${lbl}</div><div class="need-title">${n.title}</div><div class="need-signal">${n.signal}</div></div>`;
+  }).join('');
+
+  document.getElementById('insights-recs').innerHTML = INSIGHTS.recommendations.map(r => `
+    <div class="rec-item">
+      <div class="rec-num${r.rank > 1 ? ' orange' : ''}">${r.rank}</div>
+      <div><div class="rec-title">${r.title}</div><div class="rec-desc">${r.description}</div>
+      <div class="rec-tags"><span class="badge badge-${r.priority === 'high' ? 'red' : 'orange'}">${r.priority}</span><span class="badge badge-gray">${r.effort}</span></div></div>
+    </div>`).join('');
+
+  document.getElementById('insights-drivers').innerHTML = INSIGHTS.engagementDrivers.map(d => `
+    <div class="driver-card"><div class="driver-title">${d.title}</div><div class="driver-desc">${d.description}</div></div>`).join('');
+}
+
+function initMechanics() {
+  renderMechanics(MECHANICS);
+
+  document.getElementById('reportInput').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const txt = ev.target.result;
+      document.getElementById('upload-status').textContent = `✓ Загружен: ${file.name}`;
+      const prompt = generateMechanicsPrompt(txt);
+      document.getElementById('prompt-box').textContent = prompt;
+      document.getElementById('prompt-area').style.display = 'block';
+    };
+    reader.readAsText(file, 'UTF-8');
+  });
+}
+
+function generateMechanicsPrompt(reportText) {
+  return `Ты — аналитик онлайн-сообществ. Ниже — отчёт лучших практик и данные клуба.
+Верни JSON строго по схеме MECHANICS (без пояснений, только JSON).
+
+=== ОТЧЁТ ЛУЧШИХ ПРАКТИК ===
+${reportText.slice(0, 8000)}
+
+=== ДАННЫЕ КЛУБА ===
+Название: ${CLUB.name}
+Активных подписок: ${KPI.activeSubscriptions}
+MRR: ${KPI.mrr} ${CLUB.currency}
+Молчуны: ${KPI.chatSilentPaying} из ${KPI.chatTotal}
+
+=== ФОРМАТ ОТВЕТА (JSON) ===
+{ "microGroups": { "title": "...", "sections": [{ "label": "...", "text": "..." }] },
+  "toRemove": [{ "title": "...", "description": "...", "recommendation": "..." }],
+  "toAdd": [{ "rank": 1, "title": "...", "description": "...", "effort": "low|medium|high" }],
+  "botFeatures": [{ "title": "...", "description": "...", "value": "...", "complexity": "..." }],
+  "peerMechanics": [{ "title": "...", "description": "...", "whyWorks": "...", "fitClub": "..." }] }`;
+}
+
+function copyPrompt() {
+  navigator.clipboard.writeText(document.getElementById('prompt-box').textContent);
+}
+
+function applyMechanicsJSON() {
+  try {
+    const data = JSON.parse(document.getElementById('jsonInput').value);
+    localStorage.setItem('MECHANICS_OVERRIDE', JSON.stringify(data));
+    renderMechanics(data);
+    alert('✅ Механики обновлены!');
+  } catch(e) { alert('❌ Ошибка JSON: ' + e.message); }
+}
+
+function resetMechanics() {
+  localStorage.removeItem('MECHANICS_OVERRIDE');
+  location.reload();
+}
+
+function renderMechanics(m) {
+  const mg = m.microGroups;
+  document.getElementById('mech-microgroups').innerHTML = `
+    <div style="font-size:15px;font-weight:700;margin-bottom:14px">🤝 ${mg.title}</div>
+    ${mg.sections.map(s => `
+      <div class="mech-section-label">${s.label}</div>
+      ${s.type === 'list'
+        ? `<ul style="padding-left:18px;font-size:13px;color:var(--text2);line-height:1.8">${s.items.map(i=>`<li>${i}</li>`).join('')}</ul>`
+        : `<div style="font-size:13px;color:var(--text2);line-height:1.6">${s.text}</div>`
+      }`).join('')}`;
+
+  document.getElementById('mech-remove').innerHTML = m.toRemove.map(r => `
+    <div class="remove-card">
+      <div class="rc-title">✗ ${r.title}</div>
+      <div class="rc-desc">${r.description}</div>
+      <div class="rc-rec">${r.recommendation}</div>
+    </div>`).join('');
+
+  document.getElementById('mech-add').innerHTML = m.toAdd.map(a => `
+    <div class="add-card">
+      <div class="ac-rank">[${a.rank}]</div>
+      <div class="ac-title">${a.title}</div>
+      <div class="ac-desc">${a.description}</div>
+      <div style="margin-top:6px"><span class="badge badge-gray">Усилие: ${a.effort}</span></div>
+    </div>`).join('');
+
+  document.getElementById('mech-bots').innerHTML = m.botFeatures.map(b => `
+    <div class="bot-card">
+      <div class="bot-title">${b.title}</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.5">${b.description}</div>
+      <div class="bot-value">Ценность: ${b.value}</div>
+      <div class="bot-complexity">${b.complexity}</div>
+    </div>`).join('');
+
+  document.getElementById('mech-peers').innerHTML = m.peerMechanics.map(p => `
+    <div class="peer-card">
+      <div class="peer-title">${p.title}</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.5">${p.description}</div>
+      <div class="peer-why">Почему работает: ${p.whyWorks}</div>
+      <div class="peer-fit">${p.fitClub}</div>
+    </div>`).join('');
+}
+
+function initRetention() {
+  const data = [...RETENTION_DATA.riskGroup].sort((a,b) => b.silentDays - a.silentDays);
+  const f = RETENTION_DATA.funnel;
+  document.getElementById('ret-risk').textContent = fmt(data.length);
+  document.getElementById('ret-lost').textContent = fmt(data.reduce((s,r) => s + r.messageCount, 0));
+  document.getElementById('ret-avg').textContent = fmt(Math.round(data.reduce((s,r) => s + r.activeDays, 0) / data.length));
+  document.getElementById('ret-never').textContent = fmt(f.neverWrote);
+  makePaginator(data, 25, (slice, offset) => {
+    document.getElementById('ret-table').innerHTML = slice.map((r, i) => `
+      <tr><td>${offset+i+1}</td><td>${r.name}</td><td>${tgLink(r.username)}</td>
+      <td>${fmt(r.messageCount)}</td><td>${fmt(r.activeDays)}</td>
+      <td style="color:${r.silentDays>=60?'var(--red)':r.silentDays>=30?'var(--orange)':'var(--yellow)'}">${r.silentDays}</td>
+      <td>${priorityBadge(r.priority)}</td></tr>`).join('');
+  }, 'ret-table', 'ret-pagin');
+  mkChart('funnelChart', { type: 'bar', data: {
+    labels: ['Молчат 14-30 дн', 'Молчат 30-60 дн', 'Молчат 60+ дн', 'Никогда не писали'],
+    datasets: [{ data: [f.silent14_30, f.silent30_60, f.silent60plus, f.neverWrote],
+      backgroundColor: ['rgba(247,127,0,0.6)','rgba(239,100,60,0.6)','rgba(239,35,60,0.6)','rgba(100,100,120,0.5)'],
+      borderRadius: 6 }]
+  }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { min: 0 } } } });
+}
+
+function initChurn() {
+  const cd = CHURN_DATA;
+  document.getElementById('churn-summary').textContent = cd.summary.text;
+  document.getElementById('ch-unsub').textContent = fmt(cd.summary.totalUnsubscribed);
+  document.getElementById('ch-left').textContent = fmt(cd.summary.leftChat);
+  document.getElementById('ch-ghost').textContent = '~' + fmt(cd.summary.ghostsInChat);
+  document.getElementById('ch-pain').textContent = fmt(cd.summary.painfulLosses);
+  const cc = cd.crosscheck;
+  document.getElementById('ch-src-badge').textContent = `${cc.dataSource} · ${cc.dataDate}`;
+  document.getElementById('ch-cross').innerHTML = [
+    [fmt(cc.totalPayers), 'ВСЕГО ПЛАТЕЛЬЩИКОВ', ''],
+    [fmt(cc.inTelegramChat), 'В TELEGRAM-ЧАТЕ', ''],
+    [fmt(cc.activeSubscriptions), 'АКТИВНЫХ ПОДПИСОК', 'c-green'],
+    [fmt(cc.notInChat), 'НЕ В ЧАТЕ', 'c-yellow'],
+    [fmt(cc.silentZero), 'МОЛЧУНЫ (0 СООБЩ.)', 'c-red'],
+  ].map(([v,l,c]) => `<div class="crosscheck-cell"><div class="crosscheck-val ${c}">${v}</div><div class="crosscheck-label">${l}</div></div>`).join('');
+  document.getElementById('ch-insight').textContent = cc.insightText;
+  mkChart('churnChart', { type: 'bar', data: {
+    labels: cd.churnByMonth.map(m => m.month),
+    datasets: [{ data: cd.churnByMonth.map(m => m.count), backgroundColor: 'rgba(239,35,60,0.6)', borderRadius: 6 }]
+  }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0 } } } });
+  document.getElementById('ch-pain-table').innerHTML = cd.painfulLossesList.map((r, i) => `
+    <tr><td>${i+1}</td><td>${r.name}</td><td>${tgLink(r.username)}</td>
+    <td>${fmt(r.messageCount)}</td><td>${fmt(r.activeDays)}</td>
+    <td style="font-size:11px">${fmtDate(r.firstMessage)} — ${fmtDate(r.lastMessage)}</td>
+    <td>${segmentBadge(r.segment)}</td></tr>`).join('');
+  renderChurnAll(cd.allLeft);
+  const da = cd.deepAnalysis;
+  document.getElementById('ch-deep-analysis').innerHTML = `
+    <div style="font-size:15px;font-weight:700;margin-bottom:8px">🔍 Глубинный анализ: голос ушедших</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:14px">Проанализировано ${fmt(da.analyzedMessages)} сообщений от ${da.analyzedUsers} ушедших участниц. ${da.summaryText}</div>
+    <div style="font-size:13px;font-weight:600;margin-bottom:10px">🎯 Болевые точки</div>
+    ${da.painPoints.map(p => `<div class="insight-card"><div class="insight-header"><div class="insight-title">${p.emoji} ${p.title}</div><span class="badge badge-red">${fmt(p.mentions)}</span></div><div class="insight-desc">${p.description}</div><div class="ai-block-orange">${p.recommendation}</div></div>`).join('')}`;
+}
+
+function renderChurnAll(data) {
+  makePaginator(data, 25, (slice, offset) => {
+    document.getElementById('ch-all-table').innerHTML = slice.map((r, i) => `
+      <tr><td>${offset+i+1}</td><td>${r.name}</td><td>${tgLink(r.username)}</td>
+      <td>${fmt(r.messageCount)}</td><td>${fmt(r.activeDays)}</td>
+      <td>${fmtDate(r.firstMessage)}</td><td>${fmtDate(r.lastMessage)}</td>
+      <td>${segmentBadge(r.segment)}</td></tr>`).join('');
+  }, 'ch-all-table', 'ch-all-pagin');
+}
+
+function filterChurnAll() {
+  const seg = document.getElementById('ch-seg-filter').value;
+  const filtered = seg ? CHURN_DATA.allLeft.filter(r => r.segment === seg) : CHURN_DATA.allLeft;
+  renderChurnAll(filtered);
+}
+
+let silentCurrentData = [];
+let silentCurrentFilter = 'priority';
+
+function initSilent() {
+  const data = SILENT_DATA;
+  document.getElementById('sil-red').textContent = fmt(data.filter(r => r.risk === 'red').length);
+  document.getElementById('sil-ghost').textContent = fmt(data.filter(r => r.risk === 'ghost').length);
+  document.getElementById('sil-yellow').textContent = fmt(data.filter(r => r.risk === 'yellow').length);
+  document.getElementById('sil-total').textContent = fmt(data.length);
+  filterSilent('priority', document.querySelector('[data-filter="priority"]'));
+}
+
+const riskOrder = { ghost: 0, red: 1, yellow: 2, expired: 3 };
+function filterSilent(type, btn) {
+  silentCurrentFilter = type;
+  document.querySelectorAll('#sil-pills .pill').forEach(p => p.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  let data = [...SILENT_DATA];
+  if (type === 'priority') data.sort((a,b) => (riskOrder[a.risk]??9) - (riskOrder[b.risk]??9));
+  else if (type === 'red') data = data.filter(r => r.subscriptionActive && r.silentDays >= 30 && r.postCount > 0);
+  else if (type === 'ghost') data = data.filter(r => r.subscriptionActive && r.postCount === 0);
+  else if (type === 'yellow') data = data.filter(r => r.subscriptionActive && r.silentDays >= 14 && r.silentDays < 30);
+  else if (type === 'paying') data = data.filter(r => r.subscriptionActive);
+  else if (type === 'expired') data = data.filter(r => !r.subscriptionActive);
+  silentCurrentData = data;
+  renderSilentTable(data);
+}
+
+function renderSilentTable(data) {
+  const riskBadge = { ghost: ['badge-gray','👻 Призрак'], red: ['badge-red','🔴 Высокий'], yellow: ['badge-orange','🟡 Средний'], expired: ['badge-gray','❌ Истекла'] };
+  makePaginator(data, 25, (slice, offset) => {
+    document.getElementById('sil-table').innerHTML = slice.map((r) => {
+      const [rcls, rlbl] = riskBadge[r.risk] || ['badge-gray', r.risk];
+      const subCls = r.subscriptionActive ? 'badge-green' : 'badge-red';
+      const silCol = r.silentDays >= 30 ? 'c-red' : r.silentDays >= 14 ? 'c-yellow' : 'c-muted';
+      return `<tr>
+        <td><input type="checkbox" class="sil-cb"></td>
+        <td><div style="font-size:13px;font-weight:600">${r.name}</div>${r.username ? `<div style="font-size:11px;color:var(--orange)">@${r.username}</div>` : ''}</td>
+        <td><span class="badge ${subCls}">${r.subscriptionActive ? 'Активна' : 'Истекла'}</span></td>
+        <td style="font-size:12px">${fmtDate(r.subscriptionUntil)}</td>
+        <td class="${r.postCount === 0 ? 'c-muted' : ''}">${fmt(r.postCount)}</td>
+        <td style="font-size:12px">${fmtDate(r.lastMessage)}</td>
+        <td class="${silCol}">${r.silentDays}д</td>
+        <td><span class="badge ${rcls}">${rlbl}</span></td>
+        <td style="text-align:center">${r.miniApp ? '✅' : '—'}</td>
+        <td>${r.username ? `<a href="https://t.me/${r.username}" target="_blank" class="btn btn-secondary" style="padding:4px 8px;font-size:11px">✉️ TG</a>` : '—'}</td>
+      </tr>`;
+    }).join('');
+  }, 'sil-table', 'sil-pagin');
+}
+
+function toggleSelectAll(cb) {
+  document.querySelectorAll('.sil-cb').forEach(c => c.checked = cb.checked);
+}
+
+function exportSilentCSV() {
+  const date = new Date().toISOString().slice(0,10);
+  downloadCSV(silentCurrentData,
+    ['name','username','subscriptionActive','subscriptionUntil','postCount','lastMessage','silentDays','risk','miniApp'],
+    ['Имя','Username','Подписка активна','До','Постов','Последнее','Молчит (дн)','Риск','МиниАпп'],
+    `silent-${silentCurrentFilter}-${date}.csv`);
+}
+
+function initLeaderboard() {
+  const data = [...LEADERBOARD_DATA].sort((a,b) => b.totalMessages - a.totalMessages);
+  const top20Total = data.slice(0,20);
+  const top20Diary = [...LEADERBOARD_DATA].sort((a,b) => b.diaryMessages - a.diaryMessages).slice(0,20);
+
+  mkChart('lbChart1', { type: 'bar', data: {
+    labels: top20Total.map(r => r.name),
+    datasets: [{ data: top20Total.map(r => r.totalMessages), backgroundColor: 'rgba(233,69,96,0.7)', borderRadius: 4 }]
+  }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { min: 0 }, y: { ticks: { font: { size: 11 } } } } } });
+
+  mkChart('lbChart2', { type: 'bar', data: {
+    labels: top20Diary.map(r => r.name),
+    datasets: [{ data: top20Diary.map(r => r.diaryMessages), backgroundColor: 'rgba(0,210,160,0.7)', borderRadius: 4 }]
+  }, options: { indexAxis: 'y', responsive: true, maintainAspectRatio: false, scales: { x: { min: 0 }, y: { ticks: { font: { size: 11 } } } } } });
+
+  makePaginator(data, 25, (slice, offset) => {
+    document.getElementById('lb-table').innerHTML = slice.map((r, i) => `
+      <tr><td>${offset+i+1}</td><td>${r.name}</td><td>${tgLink(r.username)}</td>
+      <td>${fmt(r.totalMessages)}</td><td>${fmt(r.diaryMessages)}</td>
+      <td>${r.activeDaysLast30}/30</td><td>${r.currentStreak} 🔥</td>
+      <td><div class="activity-dots">${r.activityLast30.map(a => `<span class="dot ${a?'active':'inactive'}"></span>`).join('')}</div></td>
+      </tr>`).join('');
+  }, 'lb-table', 'lb-pagin');
+}
+
+function initActivity() {
+  const days = ['Пн','Вт','Ср','Чт','Пт','Сб','Вс'];
+  const hours = Array.from({length:24}, (_,i) => i);
+  const maxVal = Math.max(...ACTIVITY_DATA.heatmap.flat());
+  let html = '<thead><tr><th></th>' + hours.map(h => `<th>${h}</th>`).join('') + '</tr></thead><tbody>';
+  ACTIVITY_DATA.heatmap.forEach((row, di) => {
+    html += `<tr><td class="day-label">${days[di]}</td>`;
+    row.forEach(v => { html += `<td style="background:${heatColor(v,maxVal)}" title="${v}"></td>`; });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  document.getElementById('heatmap-table').innerHTML = html;
+
+  mkChart('dowChart', { type: 'bar', data: {
+    labels: ACTIVITY_DATA.byDayOfWeek.map(d => d.day),
+    datasets: [{ data: ACTIVITY_DATA.byDayOfWeek.map(d => d.count),
+      backgroundColor: ACTIVITY_DATA.byDayOfWeek.map((_,i) => i < 5 ? 'rgba(233,69,96,0.6)' : 'rgba(233,69,96,0.35)'),
+      borderRadius: 6 }]
+  }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 0, ticks: { callback: v => fmt(v) } } } } });
+}
+
+let emoIdx = 0, emoPlay = null;
+
+function initEmotions() {
+  const ed = EMOTIONS_DATA;
+  document.getElementById('emo-subtitle').textContent =
+    `Глубокий семантический анализ ${fmt(ed.totalMessages)}+ сообщений через Claude AI. Методология: Плутчик + модель Рассела + Прохаска + глубина самораскрытия.`;
+
+  const slider = document.getElementById('emo-slider');
+  slider.max = ed.months.length - 1;
+  slider.value = ed.months.length - 1;
+  emoIdx = ed.months.length - 1;
+
+  renderEmoPortrait(emoIdx);
+  initEmoCharts();
+}
+
+function renderEmoPortrait(idx) {
+  const m = EMOTIONS_DATA.months[idx];
+  document.getElementById('emo-cur-label').textContent = m.label;
+  document.getElementById('emo-slider').value = idx;
+
+  const kpi = m.kpi;
+  document.getElementById('emo-valence').textContent = (kpi.valence >= 0 ? '+' : '') + kpi.valence.toFixed(2);
+  document.getElementById('emo-arousal').textContent = kpi.arousal.toFixed(2);
+  document.getElementById('emo-action').textContent = kpi.actionMaintain + '%';
+  document.getElementById('emo-selfe').textContent = kpi.selfefficacy + '%';
+  document.getElementById('emo-deep').textContent = kpi.deepDisclosure + '%';
+  document.getElementById('emo-support').textContent = kpi.givingSupport + '%';
+
+  const p = m.portrait;
+  document.getElementById('emo-portrait').innerHTML = `
+    <div class="portrait-title">${p.title}</div>
+    <div class="portrait-desc">${p.description}</div>
+    <div class="portrait-blocks">
+      <div class="portrait-block"><div class="portrait-block-label c-red">ГЛАВНАЯ БОЛЬ</div><div class="portrait-block-text">${p.mainPain.text}</div></div>
+      <div class="portrait-block"><div class="portrait-block-label c-green">ГЛАВНЫЙ РОСТ</div><div class="portrait-block-text">${p.mainGrowth.text}</div></div>
+    </div>
+    <div class="portrait-block-full" style="margin-top:12px;background:rgba(0,0,0,.2);border-radius:8px;padding:12px"><div class="portrait-block-label c-orange">СИГНАЛ ТРЕВОГИ</div><div class="portrait-block-text">${p.warningSignal.text}</div></div>`;
+}
+
+function onEmoSlider(v) { emoIdx = parseInt(v); renderEmoPortrait(emoIdx); }
+
+function toggleEmoPlay() {
+  const btn = document.getElementById('emo-play-btn');
+  if (emoPlay) { clearInterval(emoPlay); emoPlay = null; btn.textContent = '▶ Играть'; return; }
+  if (emoIdx >= EMOTIONS_DATA.months.length - 1) emoIdx = 0;
+  btn.textContent = '⏸ Пауза';
+  emoPlay = setInterval(() => {
+    if (emoIdx < EMOTIONS_DATA.months.length - 1) { emoIdx++; renderEmoPortrait(emoIdx); }
+    else { clearInterval(emoPlay); emoPlay = null; btn.textContent = '▶ Играть'; }
+  }, 1500);
+}
+
+function initEmoCharts() {
+  const months = EMOTIONS_DATA.months;
+  const labels = months.map(m => m.label);
+
+  const lastM = months[months.length - 1];
+  const prevM = months[months.length - 2] || lastM;
+  const plutAxes = ['Радость','Доверие','Страх','Удивление','Грусть','Отвращение','Гнев','Предвкушение'];
+  const plutKeys = ['joy','trust','fear','surprise','sadness','disgust','anger','anticipation'];
+  mkChart('plutchikChart', { type: 'radar', data: {
+    labels: plutAxes,
+    datasets: [
+      { label: lastM.label, data: plutKeys.map(k => lastM.plutchik[k]), borderColor: '#e94560', backgroundColor: 'rgba(233,69,96,0.2)', fill: true },
+      { label: prevM.label, data: plutKeys.map(k => prevM.plutchik[k]), borderColor: '#8892b0', backgroundColor: 'transparent', borderDash: [4,4], fill: false }
+    ]
+  }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' } }, scales: { r: { min: 0, max: 100, ticks: { stepSize: 25, font: { size: 9 } } } } } });
+
+  const colors = months.map((_, i) => `hsl(${220 + i * 30}, 70%, 60%)`);
+  mkChart('russellChart', { type: 'bubble', data: {
+    datasets: [{ label: 'Траектория', data: months.map((m,i) => ({ x: m.kpi.valence, y: m.kpi.arousal, r: 10, label: m.label })),
+      backgroundColor: colors, borderColor: colors }]
+  }, options: { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ctx.raw.label + ` (v:${ctx.raw.x}, a:${ctx.raw.y})` } } },
+    scales: { x: { title: { display: true, text: 'Валентность' }, min: -0.3, max: 0.8 }, y: { title: { display: true, text: 'Возбуждение' }, min: 0, max: 0.7 } } } });
+
+  const procColors = ['rgba(100,100,130,0.7)','rgba(150,130,200,0.7)','rgba(100,160,220,0.7)','rgba(0,210,160,0.7)','rgba(0,180,120,0.7)','rgba(233,69,96,0.5)'];
+  const procKeys = ['precontemplation','contemplation','preparation','action','maintenance','relapse'];
+  const procLabels = ['Преконтемпляция','Осмысление','Подготовка','Действие','Поддержание','Откат'];
+  mkChart('prochaskaChart', { type: 'bar', data: {
+    labels, datasets: procKeys.map((k,i) => ({ label: procLabels[i], data: months.map(m => m.prochaska[k]), backgroundColor: procColors[i], stack: 'p' }))
+  }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } } });
+
+  const discColors = ['rgba(100,120,160,0.7)','rgba(150,100,200,0.7)','rgba(233,69,96,0.8)'];
+  mkChart('disclosureChart', { type: 'bar', data: {
+    labels, datasets: [
+      { label: 'Поверхностное', data: months.map(m => m.disclosure.surface), backgroundColor: discColors[0], stack: 'd' },
+      { label: 'Личное', data: months.map(m => m.disclosure.personal), backgroundColor: discColors[1], stack: 'd' },
+      { label: 'Глубокое', data: months.map(m => m.disclosure.deep), backgroundColor: discColors[2], stack: 'd' },
+    ]
+  }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } } });
+
+  mkChart('growthChart', { type: 'line', data: {
+    labels, datasets: [
+      { label: 'Самоэффективность', data: months.map(m => m.growth.selfefficacy), borderColor: '#00d2a0', tension: 0.4, pointRadius: 4 },
+      { label: 'Принадлежность', data: months.map(m => m.growth.belonging), borderColor: '#e94560', borderDash: [6,3], tension: 0.4, pointRadius: 4 },
+    ]
+  }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' } }, scales: { y: { min: 0 } } } });
+
+  const supColors = ['rgba(0,210,160,0.8)','rgba(100,160,220,0.7)','rgba(233,69,96,0.6)','rgba(100,100,130,0.5)'];
+  mkChart('supportChart', { type: 'bar', data: {
+    labels, datasets: [
+      { label: 'Даёт поддержку', data: months.map(m => m.support.giving), backgroundColor: supColors[0], stack: 's' },
+      { label: 'Делится', data: months.map(m => m.support.sharing), backgroundColor: supColors[1], stack: 's' },
+      { label: 'Просит помощи', data: months.map(m => m.support.requesting), backgroundColor: supColors[2], stack: 's' },
+      { label: 'Нейтральное', data: months.map(m => m.support.neutral), backgroundColor: supColors[3], stack: 's' },
+    ]
+  }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom', labels: { font: { size: 10 } } } }, scales: { x: { stacked: true }, y: { stacked: true, max: 100 } } } });
+}
+
+function initFinances() {
+  const fd = FINANCES;
+  const months = fd.revenueByMonth.map(m => m.month);
+
+  mkChart('revChart', { type: 'bar', data: {
+    labels: months,
+    datasets: [{ data: fd.revenueByMonth.map(m => m.revenue), backgroundColor: 'rgba(233,69,96,0.7)', borderRadius: 6 }]
+  }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: v => (v/1000000).toFixed(1) + 'М ₽' } } } } });
+
+  mkChart('revOrdersChart', { type: 'bar', data: {
+    labels: months,
+    datasets: [
+      { type: 'bar', label: 'Выручка ₽', data: fd.revenueByMonth.map(m => m.revenue), backgroundColor: 'rgba(233,69,96,0.5)', yAxisID: 'y', borderRadius: 4 },
+      { type: 'line', label: 'Заказы', data: fd.revenueByMonth.map(m => m.orders), borderColor: '#00d2a0', yAxisID: 'y2', tension: 0.4, pointRadius: 4 }
+    ]
+  }, options: { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true, position: 'top' } },
+    scales: { y: { position: 'left', ticks: { callback: v => (v/1000).toFixed(0) + 'к' } }, y2: { position: 'right', grid: { drawOnChartArea: false } } } } });
+
+  const allMonths = [...new Set(fd.cohorts.flatMap(c => Object.keys(c.payments)))];
+  const makeTable = (valueKey, formatFn) => {
+    let html = '<table class="cohort-table"><thead><tr><th>КОГОРТА</th><th>ВСЕГО</th>' + allMonths.map(m => `<th>${m}</th>`).join('') + '</tr></thead><tbody>';
+    fd.cohorts.forEach(c => {
+      html += `<tr><td class="cohort-label">${c.label} (${c.n})</td><td>${c.n}</td>`;
+      allMonths.forEach(m => {
+        const cell = c.payments[m];
+        const isPivot = m === Object.keys(c.payments)[0];
+        html += cell ? `<td class="${isPivot ? 'heat-pivot' : ''}">${formatFn(cell[valueKey])}</td>` : '<td></td>';
+      });
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    return html;
+  };
+  document.getElementById('cohort-orders-wrap').innerHTML = makeTable('orders', fmt);
+  document.getElementById('cohort-revenue-wrap').innerHTML = makeTable('revenue', fmtRub);
+}
+
+const DATASOURCES = [
+  { var: 'KPI', section: 'Обзор', source: 'PBI + TG', how: 'KPI.activeSubscriptions — из GetCourse / платёжной системы. KPI.mrr — сумма активных подписок × цена. KPI.chatActive30 — экспорт TG-чата, подсчёт уникальных авторов за 30 дн.' },
+  { var: 'RETENTION', section: 'Обзор', source: 'PBI', how: 'cohorts — когортный анализ из истории платежей. trendValues — 7-дневное скользящее среднее сообщений из TG-экспорта.' },
+  { var: 'INSIGHTS', section: 'Инсайты', source: 'Claude AI', how: 'Экспортируйте историю TG-чата → загрузите в Claude → используйте промпт из раздела Механики. Схема: topics[], hiddenNeeds[], recommendations[], engagementDrivers[].' },
+  { var: 'MECHANICS', section: 'Механики', source: 'Claude AI + отчёт', how: 'Загрузите отчёт лучших практик через кнопку в разделе Механики → скопируйте промпт → вставьте JSON ответа.' },
+  { var: 'RETENTION_DATA', section: 'Удержание', source: 'TG экспорт', how: 'Экспорт TG-чата → подсчёт сообщений по пользователям → фильтр: postCount≥5 && silentDays≥14.' },
+  { var: 'CHURN_DATA', section: 'Отток', source: 'TG + GC API', how: 'Список пользователей покинувших чат (из TG API) + данные по платежам из GetCourse. crosscheck — из отчёта GC API.' },
+  { var: 'SILENT_DATA', section: 'Молчуны', source: 'TG + GC API', how: 'Объединение: список участников TG × активные подписки GC. Для каждого: postCount, lastMessage, subscriptionActive, subscriptionUntil.' },
+  { var: 'LEADERBOARD_DATA', section: 'Лидерборд', source: 'TG экспорт', how: 'Экспорт TG-чата → агрегация по пользователям: totalMessages, diaryMessages (из конкретного топика), activityLast30 (массив 30 булевых).' },
+  { var: 'ACTIVITY_DATA', section: 'Активность', source: 'TG экспорт', how: 'heatmap: matrix[7][24] — подсчёт сообщений по дню недели и часу (UTC+3). byDayOfWeek: суммы по дням.' },
+  { var: 'EMOTIONS_DATA', section: 'Эмоции', source: 'Claude AI', how: 'Экспорт TG-чата помесячно → анализ Claude с методологией Плутчик + Рассел + Прохаска + раскрытие. Схема: months[].{kpi, portrait, plutchik, prochaska, disclosure, growth, support}.' },
+  { var: 'FINANCES', section: 'Финансы', source: 'GetCourse', how: 'revenueByMonth — выгрузка продаж из GC по месяцам. cohorts — сводная таблица когортных платежей: cohortKey × месяц оплаты × {orders, revenue}.' },
+];
+
+function initDatasources() {
+  document.getElementById('ds-table').innerHTML = DATASOURCES.map(d => `
+    <tr style="border-bottom:1px solid var(--border)">
+      <td style="padding:10px;font-family:monospace;color:var(--yellow);font-size:12px">${d.var}</td>
+      <td style="padding:10px">${d.section}</td>
+      <td style="padding:10px"><span class="badge badge-blue">${d.source}</span></td>
+      <td style="padding:10px;font-size:12px;color:var(--text2);line-height:1.5">${d.how}</td>
+    </tr>`).join('');
+}
+
 function initAll() {
-  [initOverview, initInsights, initMechanics, initRetention, initChurn,
-   initSilent, initLeaderboard, initActivity, initEmotions, initFinances,
-   initDatasources].forEach(fn => { if (typeof fn === 'function') fn(); });
+  initOverview();
+  initInsights();
+  initMechanics();
+  initRetention();
+  initChurn();
+  initSilent();
+  initLeaderboard();
+  initActivity();
+  initEmotions();
+  initFinances();
+  initDatasources();
 }
 </script>
 
