@@ -121,3 +121,15 @@ class RetentionFact(Base):
     retention_subscription: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
     retention_billing: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
     retention_engagement: Mapped[Optional[float]] = mapped_column(Numeric(5, 2), nullable=True)
+
+
+class UserHealth(Base):
+    __tablename__ = "user_health"
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    silent_days: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    tenure_days: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    monthly_price: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
+    activity_score: Mapped[Optional[float]] = mapped_column(Numeric(8, 2), nullable=True)
+    risk_score: Mapped[Optional[float]] = mapped_column(Numeric(6, 2), nullable=True)
+    risk_segment: Mapped[Optional[str]] = mapped_column(Text, index=True, nullable=True)
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)

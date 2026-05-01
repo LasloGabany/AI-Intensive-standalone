@@ -6,7 +6,7 @@ from sqlalchemy import select, func, not_, exists
 from dateutil.relativedelta import relativedelta
 from src.db.models import (
     Subscription, UserActivityDaily, UserLastActivity,
-    MemberRaw, KpiSnapshot, PaymentNormalized, Cohort, RetentionFact
+    MemberRaw, KpiSnapshot, PaymentNormalized, Cohort, RetentionFact, UserHealth
 )
 
 
@@ -160,5 +160,59 @@ async def build_retention(db: AsyncSession) -> int:
             count += 1
             check_month = next_month
             offset += 1
+    await db.commit()
+    return count
+
+
+async def build_user_health(db: AsyncSession) -> int:
+    today = date_type.today()
+    subs = await db.execute(select(Subscription))
+    count = 0
+    for sub in subs.scalars():
+        last = await db.execute(
+            select(UserLastActivity).where(UserLastActivity.user_id == sub.user_id)
+        )
+        activity = last.scalar_one_or_none()
+        total_messages = activity.total_messages if activity else 0
+        last_msg = activity.last_message_date if activity else None
+        first_msg = activity.first_message_date if activity else None
+
+        silent_days = (today - last_msg).days if last_msg else 9999
+        tenure_days = (today - first_msg).days if first_msg else 0
+
+        score_res = await db.execute(
+            select(func.coalesce(func.sum(UserActivityDaily.active_flag), 0))
+            .where(
+                UserActivityDaily.user_id == sub.user_id,
+                UserActivityDaily.date >= today - timedelta(days=30),
+            )
+        )
+        activity_score = float(score_res.scalar() or 0)
+        # risk_score = supplementary metric, not sole decider (PRD §6.3)
+        risk_score = round(
+            silent_days * 0.4 + (1 / max(activity_score, 0.1)) * 0.3 + (tenure_days / 30) * 0.3,
+            2
+        )
+        if sub.status != "active":
+            segment = "expired"
+        elif total_messages == 0:
+            segment = "ghost"
+        elif silent_days >= 30 and tenure_days > 60:
+            segment = "high_risk"
+        elif silent_days >= 14:
+            segment = "medium"
+        else:
+            segment = "healthy"
+
+        await db.merge(UserHealth(
+            user_id=sub.user_id,
+            silent_days=silent_days if silent_days < 9999 else None,
+            tenure_days=tenure_days,
+            monthly_price=sub.monthly_price,
+            activity_score=activity_score,
+            risk_score=risk_score,
+            risk_segment=segment,
+        ))
+        count += 1
     await db.commit()
     return count

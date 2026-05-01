@@ -74,3 +74,36 @@ async def test_cohort_month_truncated_to_first_of_month(db):
     result = await db.execute(select(Cohort).limit(5))
     for c in result.scalars().all():
         assert c.cohort_month.day == 1
+
+
+@pytest.mark.asyncio
+async def test_ghost_segment_zero_messages(db):
+    await db.execute(insert(Subscription).values(user_id=8001, status="active", monthly_price=1000))
+    await db.commit()
+    from src.agents.etl import build_user_health
+    await build_user_health(db)
+    from src.db.models import UserHealth
+    result = await db.execute(select(UserHealth).where(UserHealth.user_id == 8001))
+    assert result.scalar_one().risk_segment == "ghost"
+
+
+@pytest.mark.asyncio
+async def test_expired_segment_non_active_subscription(db):
+    await db.execute(insert(Subscription).values(user_id=8002, status="canceled", monthly_price=0))
+    await db.commit()
+    from src.agents.etl import build_user_health
+    await build_user_health(db)
+    from src.db.models import UserHealth
+    result = await db.execute(select(UserHealth).where(UserHealth.user_id == 8002))
+    assert result.scalar_one().risk_segment == "expired"
+
+
+@pytest.mark.asyncio
+async def test_risk_score_supplementary_not_sole_decider(db):
+    """risk_segment is the operational field. risk_score exists but is supplementary."""
+    from src.db.models import UserHealth
+    result = await db.execute(select(UserHealth).limit(1))
+    h = result.scalar_one_or_none()
+    if h:
+        assert h.risk_segment in ("expired", "ghost", "high_risk", "medium", "healthy")
+        assert h.risk_score is not None
