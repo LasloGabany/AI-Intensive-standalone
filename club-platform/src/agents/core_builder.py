@@ -5,7 +5,7 @@ from datetime import date as _date_type
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, text, func, cast
 from sqlalchemy.types import Integer as SAInteger, Date
-from src.db.models import MemberRaw, PaymentRaw, Subscription, MessageRaw, UserActivityDaily, UserLastActivity
+from src.db.models import MemberRaw, PaymentRaw, Subscription, MessageRaw, UserActivityDaily, UserLastActivity, PaymentNormalized
 from src.config import settings
 
 
@@ -122,5 +122,32 @@ async def build_activity_daily(db: AsyncSession, since: _date_type | None = None
             total_messages=u.total,
         ))
 
+    await db.commit()
+    return count
+
+
+async def build_payments_normalized(db: AsyncSession) -> int:
+    subs = await db.execute(select(Subscription))
+    count = 0
+    for sub in subs.scalars():
+        payment = await db.execute(
+            select(PaymentRaw)
+            .where(PaymentRaw.user_id == sub.user_id, PaymentRaw.status == "completed")
+            .order_by(PaymentRaw.date.desc())
+            .limit(1)
+        )
+        p = payment.scalar_one_or_none()
+        if not p:
+            continue
+        pay_date = p.date.date() if hasattr(p.date, 'date') else p.date
+        norm = PaymentNormalized(
+            user_id=sub.user_id,
+            payment_date=pay_date,
+            amount=p.amount,
+            months_covered=sub.plan_interval_count or 1,
+            source="getcourse",
+        )
+        db.add(norm)
+        count += 1
     await db.commit()
     return count

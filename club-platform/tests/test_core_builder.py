@@ -109,3 +109,29 @@ async def test_active_flag_zero_when_no_messages(db):
         select(UserActivityDaily).where(UserActivityDaily.user_id == 9999)
     )
     assert result.scalar_one_or_none() is None
+
+
+@pytest.mark.asyncio
+async def test_yearly_payment_gets_months_covered_12(db):
+    from sqlalchemy import insert as sa_insert
+    await db.execute(sa_insert(PaymentRaw).values(
+        order_id="t-yearly-001", user_id=3001, amount=24000,
+        date=datetime.now(timezone.utc), status="completed"
+    ))
+    await db.execute(sa_insert(MemberRaw).values(
+        user_id=3001, name="Yearly", status="active",
+        subscription_until=datetime.now(timezone.utc) + timedelta(days=365)
+    ))
+    await db.commit()
+
+    from src.agents.core_builder import build_subscriptions, build_payments_normalized
+    await build_subscriptions(db)
+    await build_payments_normalized(db)
+
+    from src.db.models import PaymentNormalized
+    result = await db.execute(
+        select(PaymentNormalized).where(PaymentNormalized.user_id == 3001)
+    )
+    row = result.scalar_one()
+    assert row.months_covered == 12
+    assert Decimal(str(row.amount)) == Decimal("24000")

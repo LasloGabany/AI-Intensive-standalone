@@ -80,3 +80,15 @@ class UserLastActivity(Base):
     last_message_date: Mapped[Optional[date_type]] = mapped_column(nullable=True)
     total_messages: Mapped[int] = mapped_column(Integer, default=0)
     updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+
+class PaymentNormalized(Base):
+    __tablename__ = "payments_normalized"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    user_id: Mapped[int] = mapped_column(BigInteger, nullable=False, index=True)
+    payment_date: Mapped[date_type] = mapped_column(nullable=False)
+    amount: Mapped[float] = mapped_column(Numeric(12, 2))
+    period_start: Mapped[Optional[date_type]] = mapped_column(nullable=True)
+    period_end: Mapped[Optional[date_type]] = mapped_column(nullable=True)
+    months_covered: Mapped[int] = mapped_column(Integer, default=1)
+    source: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
