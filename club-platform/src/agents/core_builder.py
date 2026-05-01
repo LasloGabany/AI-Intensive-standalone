@@ -1,9 +1,12 @@
 from __future__ import annotations
 from decimal import Decimal
 from datetime import datetime, timezone
+from datetime import date as _date_type
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select, text
-from src.db.models import MemberRaw, PaymentRaw, Subscription
+from sqlalchemy import select, text, func, cast
+from sqlalchemy.types import Integer as SAInteger, Date
+from src.db.models import MemberRaw, PaymentRaw, Subscription, MessageRaw, UserActivityDaily, UserLastActivity
+from src.config import settings
 
 
 def _detect_interval_count(subscription_until: datetime | None, payment_date: datetime) -> int:
@@ -64,3 +67,60 @@ async def calculate_mrr(db: AsyncSession) -> Decimal:
         text("SELECT COALESCE(SUM(monthly_price), 0) FROM subscriptions WHERE status='active'")
     )
     return Decimal(str(result.scalar()))
+
+
+async def build_activity_daily(db: AsyncSession, since: _date_type | None = None) -> int:
+    """
+    Aggregate messages_raw → user_activity_daily.
+    Incremental: only processes messages since `since` date.
+    active_flag = 1 if message_count > 0. Never use COUNT(DISTINCT) on raw.
+    """
+    if since is None:
+        since = _date_type(2000, 1, 1)
+
+    rows = await db.execute(
+        select(
+            cast(func.date_trunc('day', MessageRaw.date), Date).label("day"),
+            MessageRaw.from_id,
+            func.count().label("total"),
+            func.sum(
+                cast(MessageRaw.topic_name == settings.diary_topic_name, SAInteger)
+            ).label("diary"),
+        )
+        .where(cast(func.date_trunc('day', MessageRaw.date), Date) >= since)
+        .group_by(
+            cast(func.date_trunc('day', MessageRaw.date), Date),
+            MessageRaw.from_id,
+        )
+    )
+
+    count = 0
+    for row in rows:
+        await db.merge(UserActivityDaily(
+            user_id=row.from_id,
+            date=row.day,
+            message_count=row.total,
+            diary_count=row.diary or 0,
+            active_flag=1 if row.total > 0 else 0,
+        ))
+        count += 1
+
+    # Update user_last_activity from all messages (not just `since`)
+    agg = await db.execute(
+        select(
+            MessageRaw.from_id,
+            func.min(cast(func.date_trunc('day', MessageRaw.date), Date)).label("first"),
+            func.max(cast(func.date_trunc('day', MessageRaw.date), Date)).label("last"),
+            func.count().label("total"),
+        ).group_by(MessageRaw.from_id)
+    )
+    for u in agg:
+        await db.merge(UserLastActivity(
+            user_id=u.from_id,
+            first_message_date=u.first,
+            last_message_date=u.last,
+            total_messages=u.total,
+        ))
+
+    await db.commit()
+    return count

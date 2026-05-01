@@ -59,3 +59,53 @@ async def test_mrr_sum_from_subscriptions_not_payments(db):
     mrr = await calculate_mrr(db)
     assert isinstance(mrr, Decimal)
     assert mrr >= Decimal("0")
+
+
+from datetime import date
+
+
+@pytest.mark.asyncio
+async def test_activity_daily_counts_diary_separately(db):
+    from sqlalchemy import insert as sa_insert
+    today = datetime.now(timezone.utc)
+    await db.execute(sa_insert(MessageRaw).values([
+        dict(message_id=201, date=today, from_id=2001, text="hi", topic_name="general"),
+        dict(message_id=202, date=today, from_id=2001, text="win", topic_name="Дневник успеха"),
+        dict(message_id=203, date=today, from_id=2001, text="more", topic_name="general"),
+    ]))
+    await db.commit()
+
+    from src.agents.core_builder import build_activity_daily
+    import os
+    os.environ.setdefault("DIARY_TOPIC_NAME", "Дневник успеха")
+    await build_activity_daily(db)
+
+    from src.db.models import UserActivityDaily
+    result = await db.execute(
+        select(UserActivityDaily)
+        .where(UserActivityDaily.user_id == 2001, UserActivityDaily.date == today.date())
+    )
+    row = result.scalar_one()
+    assert row.message_count == 3
+    assert row.diary_count == 1
+    assert row.active_flag == 1
+
+
+@pytest.mark.asyncio
+async def test_user_last_activity_updated(db):
+    from src.db.models import UserLastActivity
+    result = await db.execute(
+        select(UserLastActivity).where(UserLastActivity.user_id == 2001)
+    )
+    row = result.scalar_one()
+    assert row.total_messages >= 3
+    assert row.last_message_date is not None
+
+
+@pytest.mark.asyncio
+async def test_active_flag_zero_when_no_messages(db):
+    from src.db.models import UserActivityDaily
+    result = await db.execute(
+        select(UserActivityDaily).where(UserActivityDaily.user_id == 9999)
+    )
+    assert result.scalar_one_or_none() is None

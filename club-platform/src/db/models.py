@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from datetime import datetime
+from datetime import date as date_type
 from typing import Optional
-from sqlalchemy import BigInteger, Text, Numeric, Boolean, JSON, Integer
+from sqlalchemy import BigInteger, Text, Numeric, Boolean, JSON, Integer, SmallInteger
 from sqlalchemy.orm import Mapped, mapped_column
 from src.db.connection import Base
 
@@ -59,3 +60,23 @@ class Subscription(Base):
     monthly_price: Mapped[Optional[float]] = mapped_column(Numeric(10, 2), nullable=True)
     source: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class UserActivityDaily(Base):
+    __tablename__ = "user_activity_daily"
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    date: Mapped[date_type] = mapped_column(primary_key=True, index=True)
+    message_count: Mapped[int] = mapped_column(Integer, default=0)
+    diary_count: Mapped[int] = mapped_column(Integer, default=0)
+    replies_count: Mapped[int] = mapped_column(Integer, default=0)
+    passive_events_count: Mapped[int] = mapped_column(Integer, default=0)
+    active_flag: Mapped[int] = mapped_column(SmallInteger, default=0)
+
+
+class UserLastActivity(Base):
+    __tablename__ = "user_last_activity"
+    user_id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    first_message_date: Mapped[Optional[date_type]] = mapped_column(nullable=True)
+    last_message_date: Mapped[Optional[date_type]] = mapped_column(nullable=True)
+    total_messages: Mapped[int] = mapped_column(Integer, default=0)
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
