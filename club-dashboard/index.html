@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Мой Клуб — Дашборд</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM
+═══════════════════════════════════════════ */
+:root {
+  --bg:      #1a1a2e;
+  --card:    #16213e;
+  --sidebar: #0d1127;
+  --pink:    #e94560;
+  --green:   #00d2a0;
+  --yellow:  #ffd166;
+  --orange:  #f77f00;
+  --red:     #ef233c;
+  --text:    #e0e0e0;
+  --text2:   #8892b0;
+  --border:  #1a1f3a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar { width: 220px; background: var(--sidebar); padding: 0; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; }
+.logo { padding: 20px 16px; font-size: 16px; font-weight: 700; border-bottom: 1px solid var(--border); }
+.logo span { color: var(--pink); }
+.nav-section { padding: 10px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text2); opacity: .6; }
+.nav-link { display: flex; align-items: center; gap: 8px; padding: 9px 16px; color: var(--text2); font-size: 13px; border-left: 3px solid transparent; cursor: pointer; text-decoration: none; }
+.nav-link:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.nav-link.active { background: rgba(233,69,96,.08); color: #fff; border-left-color: var(--pink); }
+.nav-divider { height: 1px; background: var(--border); margin: 6px 16px; }
+
+/* MAIN */
+.main { flex: 1; padding: 28px 32px; overflow: hidden; }
+.section { display: none; }
+.section.active { display: block; }
+
+/* PAGE HEADER */
+.page-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.page-subtitle { font-size: 13px; color: var(--text2); margin-bottom: 24px; line-height: 1.5; }
+
+/* CARDS */
+.card { background: var(--card); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+.kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border-radius: 12px; padding: 20px; }
+.stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+.stat-value { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+.stat-sub { font-size: 12px; color: var(--text2); }
+.c-pink { color: var(--pink); }
+.c-green { color: var(--green); }
+.c-yellow { color: var(--yellow); }
+.c-orange { color: var(--orange); }
+.c-red { color: var(--red); }
+.c-muted { color: var(--text2); }
+
+/* BADGE */
+.badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+.badge-pink { background: rgba(233,69,96,.2); color: var(--pink); }
+.badge-green { background: rgba(0,210,160,.15); color: var(--green); }
+.badge-yellow { background: rgba(255,209,102,.15); color: var(--yellow); }
+.badge-orange { background: rgba(247,127,0,.2); color: var(--orange); }
+.badge-red { background: rgba(239,35,60,.2); color: var(--red); }
+.badge-gray { background: rgba(136,146,176,.15); color: var(--text2); }
+.badge-blue { background: rgba(100,160,220,.15); color: #64a0dc; }
+.badge-src { font-size: 10px; padding: 1px 5px; border-radius: 3px; }
+
+/* ALERT BANNER */
+.alert-banner { background: linear-gradient(135deg, rgba(239,35,60,.12), rgba(247,127,0,.08)); border: 1px solid rgba(239,35,60,.3); border-radius: 12px; padding: 16px 20px; margin-bottom: 20px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
+.alert-nums { display: flex; gap: 24px; }
+.alert-num { text-align: center; }
+.alert-num .val { font-size: 22px; font-weight: 700; color: var(--red); }
+.alert-num .lbl { font-size: 11px; color: var(--text2); }
+.alert-progress { flex: 1; min-width: 200px; }
+.progress-bar { height: 8px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin: 6px 0; }
+.progress-fill { height: 100%; background: var(--pink); border-radius: 4px; }
+.alert-timer { font-size: 13px; color: var(--yellow); font-weight: 600; white-space: nowrap; }
+
+/* TWO-COL LAYOUT */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+
+/* TABLE */
+.table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; }
+th { text-align: left; padding: 10px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: .8px; color: var(--text2); border-bottom: 1px solid var(--border); }
+td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+tr:hover td { background: rgba(255,255,255,0.02); }
+.tg-link { color: var(--orange); text-decoration: none; }
+.tg-link:hover { text-decoration: underline; }
+
+/* PAGINATION */
+.pagination { display: flex; gap: 6px; margin-top: 16px; align-items: center; justify-content: flex-end; }
+.page-btn { padding: 5px 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--text2); cursor: pointer; font-size: 12px; }
+.page-btn:hover { border-color: var(--pink); color: var(--text); }
+.page-btn.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
+/* INSIGHT CARD */
+.insight-card { background: var(--card); border-radius: 12px; border-left: 4px solid var(--pink); padding: 20px 24px; margin-bottom: 16px; }
+.insight-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.insight-title { font-size: 16px; font-weight: 700; }
+.insight-desc { font-size: 13px; color: #c0c8d8; line-height: 1.65; margin-bottom: 12px; }
+.ai-block { background: rgba(0,180,120,.08); border-left: 3px solid rgba(0,210,160,.5); border-radius: 0 8px 8px 0; padding: 10px 14px; margin-bottom: 12px; font-size: 13px; color: #a0e8c8; line-height: 1.6; }
+.ai-block::before { content: '💡 '; }
+.ai-block-orange { background: rgba(247,127,0,.08); border-left: 3px solid rgba(247,127,0,.4); border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 13px; color: #f0a060; line-height: 1.6; }
+.ai-block-orange::before { content: '⚡ '; }
+.quotes { display: flex; flex-direction: column; gap: 6px; }
+.quote { font-size: 13px; color: var(--text2); font-style: italic; padding-left: 12px; border-left: 2px solid var(--border); }
+.quote::before { content: '«'; }
+.quote::after { content: '»'; }
+
+/* NEED CARD */
+.need-card { background: var(--card); border-radius: 10px; border-top: 3px solid var(--pink); padding: 16px; }
+.need-card.medium { border-top-color: var(--yellow); }
+.need-card.low { border-top-color: var(--text2); }
+.need-card.high { border-top-color: var(--red); }
+.need-impact { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.need-title { font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+.need-signal { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* REC ITEM */
+.rec-item { display: flex; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--border); }
+.rec-num { width: 28px; height: 28px; border-radius: 50%; background: var(--pink); color: #fff; font-size: 13px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rec-num.orange { background: var(--orange); }
+.rec-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.rec-desc { font-size: 13px; color: var(--text2); line-height: 1.5; }
+.rec-tags { display: flex; gap: 6px; margin-top: 6px; }
+
+/* DRIVER CARD */
+.driver-card { background: var(--card); border-radius: 10px; border-top: 3px solid var(--green); padding: 16px; }
+.driver-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.driver-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* MECHANICS */
+.mech-card { background: var(--card); border-radius: 12px; padding: 20px 24px; margin-bottom: 16px; }
+.mech-section-label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--text2); margin-top: 14px; margin-bottom: 4px; }
+.remove-card { background: rgba(239,35,60,.06); border: 1px solid rgba(239,35,60,.2); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.remove-card .rc-title { font-size: 13px; font-weight: 600; color: var(--red); margin-bottom: 4px; }
+.remove-card .rc-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.remove-card .rc-rec { font-size: 12px; color: var(--green); margin-top: 6px; }
+.add-card { background: rgba(0,210,160,.06); border: 1px solid rgba(0,210,160,.2); border-radius: 10px; padding: 14px 16px; margin-bottom: 10px; }
+.add-card .ac-rank { font-size: 11px; font-weight: 700; color: var(--green); margin-bottom: 4px; }
+.add-card .ac-title { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+.add-card .ac-desc { font-size: 12px; color: var(--text2); line-height: 1.5; }
+.bot-card { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 16px; }
+.bot-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.bot-value { font-size: 12px; color: var(--green); margin-top: 6px; }
+.bot-complexity { font-size: 12px; color: var(--text2); }
+.peer-card { background: var(--card); border-radius: 10px; border-top: 3px solid var(--yellow); padding: 16px; }
+.peer-title { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+.peer-why { font-size: 13px; font-weight: 600; color: var(--text); margin-top: 8px; }
+.peer-fit { font-size: 12px; color: var(--green); margin-top: 4px; }
+
+/* UPLOAD BOX */
+.upload-box { border: 2px dashed var(--border); border-radius: 12px; padding: 24px; text-align: center; margin-bottom: 20px; }
+.upload-box:hover { border-color: var(--pink); }
+.prompt-box { background: rgba(0,0,0,.3); border-radius: 8px; padding: 14px 16px; font-family: monospace; font-size: 12px; color: #a0b0c0; line-height: 1.6; white-space: pre-wrap; word-break: break-word; max-height: 300px; overflow-y: auto; margin: 10px 0; }
+.btn { padding: 8px 16px; border-radius: 8px; border: none; cursor: pointer; font-size: 13px; font-weight: 600; }
+.btn-primary { background: var(--pink); color: #fff; }
+.btn-secondary { background: rgba(255,255,255,.08); color: var(--text); }
+.btn-green { background: var(--green); color: #000; }
+.btn-orange { background: var(--orange); color: #fff; }
+.btn + .btn { margin-left: 8px; }
+
+/* FILTER PILLS */
+.filter-pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.pill { padding: 6px 14px; border-radius: 20px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-size: 12px; cursor: pointer; }
+.pill:hover { border-color: var(--pink); color: var(--text); }
+.pill.active { background: var(--pink); border-color: var(--pink); color: #fff; }
+
+/* HEATMAP */
+.heatmap-table { width: 100%; border-collapse: collapse; font-size: 11px; }
+.heatmap-table th { padding: 4px 6px; color: var(--text2); font-weight: 400; text-align: center; }
+.heatmap-table td { width: 32px; height: 28px; text-align: center; border-radius: 3px; }
+.heatmap-table .day-label { color: var(--text2); text-align: right; padding-right: 8px; white-space: nowrap; }
+
+/* ACTIVITY DOTS (leaderboard) */
+.activity-dots { display: flex; flex-wrap: wrap; gap: 2px; width: 130px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 2px; }
+.dot.active { background: var(--green); }
+.dot.inactive { background: rgba(255,255,255,0.08); }
+
+/* EMOTION PORTRAIT */
+.portrait-card { background: var(--card); border-radius: 12px; padding: 20px 24px; margin-bottom: 20px; }
+.portrait-title { font-size: 16px; font-weight: 700; color: var(--pink); margin-bottom: 10px; }
+.portrait-desc { font-size: 13px; color: var(--text2); line-height: 1.65; margin-bottom: 16px; }
+.portrait-blocks { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.portrait-block { background: rgba(0,0,0,.2); border-radius: 8px; padding: 12px; }
+.portrait-block-full { background: rgba(0,0,0,.2); border-radius: 8px; padding: 12px; grid-column: 1 / -1; }
+.portrait-block-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 6px; }
+.portrait-block-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+/* SLIDER */
+.timeline-wrap { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; padding: 16px 20px; background: var(--card); border-radius: 12px; }
+.timeline-label { font-size: 13px; font-weight: 600; white-space: nowrap; }
+input[type=range] { flex: 1; accent-color: var(--pink); }
+
+/* CHART CONTAINERS */
+.chart-container { position: relative; }
+.chart-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+.chart-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 20px; }
+
+/* CROSSCHECK GRID */
+.crosscheck-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 16px; }
+.crosscheck-cell { text-align: center; padding: 12px; background: rgba(0,0,0,.2); border-radius: 8px; }
+.crosscheck-val { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+.crosscheck-label { font-size: 11px; color: var(--text2); }
+
+/* COHORT TABLE */
+.cohort-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cohort-table th { padding: 8px 10px; background: rgba(0,0,0,.3); text-align: center; color: var(--text2); font-size: 11px; }
+.cohort-table td { padding: 8px 10px; text-align: center; border: 1px solid rgba(255,255,255,0.04); }
+.cohort-table td.cohort-label { text-align: left; font-weight: 600; }
+.heat-green { background: rgba(0,210,160,.25); color: var(--green); }
+.heat-yellow { background: rgba(255,209,102,.2); color: var(--yellow); }
+.heat-orange { background: rgba(247,127,0,.2); color: var(--orange); }
+.heat-red { background: rgba(239,35,60,.2); color: var(--red); }
+.heat-pivot { background: rgba(233,69,96,.3); color: var(--pink); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     DATA ZONE — РЕДАКТИРУЙТЕ ТОЛЬКО ЗДЕСЬ
+═══════════════════════════════════════════ -->
+<script>
+const CLUB = {
+  name: 'Мой Клуб',
+  emoji: '🏆',
+  currency: '₽',
+  accentColor: '#e94560',
+};
+
+const KPI = {
+  activeSubscriptions: 374,
+  activeSubscriptionsSub: '588 всего, 214 истекли до марта',
+  mrr: '385к',
+  mrrSub: 'было 933к в январе',
+  cr: 79.3,
+  crSub: 'было 80.5%',
+  chatActive30: 133,
+  chatActive7: 73,
+  chatNeverWrote: 93,
+  chatSilentPaying: 241,
+  chatTotal: 390,
+};
+
+const RETENTION = {
+  alertActive: true,
+  alertMonth: 'Март',
+  alertExpiring: 216,
+  alertRenewed: 21,
+  alertLeft: 195,
+  alertDaysLeft: 5,
+  cohorts: [
+    { label: 'Сен 25', n: 135, values: [100, 43.7, 23.7, 54.1, 40.7, 23, 3.7], anomaly: [3] },
+    { label: 'Окт 25', n: 232, values: [100, 37.5, 39.7, 50, 25.4, 1.7], anomaly: [3] },
+    { label: 'Дек 25', n: 162, values: [100, 36.4, 30.9, 6.8], anomaly: [] },
+    { label: 'Янв 26', n: 56,  values: [100, 39.3, 1.8], anomaly: [] },
+  ],
+  anomalyNote: '★ — скачок из-за 3-месячных подписок',
+  trendDates: ['01.10','08.10','15.10','22.10','29.10','05.11','12.11','19.11','26.11','03.12','10.12','17.12','24.12','31.12','07.01','14.01','21.01','28.01','04.02','11.02','18.02','25.02','04.03','11.03','18.03'],
+  trendValues: [45,38,52,61,48,55,43,70,65,58,45,72,80,55,60,48,53,67,71,63,58,75,82,79,85],
+};
+
+const INSIGHTS = {
+  totalMessages: 5000,
+  analysisDate: '2026-04-17',
+  topics: [
+    { title: 'Дневник мини-побед: уборка, шаги, сырники', mentions: 3925, borderColor: '#e94560', description: 'Ежедневный ритуал публичной фиксации маленьких бытовых достижений: помыла полы, прошла 10000 шагов, приготовила вкусный завтрак. Формат структурирован: 1) мини-победа 2) что нового/улучшила 3) что для себя 4) инсайт.', aiInsight: 'День тюленя (ничегонеделание) — самая сложная победа. Бытовые победы — это не скромность запросов, а тренировка переключения с режима «должна» на «хочу».', quotes: ['Сегодня мой успех — послушала аффирмации, ритуал красивая каждый день', 'Разрешила себе на тренировке плавать не на результат, а просто как пойдет', 'Не приготовленный ужин — не катастрофа'] },
+    { title: 'Выход из токсичных отношений / треугольник Карпмана', mentions: 2141, borderColor: '#ffd166', description: 'Тема появляется уже в первых знакомствах как биография. Обсуждают не только романтические отношения — треугольник жертва-тиран-спаситель применяют к себе, к коллегам, к детям.', aiInsight: 'Женщины, которые вышли из токсичных отношений, описывают это как главное достижение жизни — не карьеру, не детей, а именно уход.', quotes: ['Выгнала очередного токсика и алкаша из своей жизни', 'Вышла из токсичных отношений 4 месяца назад, была в них 9 лет не понимая что происходит'] },
+    { title: 'Запрос на структуру и систему в жизни', mentions: 1847, borderColor: '#00d2a0', description: 'Участницы ищут не мотивацию, а инструменты: планнеры, трекеры, системы. Запрос часто формулируется как «не могу начать», «начинаю и бросаю».', aiInsight: 'Хаос воспринимается как личный провал, а не как норма. Структура — это форма самоуважения для этой аудитории.', quotes: ['Хочу научиться планировать день, просто хочу дожить до вечера с ощущением что что-то сделала', 'Начала вести трекер привычек, третья неделя — это мой рекорд'] },
+  ],
+  hiddenNeeds: [
+    { impact: 'high', title: 'Дефицит принадлежности, страх хронического одиночества', signal: '«Кто-нибудь вообще замечает, что я здесь?»' },
+    { impact: 'medium', title: 'Магическое мышление — желание чтобы правильная практика «сработала»', signal: 'Участницы ищут «правильный» инструмент, а не навык его применения' },
+    { impact: 'medium', title: 'Быть принятой в бедности, без стыда', signal: 'Финансовая несостоятельность = личная несостоятельность' },
+    { impact: 'medium', title: 'Подтверждение реальности (reality-testing)', signal: '«То, что происходит со мной — это нормально? Я не схожу с ума?»' },
+    { impact: 'low', title: 'Безусловное подтверждение ценности', signal: 'Не за поступки, а за существование' },
+  ],
+  recommendations: [
+    { rank: 1, title: 'Автотриггер на 7-й день тишины', description: 'Куратор пишет лично, без шаблонного давления. Персональный контакт активирует retention.', priority: 'high', effort: 'Усилие: низкое (2ч)' },
+    { rank: 2, title: 'Рубрика «Петрович снова отличился»', description: 'Короткие смешные истории о внутренней критике. Снижает стыд через юмор.', priority: 'medium', effort: 'Усилие: среднее' },
+    { rank: 3, title: 'Закрытый круг поддержки для финансового кризиса', description: 'Концепция «финансовой ёмкости» в безопасном пространстве без осуждения.', priority: 'medium', effort: 'Усилие: высокое' },
+  ],
+  engagementDrivers: [
+    { title: '🔥 Юмор и самоирония', description: 'Снижает стыд, создаёт безопасное отношение к внутреннему критику' },
+    { title: '📈 Нарратив «я меняюсь» с точками сравнения', description: 'Без видимых точек сравнения прогресс невидим для самой участницы' },
+    { title: '💬 Личные связи внутри сообщества', description: 'Новые пишут конкретным людям по имени, не в общий чат' },
+    { title: '🤝 Помощь другим как закрепление материала', description: 'Создаёт идентичность «я часть клуба», а не просто получатель' },
+    { title: '⏰ Встраивание в ежедневный ритуал', description: 'Клуб становится частью утра как зубная щётка' },
+    { title: '✨ Аффирмации как измеримый ритуал', description: 'Минимальная единица участия в клубе в плохой день' },
+  ],
+};
+
+const MECHANICS = (function() {
+  const stored = localStorage.getItem('MECHANICS_OVERRIDE');
+  if (stored) { try { return JSON.parse(stored); } catch(e) {} }
+  return {
+    microGroups: {
+      title: 'Микро-группы поддержки «5 недель рядом»',
+      sections: [
+        { label: 'Концепция', text: 'Временные группы из 4–5 участниц, объединённых по текущей жизненной ситуации, не по теме курса. Группа живёт 5 недель, затем либо продолжается по взаимному желанию, либо участницы возвращаются в общий чат.' },
+        { label: 'Критерии подбора', type: 'list', items: ['Первичный: текущая боль (выбор из 5)', 'Вторичный: уровень активности (не смешивать ежедневных и молчунов)', 'Третичный: часовой пояс (разница не более 2ч)'] },
+        { label: 'Формат', text: 'Пн: каждая пишет «где я сейчас». Ср: одна получает полное внимание группы 15 мин. Пт: каждая делится одной вещью, взятой у другой.' },
+        { label: 'Фасилитация', text: 'Гибридная. Бот даёт ритмовые подсказки. В каждой группе ротируется роль «хранительницы ритма».' },
+      ]
+    },
+    toRemove: [
+      { title: 'Дневник успеха как обязательный ежедневный формат', description: 'Участницы с низкой активностью воспринимают невозможность написать ежедневно как провал.', recommendation: '→ Сделать дневник опциональным инструментом, не обязательным' },
+      { title: 'Генерические напоминания «ты давно не писала»', description: 'Воспринимаются как обвинение. Участницы, которые давно не писали, уходят молча.', recommendation: '→ Заменить на персональный контакт от куратора' },
+    ],
+    toAdd: [
+      { rank: 1, title: 'Онбординг-ритуал «Первые 72 часа»', description: '1) Приветствие с именем; 2) одно конкретное задание сегодня; 3) первый ответ от другой участницы.', effort: 'low' },
+      { rank: 2, title: 'Асинхронный «Круг горя» — топик без трансформации', description: 'Пространство для тех, кто просто в острой боли и не готов к «следующему шагу».', effort: 'medium' },
+      { rank: 3, title: 'Механизм возврата после паузы', description: 'Нет механизма возврата после внешнего события. Участницы «исчезают в апатию».', effort: 'medium' },
+    ],
+    botFeatures: [
+      { title: '🤖 Матчинг для микро-групп', description: 'Опрос из 3 вопросов → бот формирует группы за 2 недели → спрашивает о продолжении через 5 недель.', value: 'Полностью автоматический подбор без ручной работы куратора', complexity: 'Сложность: средняя (Telegram API + планировщик)' },
+      { title: '🪞 Зеркало роста', description: 'По команде /зеркало — первый пост + количество дней в клубе + количество сообщений.', value: 'Активирует retention: «чёрт, что я пишу эти 8 месяцев»', complexity: 'Сложность: низкая' },
+      { title: '🆘 SOS-дежурство', description: 'Список добровольцев-слушателей. При SOS-запросе бот тегает дежурного в специальном топике.', value: 'Масштабируемая система поддержки без выгорания куратора', complexity: 'Сложность: средняя' },
+      { title: '👥 Пара недели (buddy rotation)', description: 'Каждый понедельник бот соединяет двух участниц + генерирует вопрос для пары из банка.', value: 'Персональное обязательство активирует лучше групповых встреч', complexity: 'Сложность: низкая' },
+    ],
+    peerMechanics: [
+      { title: 'Свидетель недели', description: 'Каждую среду один человек пишет о любом изменении. Модератор никогда не отвечает первым.', whyWorks: 'Закрывает ключевой запрос — быть увиденным без немедленной трансформации.', fitClub: 'Подходит клубу: высокий fit. Требует: отдельный топик + правило для куратора' },
+      { title: 'Пара недели (Buddy rotation)', description: 'Бот каждый понедельник случайно соединяет двух участниц. Конкретный человек ждёт — конкретный ответ.', whyWorks: 'Dyadic accountability работает: конкретный человек ждёт ответа.', fitClub: 'Подходит клубу: высокий fit. Запускается через бота' },
+    ],
+  };
+})();
+
+const RETENTION_DATA = {
+  riskGroup: [
+    { name: 'Любовь Скрипаченко', username: 'LUBAVAS24', messageCount: 232, activeDays: 82, silentDays: 70, priority: 'highest' },
+    { name: 'Марина Петрова', username: 'marina_p', messageCount: 145, activeDays: 60, silentDays: 55, priority: 'highest' },
+    { name: 'Ольга Сидорова', username: null, messageCount: 78, activeDays: 40, silentDays: 45, priority: 'high' },
+    { name: 'Татьяна Иванова', username: 'tanya_iv', messageCount: 95, activeDays: 35, silentDays: 38, priority: 'high' },
+    { name: 'Елена Козлова', username: 'elena_k77', messageCount: 34, activeDays: 20, silentDays: 28, priority: 'medium' },
+    { name: 'Наталья Смирнова', username: null, messageCount: 12, activeDays: 10, silentDays: 22, priority: 'medium' },
+    { name: 'Светлана Новикова', username: 'sveta_nov', messageCount: 67, activeDays: 30, silentDays: 35, priority: 'high' },
+    { name: 'Ирина Морозова', username: 'irina_m', messageCount: 189, activeDays: 70, silentDays: 62, priority: 'highest' },
+  ],
+  funnel: { silent14_30: 61, silent30_60: 38, silent60plus: 87, neverWrote: 120 },
+};
+
+const CHURN_DATA = {
+  summary: { text: '456 человек перестали платить за всё время. Из них ~370 покинули чат, ~86 остаются в чате без активной подписки.', totalUnsubscribed: 222, leftChat: 110, ghostsInChat: 89, painfulLosses: 10 },
+  crosscheck: { dataSource: 'GC API', dataDate: '2026-04-16', totalPayers: 976, inTelegramChat: 486, activeSubscriptions: 520, notInChat: 490, silentZero: 121, expiredTotal: 456, insightText: 'Откуда расхождения: 976 уникальных плательщиц. В TG-чате — 486 участниц. Активных подписок: 520 (GC API, 16 апреля). Чат-активность за 30 дней: 218 участниц.' },
+  churnByMonth: [
+    { month: 'Сен 25', count: 3 }, { month: 'Окт 25', count: 54 }, { month: 'Ноя 25', count: 14 },
+    { month: 'Дек 25', count: 29 }, { month: 'Янв 26', count: 7 }, { month: 'Фев 26', count: 2 },
+  ],
+  painfulLossesList: [
+    { name: 'Людочка Новосёлова', username: 'nowoselove', messageCount: 284, activeDays: 29, firstMessage: '2025-10-03', lastMessage: '2025-11-01', segment: 'active' },
+    { name: 'Анна Быкова', username: 'anya_byk', messageCount: 156, activeDays: 21, firstMessage: '2025-09-15', lastMessage: '2025-10-20', segment: 'active' },
+  ],
+  allLeft: [
+    { name: 'Людочка Новосёлова', username: 'nowoselove', messageCount: 284, activeDays: 29, firstMessage: '2025-10-03', lastMessage: '2025-11-01', segment: 'active' },
+    { name: 'Анна Быкова', username: 'anya_byk', messageCount: 156, activeDays: 21, firstMessage: '2025-09-15', lastMessage: '2025-10-20', segment: 'active' },
+    { name: 'Катя Лебедева', username: null, messageCount: 12, activeDays: 5, firstMessage: '2025-11-01', lastMessage: '2025-11-12', segment: 'quiet' },
+    { name: 'Полина Орлова', username: 'polina_o', messageCount: 45, activeDays: 15, firstMessage: '2025-10-10', lastMessage: '2025-11-25', segment: 'moderate' },
+  ],
+  deepAnalysis: { analyzedMessages: 1386, analyzedUsers: 110, summaryText: 'Большинство ушедших были активны в темах отношений и самоощущения. 38% написали менее 5 сообщений.', painPoints: [
+    { emoji: '🔧', title: 'Технические барьеры', mentions: 647, description: 'Функции, транзакции, файлы, бот — создают фрустрацию в первые 72 часа.', recommendation: 'Еженедельный QA всех функций. Страница статуса сервисов.' },
+    { emoji: '📋', title: 'SOS-консультации недостаточно', mentions: 80, description: 'Ощущение бесплатности — обесценивает подписку.', recommendation: 'Переформатировать SOS как premium-доступ.' },
+  ]},
+};
+
+const SILENT_DATA = [
+  { name: 'Алёнка', username: 'alenka_s', subscriptionActive: true, subscriptionUntil: '2026-05-01', postCount: 69, lastMessage: '2026-02-08', silentDays: 67, risk: 'red', miniApp: true },
+  { name: 'Вера Соколова', username: null, subscriptionActive: true, subscriptionUntil: '2026-06-01', postCount: 0, lastMessage: null, silentDays: 87, risk: 'ghost', miniApp: false },
+  { name: 'Юлия Кравцова', username: 'yulia_kr', subscriptionActive: true, subscriptionUntil: '2026-05-15', postCount: 5, lastMessage: '2026-04-01', silentDays: 18, risk: 'yellow', miniApp: false },
+  { name: 'Диана Попова', username: 'diana_p', subscriptionActive: false, subscriptionUntil: '2026-03-31', postCount: 12, lastMessage: '2026-03-15', silentDays: 45, risk: 'expired', miniApp: true },
+  { name: 'Кристина Лукьянова', username: null, subscriptionActive: true, subscriptionUntil: '2026-05-20', postCount: 0, lastMessage: null, silentDays: 120, risk: 'ghost', miniApp: false },
+];
+
+const LEADERBOARD_DATA = [
+  { name: 'Анастасия', username: 'Kleopatra91', totalMessages: 1403, diaryMessages: 718, activeDaysLast30: 17, currentStreak: 6, activityLast30: [true,false,true,true,false,true,true,true,true,false,true,true,true,true,true,true,false,false,true,true,true,false,true,true,true,true,true,true,true,true] },
+  { name: 'Татьяна Исакова', username: 'iskovatv87', totalMessages: 472, diaryMessages: 400, activeDaysLast30: 22, currentStreak: 20, activityLast30: [true,true,true,false,true,true,true,false,true,true,true,true,false,true,true,true,true,true,true,false,true,true,true,true,false,true,true,true,true,true] },
+  { name: '🌷Натальё💐', username: 'natabel3010', totalMessages: 431, diaryMessages: 400, activeDaysLast30: 25, currentStreak: 10, activityLast30: [true,true,false,true,true,true,true,true,true,true,false,true,true,true,true,true,true,false,true,true,true,true,true,false,true,true,true,true,true,true] },
+  { name: 'Ели', username: 'eli_club', totalMessages: 2800, diaryMessages: 120, activeDaysLast30: 28, currentStreak: 15, activityLast30: [true,true,true,true,false,true,true,true,true,true,true,true,true,true,true,false,true,true,true,true,true,true,false,true,true,true,true,true,true,true] },
+];
+
+const ACTIVITY_DATA = {
+  heatmap: [
+    [0,0,0,0,0,5,45,120,89,67,45,34,23,12,56,78,90,123,145,167,134,45,12,3],
+    [0,0,0,0,0,4,38,98,76,54,43,29,18,10,48,65,87,110,138,152,121,38,10,2],
+    [0,0,0,0,0,6,52,134,102,78,56,40,28,14,62,85,98,142,168,180,155,52,15,4],
+    [0,0,0,0,0,8,60,145,115,90,65,48,32,16,70,95,110,165,195,210,178,60,18,5],
+    [0,0,0,0,0,6,55,138,108,82,58,42,26,13,65,88,105,155,182,198,162,55,16,4],
+    [0,0,0,1,3,12,35,75,58,42,30,22,15,8,35,50,65,88,102,115,95,38,10,3],
+    [0,0,0,1,2,8,28,62,48,35,25,18,12,6,28,42,55,72,85,96,78,30,8,2],
+  ],
+  timezone: 'UTC+3',
+  byDayOfWeek: [
+    { day: 'Пн', count: 3450 }, { day: 'Вт', count: 3100 }, { day: 'Ср', count: 3520 },
+    { day: 'Чт', count: 4010 }, { day: 'Пт', count: 3580 }, { day: 'Сб', count: 3050 }, { day: 'Вс', count: 3200 },
+  ],
+};
+
+const EMOTIONS_DATA = {
+  totalMessages: 15000,
+  months: [
+    { key: '2025-09', label: 'Сен 25', kpi: { valence: 0.18, arousal: 0.45, actionMaintain: 35, selfefficacy: 9, deepDisclosure: 3, givingSupport: 15 }, portrait: { title: 'Сен 25: Эмоциональный портрет', description: 'Сентябрь — старт клуба. Высокий энтузиазм смешивается с тревогой «правильно ли я всё делаю». Преобладает anticipation + joy при высоком arousal.', mainPain: { text: 'Технические барьеры создают первое разочарование. 40% новых участниц застревают на настройке доступа.' }, mainGrowth: { text: 'Первые мини-победы фиксируются публично — участницы удивлены что это «считается».' }, warningSignal: { text: '1) Высокий % молчунов уже в первые 2 недели 2) SOS-запросы без ответа 3) Сравнение себя с «успешными»' } }, plutchik: { joy: 65, trust: 55, fear: 42, surprise: 38, sadness: 28, disgust: 10, anger: 8, anticipation: 72 }, prochaska: { precontemplation: 25, contemplation: 28, preparation: 20, action: 18, maintenance: 7, relapse: 2 }, disclosure: { surface: 78, personal: 18, deep: 4 }, growth: { selfefficacy: 9, belonging: 52 }, support: { giving: 15, sharing: 30, requesting: 25, neutral: 30 } },
+    { key: '2025-10', label: 'Окт 25', kpi: { valence: 0.24, arousal: 0.42, actionMaintain: 38, selfefficacy: 11, deepDisclosure: 4, givingSupport: 18 }, portrait: { title: 'Окт 25: Эмоциональный портрет', description: 'Октябрь — первые продления. Те кто остался — более вовлечены. Растёт trust, снижается fear. Появляются первые «постоянные жители» — люди которых узнают по имени.', mainPain: { text: 'Первый «кризис второго месяца»: часть участниц теряет ритм и начинает пропускать дни.' }, mainGrowth: { text: 'Появляются micro-связи: участницы начинают отвечать конкретным людям, а не в общий чат.' }, warningSignal: { text: '1) Рост тихих отписок 2) Снижение качества дневников (короче, формальнее) 3) Конкуренция за внимание куратора' } }, plutchik: { joy: 68, trust: 62, fear: 35, surprise: 30, sadness: 32, disgust: 12, anger: 10, anticipation: 65 }, prochaska: { precontemplation: 22, contemplation: 26, preparation: 18, action: 22, maintenance: 10, relapse: 2 }, disclosure: { surface: 74, personal: 21, deep: 5 }, growth: { selfefficacy: 11, belonging: 58 }, support: { giving: 18, sharing: 32, requesting: 22, neutral: 28 } },
+    { key: '2025-12', label: 'Дек 25', kpi: { valence: 0.28, arousal: 0.38, actionMaintain: 40, selfefficacy: 12, deepDisclosure: 4, givingSupport: 19 }, portrait: { title: 'Дек 25: Эмоциональный портрет', description: 'Декабрь — новый поток. Смешение «старожилов» и новых. Старожилы принимают роль наставниц — это повышает их вовлечённость.', mainPain: { text: 'Новогодний стресс + финансовые тревоги снижают общий тон.' }, mainGrowth: { text: 'Появляются первые «истории трансформации» от участниц 3+ месяца.' }, warningSignal: { text: '1) Праздничный провал в активности (23 дек – 8 янв) 2) Новые участницы теряются среди старых' } }, plutchik: { joy: 70, trust: 65, fear: 30, surprise: 25, sadness: 35, disgust: 8, anger: 7, anticipation: 60 }, prochaska: { precontemplation: 20, contemplation: 24, preparation: 17, action: 25, maintenance: 12, relapse: 2 }, disclosure: { surface: 71, personal: 23, deep: 6 }, growth: { selfefficacy: 12, belonging: 62 }, support: { giving: 19, sharing: 34, requesting: 20, neutral: 27 } },
+    { key: '2026-01', label: 'Янв 26', kpi: { valence: 0.30, arousal: 0.32, actionMaintain: 41, selfefficacy: 12, deepDisclosure: 4, givingSupport: 20 }, portrait: { title: 'Янв 26: Эмоциональный портрет', description: 'Январь — «новогодний синдром». Много resolution-энергии в начале, быстрый откат к середине месяца. Joy + anticipation в начале → sadness к 20-му.', mainPain: { text: 'Разрыв между «хотела начать год иначе» и реальностью.' }, mainGrowth: { text: 'Участницы 4+ месяца демонстрируют устойчивость — не подхватывают общий откат.' }, warningSignal: { text: '1) Резкий рост «я опять не справляюсь» 2) Снижение качества мини-побед' } }, plutchik: { joy: 62, trust: 60, fear: 38, surprise: 28, sadness: 40, disgust: 14, anger: 9, anticipation: 55 }, prochaska: { precontemplation: 22, contemplation: 25, preparation: 16, action: 24, maintenance: 11, relapse: 2 }, disclosure: { surface: 73, personal: 22, deep: 5 }, growth: { selfefficacy: 12, belonging: 63 }, support: { giving: 20, sharing: 33, requesting: 21, neutral: 26 } },
+    { key: '2026-02', label: 'Фев 26', kpi: { valence: 0.32, arousal: 0.30, actionMaintain: 43, selfefficacy: 13, deepDisclosure: 5, givingSupport: 21 }, portrait: { title: 'Фев 26: Эмоциональный портрет', description: 'Февраль держит на тихой устойчивой радости от маленьких побед: зарядка сделана, котлеты приготовлены, урок пройден. Преобладает joy + trust на низком-среднем arousal — не экстаз, а удовлетворённое «справляюсь».', mainPain: { text: 'Точечные вспышки страха вокруг несоответствия: «признают недостаточной», «кто чувствует себя нужной».' }, mainGrowth: { text: 'Растёт % участниц, которые дают поддержку другим — признак зрелости сообщества.' }, warningSignal: { text: '1) Усталость от формата мини-побед у «ветеранов» 2) Запрос на новый уровень глубины' } }, plutchik: { joy: 72, trust: 58, fear: 31, surprise: 18, sadness: 41, disgust: 14, anger: 8, anticipation: 55 }, prochaska: { precontemplation: 18, contemplation: 22, preparation: 17, action: 28, maintenance: 15, relapse: 0 }, disclosure: { surface: 70, personal: 25, deep: 5 }, growth: { selfefficacy: 13, belonging: 67 }, support: { giving: 21, sharing: 35, requesting: 18, neutral: 26 } },
+  ],
+};
+
+const FINANCES = {
+  revenueByMonth: [
+    { month: 'Сен 25', revenue: 1288060, orders: 429 },
+    { month: 'Окт 25', revenue: 968278, orders: 331 },
+    { month: 'Ноя 25', revenue: 197258, orders: 124 },
+    { month: 'Дек 25', revenue: 725390, orders: 178 },
+    { month: 'Янв 26', revenue: 391588, orders: 141 },
+    { month: 'Фев 26', revenue: 249870, orders: 116 },
+    { month: 'Мар 26', revenue: 1462920, orders: 163 },
+  ],
+  cohorts: [
+    { label: 'Сен 25', n: 398, payments: { 'Сен 25': { orders: 429, revenue: 1288060 }, 'Окт 25': { orders: 90, revenue: 205890 }, 'Ноя 25': { orders: 47, revenue: 75030 }, 'Дек 25': { orders: 95, revenue: 231940 }, 'Янв 26': { orders: 89, revenue: 195110 }, 'Фев 26': { orders: 44, revenue: 63380 }, 'Мар 26': { orders: 88, revenue: 241020 } } },
+    { label: 'Окт 25', n: 202, payments: { 'Окт 25': { orders: 241, revenue: 762388 }, 'Ноя 25': { orders: 77, revenue: 122228 }, 'Дек 25': { orders: 87, revenue: 169630 }, 'Янв 26': { orders: 99, revenue: 177488 }, 'Фев 26': { orders: 52, revenue: 87480 }, 'Мар 26': { orders: 68, revenue: 125320 } } },
+    { label: 'Дек 25', n: 156, payments: { 'Дек 25': { orders: 178, revenue: 547420 }, 'Янв 26': { orders: 58, revenue: 110120 }, 'Фев 26': { orders: 48, revenue: 98920 }, 'Мар 26': { orders: 57, revenue: 156530 } } },
+    { label: 'Янв 26', n: 52, payments: { 'Янв 26': { orders: 54, revenue: 191380 }, 'Фев 26': { orders: 21, revenue: 38090 }, 'Мар 26': { orders: 22, revenue: 37580 } } },
+    { label: 'Мар 26', n: 163, payments: { 'Мар 26': { orders: 163, revenue: 993870 } } },
+  ],
+};
+</script>
+
+<!-- ═══════════════════════════════════════════
+     LAYOUT
+═══════════════════════════════════════════ -->
+
+<nav class="sidebar">
+  <div class="logo" id="logo-text">🏆 <span>Мой Клуб</span></div>
+  <a class="nav-link active" onclick="showSection('overview')">📊 Обзор</a>
+  <a class="nav-link" onclick="showSection('insights')">💡 Инсайты</a>
+  <a class="nav-link" onclick="showSection('mechanics')">⚙️ Механики клуба</a>
+  <a class="nav-link" onclick="showSection('retention')">⚠️ Удержание</a>
+  <a class="nav-link" onclick="showSection('churn')">📉 Отток</a>
+  <a class="nav-link" onclick="showSection('silent')">🤐 Молчуны</a>
+  <a class="nav-link" onclick="showSection('leaderboard')">🏆 Лидерборд</a>
+  <a class="nav-link" onclick="showSection('activity')">⚡ Активность</a>
+  <a class="nav-link" onclick="showSection('emotions')">💜 Эмоции клуба</a>
+  <div class="nav-divider"></div>
+  <div class="nav-section">Финансы и подписки</div>
+  <a class="nav-link" onclick="showSection('finances')">💰 Финансы</a>
+  <a class="nav-link" onclick="showSection('subscriptions')">📋 Подписки</a>
+  <a class="nav-link" onclick="showSection('crossanalytics')">🔗 Сквозная аналитика</a>
+  <div class="nav-divider"></div>
+  <div class="nav-section">Данные</div>
+  <a class="nav-link" onclick="showSection('datasources')">📂 Источники данных</a>
+</nav>
+
+<main class="main">
+  <div id="overview" class="section active"><!-- Task 2 --></div>
+  <div id="insights" class="section"><!-- Task 3 --></div>
+  <div id="mechanics" class="section"><!-- Task 4 --></div>
+  <div id="retention" class="section"><!-- Task 5 --></div>
+  <div id="churn" class="section"><!-- Task 6 --></div>
+  <div id="silent" class="section"><!-- Task 7 --></div>
+  <div id="leaderboard" class="section"><!-- Task 8 --></div>
+  <div id="activity" class="section"><!-- Task 9 --></div>
+  <div id="emotions" class="section"><!-- Task 10 --></div>
+  <div id="finances" class="section"><!-- Task 11 --></div>
+  <div id="subscriptions" class="section"><div class="page-title">📋 Подписки</div><p style="color:var(--text2);margin-top:12px">Раздел будет добавлен в следующей версии.</p></div>
+  <div id="crossanalytics" class="section"><div class="page-title">🔗 Сквозная аналитика</div><p style="color:var(--text2);margin-top:12px">Раздел будет добавлен в следующей версии.</p></div>
+  <div id="datasources" class="section"><!-- Task 12 --></div>
+</main>
+
+<!-- ═══════════════════════════════════════════
+     CORE JS
+═══════════════════════════════════════════ -->
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('logo-text').innerHTML = `${CLUB.emoji} <span>${CLUB.name}</span>`;
+  document.title = `${CLUB.name} — Дашборд`;
+  initAll();
+});
+
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll(`.nav-link[onclick="showSection('${id}')"]`).forEach(a => a.classList.add('active'));
+}
+
+// ── HELPERS ──
+function fmt(n) { return n?.toLocaleString('ru-RU') ?? '—'; }
+function fmtRub(n) { return n?.toLocaleString('ru-RU') + ' ₽' ?? '—'; }
+function fmtDate(s) { if (!s) return 'никогда'; const d = new Date(s); return d.toLocaleDateString('ru-RU'); }
+function priorityBadge(p) {
+  const m = { highest: ['badge-red','Высший'], high: ['badge-orange','Высокий'], medium: ['badge-yellow','Средний'] };
+  const [cls, lbl] = m[p] || ['badge-gray', p];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+function segmentBadge(s) {
+  const m = { active: ['badge-red','Активная'], moderate: ['badge-orange','Умеренная'], quiet: ['badge-gray','Тихая'] };
+  const [cls, lbl] = m[s] || ['badge-gray', s];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+function tgLink(username) {
+  if (!username) return '<span class="c-muted">—</span>';
+  return `<a class="tg-link" href="https://t.me/${username}" target="_blank">@${username}</a>`;
+}
+function cohortHeatClass(v) {
+  if (v === null || v === undefined) return '';
+  if (v >= 80) return 'heat-green';
+  if (v >= 50) return 'heat-yellow';
+  if (v >= 30) return 'heat-orange';
+  return 'heat-red';
+}
+function heatColor(value, max) {
+  if (!value) return '#0d1127';
+  const t = Math.min(value / max, 1);
+  const alpha = 0.1 + t * 0.85;
+  return `rgba(233,69,96,${alpha.toFixed(2)})`;
+}
+
+// ── PAGINATION ──
+function makePaginator(data, perPage, renderFn, containerId, paginId) {
+  let page = 0;
+  function render() {
+    const slice = data.slice(page * perPage, (page + 1) * perPage);
+    renderFn(slice, page * perPage);
+    const total = Math.ceil(data.length / perPage);
+    const pagin = document.getElementById(paginId);
+    if (!pagin) return;
+    let html = '';
+    for (let i = 0; i < total; i++) {
+      html += `<button class="page-btn${i===page?' active':''}" onclick="paginators['${paginId}'](${i})">${i+1}</button>`;
+    }
+    pagin.innerHTML = html;
+  }
+  window.paginators = window.paginators || {};
+  window.paginators[paginId] = (p) => { page = p; render(); };
+  render();
+}
+
+// ── CSV EXPORT ──
+function downloadCSV(data, fields, labels, filename) {
+  const rows = [labels.join(',')];
+  data.forEach(row => {
+    rows.push(fields.map(f => {
+      const v = row[f] ?? '';
+      const s = String(v).replace(/"/g,'""');
+      return s.includes(',') ? `"${s}"` : s;
+    }).join(','));
+  });
+  const blob = new Blob(['﻿' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = filename;
+  a.click();
+}
+
+// ── CHART DEFAULTS ──
+Chart.defaults.color = '#8892b0';
+Chart.defaults.borderColor = 'rgba(255,255,255,0.06)';
+Chart.defaults.font.family = 'Inter';
+Chart.defaults.plugins.legend.display = false;
+
+function mkChart(id, cfg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const existing = Chart.getChart(id);
+  if (existing) existing.destroy();
+  return new Chart(el.getContext('2d'), cfg);
+}
+
+function initAll() {
+  [initOverview, initInsights, initMechanics, initRetention, initChurn,
+   initSilent, initLeaderboard, initActivity, initEmotions, initFinances,
+   initDatasources].forEach(fn => { if (typeof fn === 'function') fn(); });
+}
+</script>
+
+</body>
+</html>
