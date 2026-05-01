@@ -1,11 +1,15 @@
 from __future__ import annotations
 import json
+import logging
 from datetime import date, timedelta
 from anthropic import AsyncAnthropic
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+from sqlalchemy.dialects.postgresql import insert as pg_insert
 from src.config import settings
 from src.db.models import MessageRaw, AnalyzedOutput
+
+logger = logging.getLogger(__name__)
 
 PROMPT_VERSION = "1.0"
 client = AsyncAnthropic(api_key=settings.anthropic_api_key)
@@ -35,6 +39,7 @@ async def analyze_insights(db: AsyncSession, days: int = 30) -> dict:
     )
     messages = [r[0] for r in result if r[0] and len(r[0]) > 5]
     if not messages:
+        logger.warning("No messages found for analysis period — skipping.")
         return {}
 
     prompt = (
@@ -47,22 +52,39 @@ async def analyze_insights(db: AsyncSession, days: int = 30) -> dict:
         "СООБЩЕНИЯ:\n" + "\n".join(messages[:300])
     )
 
-    response = await client.messages.create(
-        model="claude-sonnet-4-6",
-        max_tokens=4096,
-        messages=[{"role": "user", "content": prompt}],
-    )
-    raw = response.content[0].text
-    start, end = raw.find("{"), raw.rfind("}") + 1
-    data = json.loads(raw[start:end])
+    try:
+        response = await client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=4096,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        if not response.content:
+            logger.warning("LLM returned empty content list — skipping.")
+            return {}
+        raw = response.content[0].text
+        start, end = raw.find("{"), raw.rfind("}") + 1
+        data = json.loads(raw[start:end])
+    except Exception as exc:
+        logger.warning("LLM call or JSON parsing failed: %s", exc)
+        return {}
 
-    await db.merge(AnalyzedOutput(
+    stmt = pg_insert(AnalyzedOutput).values(
         analysis_type="insights",
         period="latest",
         json_data=data,
         prompt_version=PROMPT_VERSION,
-    ))
-    await db.commit()
+    ).on_conflict_do_update(
+        index_elements=["analysis_type", "period"],
+        set_=dict(json_data=data, prompt_version=PROMPT_VERSION, created_at=func.now()),
+    )
+
+    try:
+        await db.execute(stmt)
+        await db.commit()
+    except Exception:
+        await db.rollback()
+        raise
+
     return data
 
 
