@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Инсайты — Mockup</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #0f111a; color: #e0e0e0; }
+.scale-wrap { transform: scale(0.72); transform-origin: top left; width: 138.9%; }
+.dash { display: flex; min-height: 100vh; }
+
+.sidebar { width: 220px; background: #0d1127; padding: 16px 0; flex-shrink: 0; }
+.logo { padding: 0 16px 20px; font-size: 17px; font-weight: 700; border-bottom: 1px solid #1a1f3a; }
+.logo span { color: #e94560; }
+.nav-label { padding: 12px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #8892b0; opacity:.6; }
+.nav-link { display: flex; align-items: center; gap: 8px; padding: 10px 16px; color: #8892b0; font-size: 13px; border-left: 3px solid transparent; }
+.nav-link.active { background: rgba(233,69,96,.08); color: #fff; border-left-color: #e94560; }
+.divider { height: 1px; background: #1a1f3a; margin: 8px 16px; }
+
+.main { flex: 1; padding: 24px 28px; overflow: hidden; }
+
+/* Page header */
+.page-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; display: flex; align-items: center; gap: 10px; }
+.page-subtitle { font-size: 13px; color: #8892b0; margin-bottom: 24px; }
+
+/* Insight card */
+.insight-card {
+  background: #16213e;
+  border-radius: 12px;
+  border-left: 4px solid #e94560;
+  padding: 20px 24px;
+  margin-bottom: 16px;
+}
+.insight-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+.insight-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: #fff;
+}
+.mention-badge {
+  background: rgba(233,69,96,.2);
+  color: #e94560;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  margin-left: 16px;
+  flex-shrink: 0;
+}
+.insight-desc {
+  font-size: 13px;
+  color: #c0c8d8;
+  line-height: 1.65;
+  margin-bottom: 14px;
+}
+
+/* AI insight block */
+.ai-insight {
+  background: rgba(0, 180, 120, 0.08);
+  border-left: 3px solid rgba(0, 210, 160, 0.5);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: #a0e8c8;
+  line-height: 1.65;
+}
+.ai-insight::before {
+  content: '💡 ';
+}
+
+/* Quotes */
+.quotes { display: flex; flex-direction: column; gap: 6px; }
+.quote {
+  font-size: 13px;
+  color: #8892b0;
+  font-style: italic;
+  padding-left: 12px;
+  border-left: 2px solid #1a1f3a;
+}
+.quote::before { content: '«'; }
+.quote::after  { content: '»'; }
+</style>
+</head>
+<body>
+
+<div style="padding:10px 16px; background:#0d1127; border-bottom:1px solid #1a1f3a; font-size:12px; color:#8892b0;">
+  📐 Макет — Инсайты
+</div>
+
+<div class="scale-wrap">
+<div class="dash">
+
+  <div class="sidebar">
+    <div class="logo">🐯 Клуб <span>СВОЯ</span></div>
+    <nav style="margin-top:12px">
+      <a class="nav-link">📊 Обзор</a>
+      <a class="nav-link active">🔍 Инсайты</a>
+      <a class="nav-link">🔧 Механики клуба</a>
+      <a class="nav-link">⚠️ Удержание</a>
+      <a class="nav-link">🚪 Отток</a>
+      <a class="nav-link">🔇 Молчуны</a>
+      <a class="nav-link">🏆 Лидерборд</a>
+      <a class="nav-link">⏰ Активность</a>
+      <a class="nav-link">💜 Эмоции клуба</a>
+      <div class="divider"></div>
+      <div class="nav-label">Финансы и подписки</div>
+      <a class="nav-link">💰 Финансы</a>
+      <a class="nav-link">📈 Подписки</a>
+      <a class="nav-link">🔗 Сквозная аналитика</a>
+      <div class="divider"></div>
+      <div class="nav-label">Данные</div>
+      <a class="nav-link">📋 Источники данных</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="page-title">🔍 Инсайты: проблемы и скрытые потребности</div>
+    <div class="page-subtitle">Консолидированный анализ 5000 сообщений. Темы ранжированы по критичности для удержания и развития клуба.</div>
+
+    <!-- INSIGHT 1 -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-title">Дневник мини-побед: уборка, шаги, сырники</div>
+        <div class="mention-badge">3925 упоминаний</div>
+      </div>
+      <div class="insight-desc">
+        Ежедневный ритуал публичной фиксации маленьких бытовых достижений: помыла полы, прошла 10000 шагов, приготовила вкусный завтрак, записалась на маникюр. Это не хвастовство — это коллективное разрешение считать обыденное подвигом. Формат структурирован: 1) мини-победа 2) что нового/улучшила 3) что для себя 4) инсайт.
+      </div>
+      <div class="ai-insight">
+        День тюленя (ничегонеделание) — самая сложная победа для этой аудитории. Разрешить себе лечь и не вставать без чувства вины — это уровень, который многие обсуждают как прорыв. Бытовые победы — это не скромность запросов, а тренировка переключения с режима 'должна' на режим 'хочу'.
+      </div>
+      <div class="quotes">
+        <div class="quote">Сегодня мой успех — послушала аффирмации, ритуал красивая каждый день</div>
+        <div class="quote">Разрешила себе на тренировке в бассейне не на результат плавать, а просто как пойдет</div>
+        <div class="quote">Не приготовленный ужин — не катастрофа</div>
+      </div>
+    </div>
+
+    <!-- INSIGHT 2 -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-title">Выход из токсичных отношений / треугольник Карпмана</div>
+        <div class="mention-badge">2141 упоминание</div>
+      </div>
+      <div class="insight-desc">
+        Тема появляется уже в первых знакомствах как биография: '4 года в токсичных треугольных отношениях, не понимая что происходит', 'выгнала токсика и алкаша', 'выхожу из любовного треугольника'. Обсуждают не только романтические отношения — треугольник жертва-тиран-спаситель применяют к себе, к коллегам, к детям.
+      </div>
+      <div class="ai-insight">
+        Женщины, которые уже вышли из токсичных отношений, описывают это как главное достижение жизни — не карьеру, не детей, а именно уход. Это базовый маркер 'до Сергея' и 'после Сергея'. Треугольник при этом редко обсуждается концептуально — он описывается через конкретные сцены (молчала, терпела, прощала).
+      </div>
+      <div class="quotes">
+        <div class="quote">Выгнала очередного токсика и алкаша из своей жизни, хочу перестать быть удобной, выйти из треугольника жертва тиран спаситель</div>
+        <div class="quote">Вышла из токсичных отношений 4 месяца назад, была в них 9 лет не понимая что происходит</div>
+        <div class="quote">Хочу счастья, любви, перестать быть удобной</div>
+      </div>
+    </div>
+
+    <!-- INSIGHT 3 -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-title">Запрос на структуру и систему в жизни</div>
+        <div class="mention-badge">1847 упоминаний</div>
+      </div>
+      <div class="insight-desc">
+        Участницы ищут не мотивацию, а инструменты: планнеры, трекеры, системы. Запрос часто формулируется как 'не могу начать', 'начинаю и бросаю', 'нет стабильности'. Важен не результат, а сам факт следования системе.
+      </div>
+      <div class="ai-insight">
+        Хаос воспринимается как личный провал, а не как норма. Структура — это форма самоуважения для этой аудитории. Клуб может позиционировать любой инструмент не как 'повышение продуктивности', а как 'забота о себе через порядок'.
+      </div>
+      <div class="quotes">
+        <div class="quote">Хочу научиться планировать день, просто хочу дожить до вечера с ощущением что что-то сделала</div>
+        <div class="quote">Начала вести трекер привычек, третья неделя — это мой рекорд</div>
+      </div>
+    </div>
+
+    <div style="height:32px"></div>
+  </div>
+</div>
+</div>
+</body>
+</html>

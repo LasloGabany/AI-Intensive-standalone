@@ -1,0 +1,42 @@
+<h2>3 подхода к архитектуре дашборда</h2>
+<p class="subtitle">Выбери подход — или скажи что нравится из нескольких</p>
+
+<div class="options">
+
+  <div class="option" data-choice="a" onclick="toggleSelect(this)">
+    <div class="letter">A</div>
+    <div class="content">
+      <h3>Единый экран загрузки → дашборд</h3>
+      <p>Пользователь видит один экран с 3-5 зонами drag-and-drop. Загружает все CSV сразу, нажимает «Построить дашборд» — и открывается полный дашборд с данными. Простейший флоу: 2 экрана, никакой навигации на этапе загрузки.</p>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h4>Плюсы</h4><ul><li>Минимум шагов</li><li>Понятно новичку</li><li>Один HTML-файл</li></ul></div>
+        <div class="cons"><h4>Минусы</h4><ul><li>Нужно загрузить всё сразу</li><li>Если один файл не готов — стоп</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="b" onclick="toggleSelect(this)">
+    <div class="letter">B ★ Рекомендую</div>
+    <div class="content">
+      <h3>Секционная загрузка + demo-режим</h3>
+      <p>Каждый раздел дашборда (KPI, Ретеншн, Чат, Финансы) имеет свою кнопку загрузки прямо на странице. Раздел без данных показывает демо-данные с плашкой «Загрузите CSV». Клиент может показывать дашборд с демо прямо клиентам — мощно для продаж.</p>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h4>Плюсы</h4><ul><li>Частичная загрузка OK</li><li>Demo-режим для презентаций</li><li>Интуитивно понятно</li></ul></div>
+        <div class="cons"><h4>Минусы</h4><ul><li>Чуть сложнее в разработке</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="option" data-choice="c" onclick="toggleSelect(this)">
+    <div class="letter">C</div>
+    <div class="content">
+      <h3>Шаблон Google Sheets → iframe</h3>
+      <p>Клиент копирует Google Sheets шаблон, заполняет данные, публикует как CSV. Дашборд берёт данные напрямую по URL. Никакого drag-and-drop вообще.</p>
+      <div class="pros-cons" style="margin-top:12px">
+        <div class="pros"><h4>Плюсы</h4><ul><li>Данные всегда актуальны</li><li>Редактирование в Sheets</li></ul></div>
+        <div class="cons"><h4>Минусы</h4><ul><li>Нужен интернет всегда</li><li>Сложнее настроить Google Sheets</li><li>Зависимость от Google</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+</div>

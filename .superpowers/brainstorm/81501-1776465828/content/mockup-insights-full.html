@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Инсайты — Full Mockup</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #0f111a; color: #e0e0e0; }
+.scale-wrap { transform: scale(0.72); transform-origin: top left; width: 138.9%; }
+.dash { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar { width: 220px; background: #0d1127; padding: 16px 0; flex-shrink: 0; }
+.logo { padding: 0 16px 20px; font-size: 17px; font-weight: 700; border-bottom: 1px solid #1a1f3a; }
+.logo span { color: #e94560; }
+.nav-label { padding: 12px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #8892b0; opacity:.6; }
+.nav-link { display: flex; align-items: center; gap: 8px; padding: 10px 16px; color: #8892b0; font-size: 13px; border-left: 3px solid transparent; }
+.nav-link.active { background: rgba(233,69,96,.08); color: #fff; border-left-color: #e94560; }
+.divider { height: 1px; background: #1a1f3a; margin: 8px 16px; }
+
+/* MAIN */
+.main { flex: 1; padding: 24px 28px; max-width: 100%; overflow: hidden; }
+.page-title { font-size: 22px; font-weight: 700; margin-bottom: 6px; }
+.page-sub { font-size: 13px; color: #8892b0; margin-bottom: 28px; }
+.section-title { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.section-sub { font-size: 13px; color: #8892b0; margin-bottom: 16px; }
+
+/* ── 1. INSIGHT CARDS ── */
+.insight-card {
+  background: #16213e;
+  border-radius: 12px;
+  border-left: 4px solid #e94560;
+  padding: 20px 24px;
+  margin-bottom: 14px;
+}
+.insight-card.orange { border-left-color: #f77f00; }
+.insight-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+.insight-title { font-size: 16px; font-weight: 700; color: #fff; }
+.mention-badge { background: rgba(233,69,96,.2); color: #e94560; font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; white-space: nowrap; margin-left: 16px; flex-shrink: 0; }
+.insight-desc { font-size: 13px; color: #c0c8d8; line-height: 1.65; margin-bottom: 12px; }
+.ai-block { background: rgba(0,180,120,.08); border-left: 3px solid rgba(0,210,160,.5); border-radius: 0 8px 8px 0; padding: 12px 16px; margin-bottom: 12px; font-size: 13px; color: #a0e8c8; line-height: 1.65; }
+.ai-block::before { content: '💡 '; }
+.quotes { display: flex; flex-direction: column; gap: 5px; }
+.quote { font-size: 13px; color: #8892b0; font-style: italic; padding-left: 12px; border-left: 2px solid #1a1f3a; }
+.quote::before { content: '«'; }
+.quote::after { content: '»'; }
+
+/* ── 2. HIDDEN NEEDS ── */
+.needs-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 32px; }
+.need-card { background: #16213e; border-radius: 12px; padding: 16px; border-top: 3px solid transparent; }
+.need-card.high { border-top-color: #e94560; }
+.need-card.medium { border-top-color: #ffd166; }
+.impact-label { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 5px; }
+.impact-label.high { color: #e94560; }
+.impact-label.medium { color: #ffd166; }
+.need-title { font-size: 14px; font-weight: 700; color: #fff; line-height: 1.4; margin-bottom: 10px; }
+.need-signal { font-size: 12px; color: #8892b0; line-height: 1.5; font-style: italic; }
+
+/* ── 3. RECOMMENDATIONS ── */
+.rec-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 32px; }
+.rec-item { background: #16213e; border-radius: 10px; padding: 16px 20px; display: flex; align-items: flex-start; gap: 16px; }
+.rec-num { width: 32px; height: 32px; border-radius: 50%; background: #e94560; color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 2px; }
+.rec-num.orange { background: #f77f00; }
+.rec-body { flex: 1; }
+.rec-title { font-size: 14px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.rec-sub { font-size: 12px; color: #8892b0; margin-bottom: 8px; }
+.rec-tags { display: flex; gap: 8px; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 5px; }
+.tag-high { background: rgba(233,69,96,.2); color: #e94560; }
+.tag-medium { background: rgba(247,127,0,.2); color: #f77f00; }
+.tag-effort { background: rgba(136,146,176,.12); color: #8892b0; }
+
+/* ── 4. ENGAGEMENT DRIVERS ── */
+.drivers-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 40px; }
+.driver-card { background: #16213e; border-radius: 12px; padding: 18px; border-top: 2px solid rgba(0,210,160,.3); }
+.driver-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 8px; }
+.driver-desc { font-size: 12px; color: #8892b0; line-height: 1.55; }
+</style>
+</head>
+<body>
+
+<div style="padding:10px 16px; background:#0d1127; border-bottom:1px solid #1a1f3a; font-size:12px; color:#8892b0;">
+  📐 Инсайты — полный раздел (прокрути вниз — все 4 под-секции)
+</div>
+
+<div class="scale-wrap">
+<div class="dash">
+
+  <div class="sidebar">
+    <div class="logo">🐯 Клуб <span>СВОЯ</span></div>
+    <nav style="margin-top:12px">
+      <a class="nav-link">📊 Обзор</a>
+      <a class="nav-link active">🔍 Инсайты</a>
+      <a class="nav-link">🔧 Механики клуба</a>
+      <a class="nav-link">⚠️ Удержание</a>
+      <a class="nav-link">🚪 Отток</a>
+      <a class="nav-link">🔇 Молчуны</a>
+      <a class="nav-link">🏆 Лидерборд</a>
+      <a class="nav-link">⏰ Активность</a>
+      <a class="nav-link">💜 Эмоции клуба</a>
+      <div class="divider"></div>
+      <div class="nav-label">Финансы и подписки</div>
+      <a class="nav-link">💰 Финансы</a>
+      <a class="nav-link">📈 Подписки</a>
+      <a class="nav-link">🔗 Сквозная аналитика</a>
+      <div class="divider"></div>
+      <div class="nav-label">Данные</div>
+      <a class="nav-link">📋 Источники данных</a>
+    </nav>
+  </div>
+
+  <div class="main">
+    <div class="page-title">🔍 Инсайты: проблемы и скрытые потребности</div>
+    <div class="page-sub">Консолидированный анализ 5000 сообщений. Темы ранжированы по критичности для удержания и развития клуба.</div>
+
+    <!-- ── 1. ТОП ТЕМ ── -->
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-title">Дневник мини-побед: уборка, шаги, сырники</div>
+        <div class="mention-badge">3925 упоминаний</div>
+      </div>
+      <div class="insight-desc">Ежедневный ритуал публичной фиксации маленьких бытовых достижений. Формат структурирован: 1) мини-победа 2) что нового/улучшила 3) что для себя 4) инсайт.</div>
+      <div class="ai-block">День тюленя — самая сложная победа для этой аудитории. Разрешить себе лечь и не вставать без чувства вины — это уровень, который многие обсуждают как прорыв.</div>
+      <div class="quotes">
+        <div class="quote">Сегодня мой успех — послушала аффирмации, ритуал красивая каждый день</div>
+        <div class="quote">Не приготовленный ужин — не катастрофа</div>
+      </div>
+    </div>
+
+    <div class="insight-card">
+      <div class="insight-header">
+        <div class="insight-title">Поиск настоящей себя: кто я без ролей</div>
+        <div class="mention-badge">1962 упоминания</div>
+      </div>
+      <div class="insight-desc">Формулировка 'найти себя настоящую' встречается буквально в каждом третьем знакомстве. Речь идёт о потере идентичности после ролей мамы, жены, сотрудницы, дочери.</div>
+      <div class="ai-block">Эта тема декларируется на старте, но почти не разрабатывается в дальнейших постах. Разрыв между заявленным запросом и реальной активностью — самый большой в клубе.</div>
+      <div class="quotes">
+        <div class="quote">Поняла, что совсем не знаю, кто я есть, кто я настоящая</div>
+        <div class="quote">За мужем 8 лет — потеряла себя</div>
+      </div>
+    </div>
+
+    <div class="insight-card orange">
+      <div class="insight-header">
+        <div class="insight-title">Технические проблемы как первый опыт клуба</div>
+        <div class="mention-badge" style="background:rgba(247,127,0,.2);color:#f77f00">1784 упоминания</div>
+      </div>
+      <div class="insight-desc">Первые дни клуба захлестнуты вопросами: не приходит код, чекап не открывается, кнопка под видео не работает, PDF не скачивается.</div>
+      <div class="ai-block">Технические проблемы парадоксально стали инструментом социализации: женщины помогали друг другу — это создало первые связи в сообществе сильнее, чем любой структурированный нетворкинг.</div>
+      <div class="quotes">
+        <div class="quote">Ничего не открывается, не могу ничего посмотреть, задания какие, ничего не приходит</div>
+      </div>
+    </div>
+
+    <!-- ── 2. СКРЫТЫЕ ПОТРЕБНОСТИ ── -->
+    <div style="margin-top:32px; margin-bottom:16px">
+      <div class="section-title">🧠 Скрытые потребности участниц</div>
+      <div class="section-sub">Что участницы хотят, но не просят напрямую.</div>
+    </div>
+
+    <div class="needs-grid">
+      <div class="need-card high">
+        <div class="impact-label high">🔴 ВЫСОКИЙ ИМПАКТ</div>
+        <div class="need-title">Получить безусловное подтверждение ценности — не за поступки, а за существование</div>
+        <div class="need-signal">Ведут дневник успеха, перечисляют мелкие победы, пишут 'я молодец'</div>
+      </div>
+      <div class="need-card medium">
+        <div class="impact-label medium">🟡 СРЕДНИЙ ИМПАКТ</div>
+        <div class="need-title">Подтверждение собственного восприятия реальности (reality-testing)</div>
+        <div class="need-signal">Описывают конфликты с партнёрами, просят совета по отношениям</div>
+      </div>
+      <div class="need-card medium">
+        <div class="impact-label medium">🟡 СРЕДНИЙ ИМПАКТ</div>
+        <div class="need-title">Быть принятой в бедности, без стыда за финансовую несостоятельность</div>
+        <div class="need-signal">Упоминают финансовые трудности вскользь, с оправданиями</div>
+      </div>
+      <div class="need-card medium">
+        <div class="impact-label medium">🟡 СРЕДНИЙ ИМПАКТ</div>
+        <div class="need-title">Магическое мышление: желание, чтобы практика 'сработала' без боли реального изменения</div>
+        <div class="need-signal">Делятся инсайтами, практиками, внедрёнными техниками</div>
+      </div>
+      <div class="need-card high">
+        <div class="impact-label high">🔴 ВЫСОКИЙ ИМПАКТ</div>
+        <div class="need-title">Дефицит привязанности, страх хронического одиночества</div>
+        <div class="need-signal">Описывают одиночество косвенно — праздники в одиночестве, 'бывает одиноко'</div>
+      </div>
+    </div>
+
+    <!-- ── 3. РЕКОМЕНДАЦИИ ── -->
+    <div class="section-title">🎯 ТОП рекомендации для владельца</div>
+    <div class="section-sub" style="margin-bottom:16px">Конкретные действия, ранжированные по влиянию на удержание и рост.</div>
+
+    <div class="rec-list">
+      <div class="rec-item">
+        <div class="rec-num">1</div>
+        <div class="rec-body">
+          <div class="rec-title">Автотриггер на 7-й день тишины: куратор пишет лично, без шаблонного давления</div>
+          <div class="rec-sub">Возврат 20–30% отваливающихся на паузе; снижение невидимого оттока</div>
+          <div class="rec-tags"><span class="tag tag-high">high</span><span class="tag tag-effort">Усилие: низкое (2ч)</span></div>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-num">2</div>
+        <div class="rec-body">
+          <div class="rec-title">Запустить рубрику 'Петрович снова отличился' — короткие смешные истории о внутреннем критике</div>
+          <div class="rec-sub">Юмор снижает стыд за откаты, повышает вовлечённость молчунов</div>
+          <div class="rec-tags"><span class="tag tag-high">high</span><span class="tag tag-effort">Усилие: низкое (1ч/нед)</span></div>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-num orange">3</div>
+        <div class="rec-body">
+          <div class="rec-title">Добавить 'точки сравнения' в дневник успеха: что было месяц назад vs сейчас</div>
+          <div class="rec-sub">Делает прогресс видимым — ключевой мотиватор для продления</div>
+          <div class="rec-tags"><span class="tag tag-medium">medium</span><span class="tag tag-effort">Усилие: среднее</span></div>
+        </div>
+      </div>
+      <div class="rec-item">
+        <div class="rec-num orange">4</div>
+        <div class="rec-body">
+          <div class="rec-title">Закрытый круг поддержки для финансового кризиса</div>
+          <div class="rec-sub">Финансовая тема табуирована в основном чате. Нужен контейнер без обвинения.</div>
+          <div class="rec-tags"><span class="tag tag-high">high</span><span class="tag tag-effort">Усилие: medium</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 4. ДРАЙВЕРЫ ВОВЛЕЧЕНИЯ ── -->
+    <div class="section-title">🔥 Драйверы вовлечения</div>
+    <div class="section-sub" style="margin-bottom:16px">Что генерирует максимум ответов и вовлечение в клубе.</div>
+
+    <div class="drivers-grid">
+      <div class="driver-card">
+        <div class="driver-title">🔥 Юмор и самоирония</div>
+        <div class="driver-desc">Снижает стыд за откаты, создаёт безопасное отношение к Петровичу. Лояльные используют систематически, ушедшие — почти никогда.</div>
+      </div>
+      <div class="driver-card">
+        <div class="driver-title">🔥 Нарратив 'я меняюсь' с точками сравнения</div>
+        <div class="driver-desc">Уйти из клуба = потерять накопленную историю трансформации. Без видимых точек сравнения прогресс невидим и мотивация падает.</div>
+      </div>
+      <div class="driver-card">
+        <div class="driver-title">🔥 Личные связи внутри сообщества</div>
+        <div class="driver-desc">Лояльные пишут конкретным людям по имени и помнят их истории. Ушедшие пишут в пустоту. Личная связь держит сильнее контента.</div>
+      </div>
+      <div class="driver-card">
+        <div class="driver-title">🔥 Помощь другим как закрепление материала</div>
+        <div class="driver-desc">Помогая другим, участница ощущает компетентность и принадлежность. Создаёт идентичность 'я часть клуба', а не 'я потребитель клуба'.</div>
+      </div>
+      <div class="driver-card">
+        <div class="driver-title">🔥 Встраивание в ежедневный ритуал</div>
+        <div class="driver-desc">Когда клуб становится частью утра как зубная щётка — выпасть из него значит выпасть из своего ритма.</div>
+      </div>
+      <div class="driver-card">
+        <div class="driver-title">🔥 Аффирмации как измеримый ритуал</div>
+        <div class="driver-desc">Минимальная единица участия даже в плохой день. 'Послушала аффирмацию' = я в клубе, я двигаюсь. Снижает порог входа до нуля.</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</body>
+</html>

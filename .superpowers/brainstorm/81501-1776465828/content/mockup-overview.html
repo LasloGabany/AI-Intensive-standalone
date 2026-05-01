@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup — Club Dashboard Template</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #0f111a; color: #e0e0e0; }
+
+/* Scale wrapper */
+.scale-wrap { transform: scale(0.72); transform-origin: top left; width: 138.9%; }
+
+/* Dashboard shell */
+.dash { display: flex; min-height: 100vh; }
+
+/* Sidebar */
+.sidebar { width: 220px; background: #0d1127; padding: 16px 0; flex-shrink: 0; }
+.logo { padding: 0 16px 20px; font-size: 17px; font-weight: 700; border-bottom: 1px solid #1a1f3a; }
+.logo span { color: #e94560; }
+.nav-label { padding: 12px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #8892b0; opacity: .6; }
+.nav-link { display: flex; align-items: center; gap: 8px; padding: 10px 16px; color: #8892b0; font-size: 13px; border-left: 3px solid transparent; cursor: pointer; }
+.nav-link:hover, .nav-link.active { background: rgba(233,69,96,.08); color: #fff; border-left-color: #e94560; }
+.divider { height: 1px; background: #1a1f3a; margin: 8px 16px; }
+
+/* Main */
+.main { flex: 1; padding: 24px 28px; overflow: hidden; }
+h1 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+
+/* KPI row */
+.kpi-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+.kpi { background: #16213e; border-radius: 10px; padding: 16px; }
+.kpi-label { font-size: 10px; color: #8892b0; text-transform: uppercase; letter-spacing: .8px; margin-bottom: 6px; }
+.kpi-value { font-size: 24px; font-weight: 700; color: #fff; }
+.kpi-sub { font-size: 11px; color: #8892b0; margin-top: 4px; }
+.kpi-badge { display: inline-block; font-size: 10px; padding: 1px 6px; border-radius: 6px; margin-top: 4px; }
+.badge-green { background: rgba(0,210,160,.15); color: #00d2a0; }
+.badge-red { background: rgba(239,35,60,.15); color: #ef233c; }
+
+/* Retention section */
+.section-label { font-size: 13px; font-weight: 600; margin-bottom: 10px; color: #fff; display: flex; align-items: center; gap: 8px; }
+.tag { font-size: 10px; background: #e94560; color: #fff; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+.tag-blue { background: #0f3460; }
+
+.ret-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ret-table th { text-align: center; padding: 7px 10px; color: #8892b0; font-weight: 500; border-bottom: 1px solid #1a1f3a; }
+.ret-table td { text-align: center; padding: 7px 10px; border-bottom: 1px solid rgba(255,255,255,.04); }
+.ret-table td:first-child { text-align: left; color: #8892b0; }
+.cell-100 { background: rgba(0,210,160,.25); color: #00d2a0; border-radius: 4px; font-weight: 700; }
+.cell-hi { background: rgba(0,210,160,.15); color: #00d2a0; border-radius: 4px; }
+.cell-mid { background: rgba(255,209,102,.12); color: #ffd166; border-radius: 4px; }
+.cell-lo { background: rgba(239,35,60,.12); color: #ef233c; border-radius: 4px; }
+
+/* Grid */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px; }
+.card { background: #16213e; border-radius: 10px; padding: 16px; }
+
+/* Chart placeholder */
+.chart-ph { background: #0d1127; border-radius: 8px; height: 140px; display: flex; align-items: flex-end; gap: 3px; padding: 12px 8px 8px; }
+.bar { flex: 1; border-radius: 3px 3px 0 0; background: rgba(233,69,96,.4); min-width: 0; }
+
+/* Chat pulse */
+.pulse-row { display: flex; gap: 12px; margin-bottom: 12px; }
+.pulse-stat { flex: 1; background: #0d1127; border-radius: 8px; padding: 12px; text-align: center; }
+.pulse-val { font-size: 22px; font-weight: 700; color: #fff; }
+.pulse-lbl { font-size: 11px; color: #8892b0; margin-top: 3px; }
+
+/* Line chart placeholder */
+.line-ph { background: #0d1127; border-radius: 8px; height: 100px; position: relative; overflow: hidden; }
+.line-ph::after {
+  content: '';
+  position: absolute;
+  bottom: 20px; left: 10px; right: 10px;
+  height: 2px;
+  background: linear-gradient(90deg, #e94560 0%, #e94560 30%, #ffd166 50%, #00d2a0 80%, #00d2a0 100%);
+  border-radius: 2px;
+  filter: drop-shadow(0 0 6px #e94560);
+}
+
+/* Insight cards */
+.insight { background: #0d1127; border-radius: 8px; padding: 12px; margin-bottom: 8px; border-left: 3px solid #e94560; }
+.insight-title { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 4px; }
+.insight-sub { font-size: 11px; color: #8892b0; }
+
+/* DATA ZONE banner */
+.data-banner { background: rgba(233,69,96,.08); border: 1px dashed #e94560; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; font-size: 12px; color: #e94560; display: flex; align-items: center; gap: 8px; }
+</style>
+</head>
+<body>
+<div style="padding:12px 16px; background:#0d1127; border-bottom:1px solid #1a1f3a; font-size:12px; color:#8892b0; display:flex; justify-content:space-between; align-items:center;">
+  <span>📐 Макет шаблона — Club Dashboard</span>
+  <span style="color:#00d2a0">▼ Прокрути вниз чтобы увидеть все секции</span>
+</div>
+
+<div class="scale-wrap">
+<div class="dash">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">🐯 Клуб <span>СВОЯ</span></div>
+    <nav style="margin-top:12px">
+      <a class="nav-link active">📊 Обзор</a>
+      <div class="divider"></div>
+      <div class="nav-label">Аналитика</div>
+      <a class="nav-link">🔄 Ретеншн</a>
+      <a class="nav-link">💬 Чат</a>
+      <a class="nav-link">💡 Инсайты</a>
+      <div class="divider"></div>
+      <div class="nav-label">Финансы</div>
+      <a class="nav-link">💰 Финансы</a>
+      <a class="nav-link">📈 Подписки</a>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- DATA ZONE hint -->
+    <div class="data-banner">
+      ✏️ <strong>DATA ZONE</strong> — все данные ниже редактируются в секции <code>// ═══ ДАННЫЕ ═══</code> в начале файла index.html
+    </div>
+
+    <h1>Обзор клуба</h1>
+
+    <!-- KPI CARDS -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Активных подписок</div>
+        <div class="kpi-value">520</div>
+        <div class="kpi-sub">из 976 всего</div>
+        <div class="kpi-badge badge-green">retention 53.3%</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">MRR</div>
+        <div class="kpi-value">915к ₽</div>
+        <div class="kpi-sub">ARPU 1 759 ₽/мес</div>
+        <div class="kpi-badge badge-green">▲ 8%</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Выручка (месяц)</div>
+        <div class="kpi-value">544к ₽</div>
+        <div class="kpi-sub">Апрель 2026</div>
+        <div class="kpi-badge badge-red">▼ vs март</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Отписалось</div>
+        <div class="kpi-value">456</div>
+        <div class="kpi-sub">за всё время</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Активность чата</div>
+        <div class="kpi-value">215</div>
+        <div class="kpi-sub">за 30 дней</div>
+        <div class="kpi-badge badge-green">▲ активно</div>
+      </div>
+    </div>
+
+    <!-- RETENTION TABLE -->
+    <div class="card" style="margin-bottom:16px">
+      <div class="section-label">
+        Когортный ретеншн
+        <span class="tag">РЕТЕНШН</span>
+      </div>
+      <table class="ret-table">
+        <thead>
+          <tr>
+            <th style="text-align:left">Когорта</th>
+            <th>Сен 25</th><th>Окт 25</th><th>Ноя 25</th><th>Дек 25</th><th>Янв 26</th><th>Фев 26</th><th>Мар 26</th><th>Апр 26</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Сен 25 (398)</td>
+            <td><span class="cell-100">100%</span></td>
+            <td><span class="cell-hi">91.7%</span></td>
+            <td><span class="cell-hi">85.4%</span></td>
+            <td><span class="cell-lo">22.4%</span></td>
+            <td><span class="cell-lo">27.9%</span></td>
+            <td><span class="cell-mid">30.2%</span></td>
+            <td><span class="cell-lo">28.9%</span></td>
+            <td><span class="cell-lo">32.7%</span></td>
+          </tr>
+          <tr>
+            <td>Окт 25 (202)</td>
+            <td>—</td>
+            <td><span class="cell-100">100%</span></td>
+            <td><span class="cell-hi">82.2%</span></td>
+            <td><span class="cell-mid">75.2%</span></td>
+            <td><span class="cell-mid">55.9%</span></td>
+            <td><span class="cell-mid">62.9%</span></td>
+            <td><span class="cell-mid">56.9%</span></td>
+            <td><span class="cell-mid">55%</span></td>
+          </tr>
+          <tr>
+            <td>Дек 25 (156)</td>
+            <td>—</td><td>—</td><td>—</td>
+            <td><span class="cell-100">100%</span></td>
+            <td><span class="cell-mid">65.4%</span></td>
+            <td><span class="cell-mid">62.8%</span></td>
+            <td><span class="cell-mid">49.4%</span></td>
+            <td><span class="cell-mid">46.2%</span></td>
+          </tr>
+          <tr>
+            <td>Мар 26 (163)</td>
+            <td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>
+            <td><span class="cell-100">100%</span></td>
+            <td><span class="cell-100">100%</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- CHAT + TREND -->
+    <div class="two-col">
+      <div class="card">
+        <div class="section-label">Пульс чата <span class="tag" style="background:#0f3460">TG</span></div>
+        <div class="pulse-row">
+          <div class="pulse-stat">
+            <div class="pulse-val">126</div>
+            <div class="pulse-lbl">активных за 7 дн</div>
+          </div>
+          <div class="pulse-stat">
+            <div class="pulse-val">215</div>
+            <div class="pulse-lbl">активных за 30 дн</div>
+          </div>
+        </div>
+        <div class="pulse-row">
+          <div class="pulse-stat" style="border-left:2px solid #ef233c">
+            <div class="pulse-val" style="color:#ef233c">120</div>
+            <div class="pulse-lbl">никогда не писали</div>
+          </div>
+          <div class="pulse-stat" style="border-left:2px solid #ffd166">
+            <div class="pulse-val" style="color:#ffd166">761</div>
+            <div class="pulse-lbl">платят, но молчат</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-label">Тренд активности (7-дн. среднее)</div>
+        <div class="line-ph" style="height:120px; background:#0d1127; border-radius:8px; padding:12px; display:flex; align-items:flex-end; gap:2px">
+          <div style="flex:1;height:30%;background:rgba(233,69,96,.3);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:45%;background:rgba(233,69,96,.35);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:35%;background:rgba(233,69,96,.3);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:55%;background:rgba(233,69,96,.4);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:40%;background:rgba(233,69,96,.35);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:60%;background:rgba(233,69,96,.45);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:50%;background:rgba(233,69,96,.4);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:75%;background:rgba(233,69,96,.5);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:65%;background:rgba(233,69,96,.45);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:80%;background:rgba(233,69,96,.55);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:90%;background:rgba(233,69,96,.6);border-radius:2px 2px 0 0"></div>
+          <div style="flex:1;height:100%;background:#e94560;border-radius:2px 2px 0 0"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS -->
+    <div class="card" style="margin-top:16px">
+      <div class="section-label">💡 Инсайты · топ тем из чата</div>
+      <div class="insight">
+        <div class="insight-title">Интерес к мини-приложению · 120 упоминаний</div>
+        <div class="insight-sub">Апрель — первый месяц активного обсуждения. Аномально высокая активность.</div>
+      </div>
+      <div class="insight" style="border-left-color:#ffd166">
+        <div class="insight-title">Проблемы с мотивацией · 87 упоминаний</div>
+        <div class="insight-sub">Пик в середине месяца. Связан с окончанием марафона.</div>
+      </div>
+      <div class="insight" style="border-left-color:#00d2a0">
+        <div class="insight-title">Запрос на живые встречи · 54 упоминания</div>
+        <div class="insight-sub">Стабильный запрос. Потенциал для нового продукта.</div>
+      </div>
+    </div>
+
+    <!-- FINANCES preview -->
+    <div class="card" style="margin-top:16px; margin-bottom: 32px">
+      <div class="section-label">💰 Финансы · выручка по месяцам</div>
+      <div style="background:#0d1127; border-radius:8px; height:130px; display:flex; align-items:flex-end; gap:6px; padding:12px 8px 8px">
+        <div style="flex:1;height:83%;background:rgba(233,69,96,.5);border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:62%;background:rgba(233,69,96,.45);border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:13%;background:rgba(233,69,96,.3);border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:61%;background:rgba(233,69,96,.45);border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:46%;background:rgba(233,69,96,.4);border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:20%;background:rgba(233,69,96,.3);border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:100%;background:#e94560;border-radius:3px 3px 0 0"></div>
+        <div style="flex:1;height:35%;background:rgba(233,69,96,.4);border-radius:3px 3px 0 0"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;color:#8892b0;padding:0 8px">
+        <span>Сен</span><span>Окт</span><span>Ноя</span><span>Дек</span><span>Янв</span><span>Фев</span><span>Мар</span><span>Апр</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+</div>
+</body>
+</html>

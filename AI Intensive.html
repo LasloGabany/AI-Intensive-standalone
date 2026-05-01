@@ -1,0 +1,1414 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>AI Интенсив для психологов · 11–13 мая</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ============================================================
+   AI Интенсив для психологов — стили
+   Палитра: тёплый тёмный фон + терракотовый акцент + кремовый
+   ============================================================ */
+
+:root{
+  --bg-0: #0d0c0a;
+  --bg-1: #131210;
+  --bg-2: #1a1815;
+  --bg-3: #221f1b;
+  --line: rgba(255,235,210,.08);
+  --line-strong: rgba(255,235,210,.14);
+  --ink-1: #f4ece0;
+  --ink-2: #c8bfb1;
+  --ink-3: #8e857a;
+  --ink-4: #5c554d;
+  --accent: #d97757;
+  --accent-soft: #e89678;
+  --accent-deep: #b85c3f;
+  --accent-glow: rgba(217,119,87,.18);
+  --serif: 'Cormorant Garamond', 'Times New Roman', Georgia, serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, monospace;
+  --wrap: 1200px;
+  --pad-y: clamp(80px, 9vw, 140px);
+  --radius: 14px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background: var(--bg-1);
+  color: var(--ink-1);
+  font-family: var(--sans);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+img{max-width:100%; display:block}
+a{color:inherit; text-decoration:none}
+button{font:inherit; cursor:pointer}
+
+.wrap{max-width: var(--wrap); margin: 0 auto; padding: 0 28px}
+.center{text-align:center}
+.muted{color: var(--ink-3); font-style: italic}
+em{font-style: italic; color: var(--accent-soft); font-weight: inherit}
+
+.eyebrow{
+  display:block;
+  font-family: var(--sans);
+  text-transform: uppercase;
+  letter-spacing: .22em;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 0 0 22px;
+  text-align: center;
+}
+.island{max-width: 720px; margin: 0 auto}
+.section-head{margin-bottom: 56px}
+
+.section-title{
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: clamp(36px, 5vw, 68px);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+  margin: 0 auto 50px;
+  max-width: 22ch;
+  color: var(--ink-1);
+  text-align: center;
+}
+.section-title .muted{display:block; font-size: .58em; line-height: 1.4; margin-top: 14px; color: var(--ink-3)}
+
+/* HEADER */
+.site-header{
+  position: sticky; top: 0; z-index: 50;
+  backdrop-filter: blur(14px);
+  background: rgba(13,12,10,.72);
+  border-bottom: 1px solid transparent;
+  transition: border-color .25s, background .25s;
+}
+.site-header.scrolled{
+  border-bottom-color: var(--line);
+  background: rgba(13,12,10,.92);
+}
+.header-wrap{display:flex; align-items:center; gap: 32px; height: 72px}
+.brand{display:flex; align-items:baseline; gap: 10px}
+.brand-mark{font-family: var(--serif); font-size: 26px; font-weight: 600; color: var(--accent); letter-spacing: -0.02em}
+.brand-name{font-size: 13px; color: var(--ink-2); text-transform: uppercase; letter-spacing: .14em}
+.brand-name em{color: var(--ink-3); font-style: normal}
+.nav-mid{display:flex; gap: 28px; margin-left: auto; margin-right: auto; font-size: 14px}
+.nav-mid a{color: var(--ink-2); transition: color .2s}
+.nav-mid a:hover{color: var(--accent)}
+.header-cta{display:flex; align-items:center; gap: 18px; margin-left:auto}
+.header-date{font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums}
+
+@media (max-width: 880px){
+  .nav-mid{display:none}
+  .header-date{display:none}
+  .header-wrap{height:64px; gap: 12px}
+  .brand-name{display:none}
+}
+
+/* BUTTONS */
+.btn{
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: 12px; padding: 14px 26px;
+  border: 1px solid transparent; border-radius: 999px;
+  font-weight: 500; font-size: 15px; letter-spacing: 0; cursor: pointer;
+  transition: transform .15s ease, box-shadow .25s, background .25s;
+  text-decoration: none; white-space: nowrap;
+}
+.btn-primary{
+  background: var(--accent); color: #1a0f08;
+  box-shadow: 0 1px 0 0 rgba(255,255,255,.18) inset, 0 0 0 0 var(--accent-glow);
+}
+.btn-primary:hover{
+  background: var(--accent-soft);
+  box-shadow: 0 1px 0 0 rgba(255,255,255,.28) inset, 0 18px 60px -10px var(--accent-glow);
+  transform: translateY(-1px);
+}
+.btn-primary:active{transform: translateY(0)}
+.btn-sm{padding: 10px 18px; font-size: 14px}
+.btn-lg{padding: 17px 32px; font-size: 16px}
+.btn-xl{padding: 22px 44px; font-size: 18px}
+.btn-block{display:flex; width:100%}
+.link-quiet{color: var(--ink-3); border-bottom: 1px dotted var(--ink-4); padding-bottom: 1px; transition: color .2s, border-color .2s; font-size: 14px}
+.link-quiet:hover{color: var(--accent); border-bottom-color: var(--accent)}
+.link-accent{color: var(--accent)}
+.link-accent:hover{color: var(--accent-soft)}
+
+/* HERO */
+.hero{position: relative; padding: 80px 0 100px; overflow: hidden}
+.hero-glow{
+  position: absolute; top: -180px; left: 50%; transform: translateX(-50%);
+  width: 1100px; height: 700px;
+  background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 65%);
+  pointer-events: none; z-index: 0;
+}
+.hero-grain{
+  position:absolute; inset:0;
+  background-image: radial-gradient(rgba(255,255,255,.025) 1px, transparent 1px);
+  background-size: 3px 3px;
+  pointer-events:none; mix-blend-mode: overlay; z-index:0;
+}
+.hero-wrap{position:relative; z-index:1; text-align:center}
+.hero-meta{
+  display:inline-flex; align-items:center; gap: 12px;
+  padding: 8px 18px; border: 1px solid var(--line-strong); border-radius: 999px;
+  font-size: 13px; color: var(--ink-2); margin-bottom: 32px; font-variant-numeric: tabular-nums;
+}
+.hero-meta .dot{
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 0 4px rgba(217,119,87,.22);
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse{0%,100%{opacity:.65; transform:scale(1)}50%{opacity:1; transform:scale(1.18)}}
+.hero-meta .sep{color: var(--ink-4)}
+.hero-title{
+  font-family: var(--serif); font-weight: 500;
+  font-size: clamp(42px, 6vw, 88px); line-height: 1.04;
+  letter-spacing: -0.022em; margin: 0 auto 28px; max-width: 19ch; text-wrap: pretty;
+}
+.hero-title .variant{display:none}
+body[data-headline="A"] .variant-a,
+body[data-headline="B"] .variant-b,
+body[data-headline="C"] .variant-c{display:inline}
+.hero-sub{color: var(--ink-3); font-size: 16px; max-width: 60ch; margin: 0 auto 38px}
+.hero-actions{display:flex; flex-direction:column; align-items:center; gap: 14px; margin-bottom: 48px}
+.hero-microcopy{font-size: 13px; color: var(--ink-3); margin: 0; max-width: 44ch; text-align:center}
+.hero-trust{
+  list-style:none; padding:0; margin: 0 auto;
+  display:flex; gap: 56px; justify-content:center;
+  border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+  padding: 24px 0; max-width: 720px;
+}
+.hero-trust li{display:flex; flex-direction:column; align-items:center; gap: 4px}
+.trust-num{font-family: var(--serif); font-size: 36px; color: var(--ink-1); line-height:1}
+.trust-cap{font-size: 12px; text-transform:uppercase; letter-spacing:.14em; color: var(--ink-3)}
+.countdown{
+  margin: 38px auto 0; display: inline-flex; align-items: baseline; gap: 18px;
+  padding: 14px 22px; background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: 12px; font-variant-numeric: tabular-nums;
+}
+.cd-label{font-size: 12px; text-transform:uppercase; letter-spacing:.16em; color: var(--ink-3); margin-right: 6px}
+.cd-cell{display:inline-flex; align-items:baseline; gap: 4px}
+.cd-cell b{font-family: var(--serif); font-size: 28px; color: var(--ink-1); font-weight: 500; min-width: 1.5ch; text-align:center}
+.cd-cell i{font-style: normal; font-size: 12px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .1em}
+
+@media (max-width: 720px){
+  .hero{padding: 50px 0 70px}
+  .hero-trust{gap: 28px}
+  .trust-num{font-size: 28px}
+  .countdown{gap: 12px; padding: 12px 16px; flex-wrap:wrap}
+}
+
+/* PAIN */
+.pain{padding: var(--pad-y) 0; border-top: 1px solid var(--line); position:relative}
+.pain .pain-grid,.pain .pain-conclusion{max-width: 760px; margin-left:auto; margin-right:auto}
+.pain-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 60px}
+.pain-card{
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 32px 28px 30px;
+  transition: border-color .25s, transform .25s, background .25s; position: relative;
+}
+.pain-card:hover{border-color: var(--accent); background: var(--bg-3); transform: translateY(-4px)}
+.pain-num{font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: .12em; margin-bottom: 22px}
+.pain-card h3{font-family: var(--serif); font-size: 28px; font-weight: 500; margin: 0 0 14px; letter-spacing: -.01em}
+.pain-card p{margin: 0; color: var(--ink-2); font-size: 16px}
+.pain-conclusion{text-align:center; padding: 50px 24px 0; border-top: 1px dashed var(--line); max-width: 760px; margin: 0 auto}
+.pain-conclusion p{font-family: var(--serif); font-size: clamp(22px, 2.4vw, 32px); line-height: 1.3; color: var(--ink-1); max-width: 28ch; margin: 0 auto 14px}
+.pain-bridge{color: var(--ink-3) !important; font-size: 18px !important; font-style: italic}
+@media (max-width: 880px){.pain-grid{grid-template-columns: 1fr; gap: 16px}}
+
+/* IDEA */
+.idea{padding: var(--pad-y) 0; background: var(--bg-0); border-top: 1px solid var(--line)}
+.idea .big-quote,.idea .idea-grid{max-width: 820px; margin-left:auto; margin-right:auto}
+.idea-title{max-width: 28ch; margin-bottom: 36px}
+.big-quote{
+  font-family: var(--serif); font-style: italic;
+  font-size: clamp(28px, 3.4vw, 44px); line-height: 1.18;
+  color: var(--ink-1); margin: 0 auto 80px; padding: 0 28px;
+  border-left: none; text-align: center; max-width: 28ch;
+}
+.idea-grid{display:grid; grid-template-columns: 1fr; gap: 40px; align-items:start; text-align: center}
+.idea-text h3{font-family: var(--serif); font-size: 30px; font-weight: 500; margin: 0 0 18px}
+.idea-text p{color: var(--ink-2); margin: 0 auto 16px; max-width: 60ch}
+.idea-callout{
+  margin: 28px auto 0 !important; padding: 20px 24px;
+  background: rgba(217,119,87,.08); border-radius: 8px;
+  color: var(--ink-1) !important; font-style: italic;
+  font-family: var(--serif); font-size: 19px; max-width: 56ch; text-align: center;
+}
+.testimonial-card{
+  background: var(--bg-2); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 36px 30px 30px; margin: 0; position: relative;
+}
+.testimonial-inline{margin-top: 8px}
+.quote-mark{position:absolute; top: -8px; left: 22px; font-family: var(--serif); font-size: 96px; line-height: 1; color: var(--accent); opacity: .55}
+.testimonial-card blockquote{font-family: var(--serif); font-size: 22px; font-style: italic; line-height: 1.4; margin: 0 0 22px; color: var(--ink-1)}
+.testimonial-card figcaption{display:flex; align-items:center; gap: 14px; border-top: 1px solid var(--line); padding-top: 18px}
+.avatar{width: 44px; height: 44px; border-radius: 50%; display:inline-flex; align-items:center; justify-content:center; font-size: 13px; font-weight: 600; color: #1a0f08; background: var(--accent); flex: none}
+.avatar-svetlana{background: linear-gradient(135deg, #d97757, #b85c3f)}
+.a-1{background: linear-gradient(135deg,#d97757,#a04528)}
+.a-2{background: linear-gradient(135deg,#c4a87a,#8a6d3f)}
+.a-3{background: linear-gradient(135deg,#b88060,#6b4a36)}
+.a-4{background: linear-gradient(135deg,#d4906c,#965a3a)}
+.a-5{background: linear-gradient(135deg,#a87a5e,#5c4232)}
+.a-6{background: linear-gradient(135deg,#cc8966,#7d4c30)}
+figcaption b{display:block; font-size: 14px; color: var(--ink-1); font-weight:600}
+figcaption em{display:block; font-size: 12px; color: var(--ink-3); font-style:normal}
+@media (max-width: 880px){.idea-grid{grid-template-columns: 1fr; gap: 40px}}
+
+/* PROGRAM */
+.program{padding: var(--pad-y) 0; border-top: 1px solid var(--line)}
+.program .days{max-width: 920px; margin: 0 auto}
+.days{display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px}
+.day{
+  background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 0; display:flex; flex-direction:column;
+  transition: transform .3s, border-color .3s; position: relative; overflow: hidden;
+}
+.day::before{content:''; position:absolute; top:0; left:0; right:0; height: 3px; background: linear-gradient(90deg, transparent, var(--accent), transparent); opacity: 0; transition: opacity .3s}
+.day:hover{transform: translateY(-6px); border-color: var(--accent)}
+.day:hover::before{opacity: 1}
+.day-head{padding: 32px 28px 22px; border-bottom: 1px solid var(--line)}
+.day-tag{font-family: var(--mono); font-size: 12px; color: var(--accent); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 16px; display: block}
+.day-head h3{font-family: var(--serif); font-weight: 500; font-size: 26px; letter-spacing: -.01em; margin: 0; line-height: 1.2}
+.day-list{list-style:none; margin: 0; padding: 24px 28px; flex: 1; display:flex; flex-direction: column; gap: 14px}
+.day-list li{position: relative; padding-left: 26px; color: var(--ink-2); font-size: 15px; line-height: 1.5}
+.day-list li::before{content:''; position:absolute; left: 0; top: 8px; width: 14px; height: 8px; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg)}
+.day-list b{color: var(--ink-1)}
+.day-foot{padding: 20px 28px; background: var(--bg-3); display:flex; justify-content:space-between; align-items:flex-end; border-top: 1px solid var(--line)}
+.comp{display:flex; flex-direction:column; gap: 4px}
+.comp-label{font-size: 11px; text-transform: uppercase; letter-spacing: .12em; color: var(--ink-4)}
+.comp-old{font-size: 14px; color: var(--ink-3); text-decoration: line-through}
+.comp-now{align-items:flex-end; text-align:right}
+.comp-new{font-family: var(--serif); font-size: 19px; color: var(--accent)}
+@media (max-width: 880px){.days{grid-template-columns: 1fr; gap: 16px}}
+
+/* FOR WHOM */
+.forwhom{padding: var(--pad-y) 0; background: var(--bg-0); border-top: 1px solid var(--line)}
+.forwhom-grid{display:grid; grid-template-columns: 1fr; gap: 16px; margin-bottom: 50px; max-width: 720px; margin-left:auto; margin-right:auto}
+.forwhom .fw-final,.forwhom .center{max-width: 760px; margin-left:auto; margin-right:auto}
+.fw-col{background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 36px 32px; text-align: center}
+.fw-col h3{font-family: var(--serif); font-size: 28px; font-weight: 500; margin: 0 0 24px; letter-spacing: -.01em; text-align: center}
+.fw-col ul{list-style:none; padding:0; margin: 0 auto; display:flex; flex-direction:column; gap: 14px; max-width: 44ch; text-align: left}
+.fw-col li{position: relative; padding-left: 32px; font-size: 16px; color: var(--ink-2); line-height: 1.5}
+.fw-yes li::before{content:''; position:absolute; left: 0; top: 6px; width: 18px; height: 10px; border-left: 2px solid var(--accent); border-bottom: 2px solid var(--accent); transform: rotate(-45deg)}
+.fw-no li{color: var(--ink-3)}
+.fw-no li::before{content:''; position:absolute; left: 4px; top: 9px; width: 14px; height: 14px; background: linear-gradient(45deg, transparent 45%, var(--ink-4) 45%, var(--ink-4) 55%, transparent 55%), linear-gradient(-45deg, transparent 45%, var(--ink-4) 45%, var(--ink-4) 55%, transparent 55%)}
+.fw-final{font-family: var(--serif); font-size: clamp(20px, 2.2vw, 28px); text-align:center; max-width: 60ch; margin: 0 auto 30px; line-height: 1.4}
+
+/* SPEAKERS */
+.speakers{padding: var(--pad-y) 0; border-top: 1px solid var(--line)}
+.speakers-grid{display:grid; grid-template-columns: 1fr; gap: 16px; max-width: 820px; margin: 0 auto}
+.speaker{display:grid; grid-template-columns: 1fr; gap: 22px; background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 36px 32px; text-align: center; justify-items: center}
+.speaker-photo{width: 180px; height: 180px; border-radius: 50%; overflow: hidden; display:flex; flex-direction:column; align-items:center; justify-content:center; position: relative; background: repeating-linear-gradient(135deg, rgba(217,119,87,.15) 0 12px, rgba(217,119,87,.05) 12px 24px); border: 1px solid var(--line-strong)}
+.speaker-photo-zh{background: radial-gradient(circle at 50% 35%, rgba(217,119,87,.45) 0%, transparent 55%), repeating-linear-gradient(135deg, rgba(217,119,87,.18) 0 12px, rgba(217,119,87,.06) 12px 24px)}
+.speaker-photo-la{background: radial-gradient(circle at 50% 35%, rgba(180,140,110,.45) 0%, transparent 55%), repeating-linear-gradient(135deg, rgba(255,235,210,.1) 0 12px, rgba(255,235,210,.04) 12px 24px)}
+.ph-initials{font-family: var(--serif); font-size: 64px; color: rgba(244,236,224,.8); line-height: 1}
+.ph-caption{position:absolute; bottom: 14px; font-family: var(--mono); font-size: 11px; color: var(--ink-4); letter-spacing: .04em}
+.speaker-body h3{font-family: var(--serif); font-size: 32px; font-weight: 500; margin: 0 0 6px; letter-spacing: -.01em}
+.speaker-sub{color: var(--accent); font-size: 13px; letter-spacing: .04em; margin: 0 0 18px}
+.speaker-body p{color: var(--ink-2); margin: 0 auto 12px; font-size: 15px; max-width: 56ch}
+.speaker-tags{list-style:none; padding:0; margin: 18px auto 0; display:flex; flex-wrap:wrap; gap: 8px; justify-content: center}
+.speaker-tags li{padding: 6px 12px; border: 1px solid var(--line-strong); border-radius: 999px; font-size: 12px; color: var(--ink-2); letter-spacing: .02em}
+@media (max-width: 1000px){
+  .speakers-grid{grid-template-columns: 1fr}
+  .speaker{grid-template-columns: 160px 1fr; padding: 24px; gap: 20px}
+  .speaker-photo{width: 160px; height: 200px}
+  .ph-initials{font-size: 44px}
+}
+@media (max-width: 580px){
+  .speaker{grid-template-columns: 1fr}
+  .speaker-photo{width: 100%; height: 220px}
+}
+
+/* REVIEWS */
+.reviews{padding: var(--pad-y) 0; background: var(--bg-0); border-top: 1px solid var(--line)}
+.reviews-grid{display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; max-width: 1000px; margin: 0 auto}
+.review{background: var(--bg-2); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px 26px 24px; margin: 0; display:flex; flex-direction:column; text-align: center}
+.review blockquote{font-family: var(--serif); font-size: 20px; font-style: italic; line-height: 1.4; margin: 0 0 22px; color: var(--ink-1); flex: 1}
+.review b{color: var(--accent); font-weight: 500; font-style: normal}
+.review figcaption{display:flex; align-items:center; gap: 12px; border-top: 1px solid var(--line); padding-top: 16px; justify-content: center; text-align: left}
+@media (max-width: 1000px){.reviews-grid{grid-template-columns: 1fr 1fr}}
+@media (max-width: 640px){.reviews-grid{grid-template-columns: 1fr}}
+
+/* FORMAT TIMELINE */
+.format{padding: var(--pad-y) 0; border-top: 1px solid var(--line)}
+.format .timeline{max-width: 820px; margin: 0 auto}
+.timeline{list-style:none; padding:0; margin:0; display:flex; flex-direction:column}
+.timeline li{display:grid; grid-template-columns: 1fr; gap: 8px; padding: 28px 0; border-top: 1px solid var(--line); position: relative; text-align: center}
+.timeline li:last-child{border-bottom: 1px solid var(--line)}
+.timeline li::before{display: none}
+.t-time{font-family: var(--mono); font-size: 13px; color: var(--ink-3); letter-spacing: .06em}
+.t-time i{font-style: normal; color: var(--ink-4); padding: 0 4px}
+.timeline h3{font-family: var(--serif); font-size: 26px; font-weight: 500; letter-spacing: -.01em; margin: 0 0 8px}
+.timeline p{margin: 0 auto; color: var(--ink-2); max-width: 60ch}
+
+/* VALUE STACK */
+.stack{padding: var(--pad-y) 0; background: var(--bg-0); border-top: 1px solid var(--line)}
+.stack .stack-list,.stack .stack-total{max-width: 820px; margin-left:auto; margin-right:auto}
+.stack-list{list-style:none; padding:0; margin: 0 auto 40px}
+.stack-list li{display: grid; grid-template-columns: 1fr; gap: 6px; padding: 22px 0; border-top: 1px solid var(--line); text-align: center}
+.stack-list li:last-child{border-bottom: 1px solid var(--line)}
+.s-item{position: relative; padding-left: 0; font-size: 17px; color: var(--ink-1)}
+.s-item::before{display:none}
+.s-eq{color: var(--ink-3); font-size: 14px; font-style: italic; text-align: center; font-family: var(--serif)}
+.s-eq b{color: var(--ink-2); font-weight: 500; font-style: normal; font-family: var(--sans); font-size: 13px; padding-left: 6px}
+.stack-total{text-align: center; padding: 40px; background: linear-gradient(180deg, rgba(217,119,87,.05), transparent), var(--bg-2); border: 1px solid var(--line-strong); border-radius: var(--radius); position: relative}
+.total-line{display:flex; justify-content:space-between; align-items:baseline; padding: 12px 0; max-width: 480px; margin: 0 auto; font-size: 16px; text-align: left}
+.total-line:first-child{border-bottom: 1px solid var(--line)}
+.total-strike{color: var(--ink-3); text-decoration: line-through; font-family: var(--serif); font-size: 22px}
+.total-now{padding-top: 22px}
+.total-now-val{font-family: var(--serif); font-size: clamp(48px, 6vw, 72px); color: var(--accent); line-height: 1}
+.total-fine{color: var(--ink-3); font-size: 13px; margin: 4px 0 28px}
+
+/* AI FUN FACTS */
+.funfacts{position: relative; padding: var(--pad-y) 0; border-top: 1px solid var(--line); background: var(--bg-0); overflow: hidden}
+.funfacts-stage{position: relative; height: 280px; margin: 30px auto 30px; max-width: 1100px}
+.ff-svg{position:absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible}
+.ff-particles{position:absolute; inset:0; pointer-events:none}
+.ff-dot-p{position: absolute; width: 6px; height: 6px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 6px var(--accent), 0 0 18px var(--accent-glow), 0 0 32px var(--accent-glow); transform: translate(-50%,-50%); opacity: 0}
+.ff-card{
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+  width: min(520px, 90%); padding: 30px 36px;
+  background: rgba(26,24,21,.72); backdrop-filter: blur(14px);
+  border: 1px solid rgba(217,119,87,.28); border-radius: 16px;
+  text-align: center; box-shadow: 0 0 60px rgba(217,119,87,.12);
+  transition: opacity .4s, transform .4s;
+}
+.ff-card.swap{opacity: 0; transform: translate(-50%,-46%)}
+.ff-num{display:block; font-family: var(--serif); margin-bottom: 8px}
+.ff-num b{font-size: clamp(40px, 5vw, 64px); font-weight: 500; color: var(--accent); line-height: 1; letter-spacing: -.02em}
+.ff-text{margin: 0; font-size: 16px; color: var(--ink-2); line-height: 1.5}
+.ff-dots{display:flex; justify-content:center; gap: 10px; margin-top: 20px}
+.ff-dot{width: 8px; height: 8px; border: none; border-radius: 50%; background: var(--ink-4); transition: background .3s, transform .3s; cursor: pointer; padding: 0}
+.ff-dot.active{background: var(--accent); transform: scale(1.4)}
+
+/* NETWORK GRAPH */
+.netgraph{padding: var(--pad-y) 0; border-top: 1px solid var(--line); background: radial-gradient(ellipse at center top, rgba(217,119,87,.06), transparent 60%), var(--bg-1); position: relative}
+.netgraph-lede{text-align:center; color: var(--ink-3); max-width: 56ch; margin: -20px auto 50px; font-size: 15px}
+.net-stage{position: relative; width: 100%; max-width: 1000px; aspect-ratio: 10 / 7; margin: 0 auto}
+.net-svg{position:absolute; inset:0; width: 100%; height: 100%; overflow: visible}
+.net-svg .edge{transition: stroke .4s, stroke-width .4s, opacity .4s}
+.net-svg .edge.active{stroke: var(--accent); stroke-width: 1.5; opacity: 1; filter: drop-shadow(0 0 4px var(--accent-glow))}
+.net-particle{fill: var(--accent); filter: drop-shadow(0 0 4px var(--accent)) drop-shadow(0 0 10px var(--accent-glow))}
+.net-nodes{position:absolute; inset:0; pointer-events:none}
+.net-node{position: absolute; transform: translate(-50%,-50%); pointer-events: auto; cursor: pointer; padding: 11px 18px; background: rgba(26,24,21,.72); backdrop-filter: blur(10px); border: 1px solid rgba(217,119,87,.22); border-radius: 999px; color: var(--ink-2); font-size: 13px; letter-spacing: .04em; font-family: var(--mono); white-space: nowrap; transition: transform .35s cubic-bezier(.2,.7,.3,1), background .3s, border-color .3s, color .3s, box-shadow .35s}
+.net-node.center{font-family: var(--serif); font-size: 22px; font-weight: 500; letter-spacing: -.01em; padding: 18px 32px; border-color: var(--accent); background: rgba(217,119,87,.12); color: var(--ink-1); box-shadow: 0 0 0 1px rgba(217,119,87,.18) inset, 0 0 30px rgba(217,119,87,.25)}
+.net-node:hover{transform: translate(-50%,-50%) scale(1.08); border-color: var(--accent); background: rgba(217,119,87,.18); color: var(--ink-1); box-shadow: 0 0 24px rgba(217,119,87,.4); z-index: 3}
+.net-node.linked{border-color: var(--accent-soft); color: var(--ink-1); box-shadow: 0 0 18px rgba(217,119,87,.25)}
+@media (max-width: 720px){
+  .net-stage{aspect-ratio: auto; height: 520px}
+  .net-node{font-size: 11px; padding: 8px 12px}
+  .net-node.center{font-size: 17px; padding: 14px 22px}
+  .funfacts-stage{height: 360px}
+}
+
+/* REGISTER */
+.register{padding: var(--pad-y) 0; border-top: 1px solid var(--line); position: relative}
+.register::before{content: ''; position: absolute; top: -160px; left: 50%; transform: translateX(-50%); width: 800px; height: 500px; background: radial-gradient(ellipse at center, var(--accent-glow), transparent 70%); pointer-events: none}
+.register-wrap{display:grid; grid-template-columns: 1fr; gap: 40px; align-items: start; position: relative; max-width: 560px; margin: 0 auto; text-align: center}
+.register-meta .section-title{margin-bottom: 28px}
+.register-bullets{list-style:none; padding:0; margin:0 auto; display:flex; flex-direction:column; gap: 12px; max-width: 44ch; text-align: left}
+.register-bullets li{display:flex; gap: 12px; color: var(--ink-2); font-size: 15px}
+.check{color: var(--accent); font-weight: 600}
+.register-form{background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: var(--radius); padding: 36px 32px; position: relative; text-align: left}
+.field{margin-bottom: 22px}
+.field label{display:block; font-size: 13px; color: var(--ink-3); margin-bottom: 8px; letter-spacing: .02em}
+.field label .opt{color: var(--ink-4); font-size: 12px}
+.field input[type="text"],.field input[type="email"],.field input[type="tel"]{width: 100%; background: var(--bg-1); border: 1px solid var(--line-strong); border-radius: 10px; color: var(--ink-1); padding: 14px 16px; font: inherit; font-size: 16px; transition: border-color .2s, background .2s}
+.field input:focus{outline: none; border-color: var(--accent); background: var(--bg-3)}
+.field.invalid input{border-color: #c0533c}
+.field-err{display:block; min-height: 16px; font-size: 12px; color: #e08a78; margin-top: 6px}
+.phone-wrap{display:flex; background: var(--bg-1); border: 1px solid var(--line-strong); border-radius: 10px; overflow: hidden; transition: border-color .2s}
+.phone-wrap:focus-within{border-color: var(--accent)}
+.phone-flag{display:flex; align-items:center; padding: 0 14px; font-size: 15px; color: var(--ink-2); border-right: 1px solid var(--line); user-select: none}
+.phone-wrap input{border:none !important; background:transparent !important; flex:1}
+.check-row{display:flex; gap: 12px; align-items:flex-start; font-size: 13px; color: var(--ink-3); margin-bottom: 22px; cursor: pointer; line-height: 1.4}
+.check-row input[type="checkbox"]{appearance:none; width: 18px; height: 18px; border: 1px solid var(--line-strong); border-radius: 4px; background: var(--bg-1); flex: none; margin-top: 2px; position: relative; cursor:pointer; transition: background .2s, border-color .2s}
+.check-row input[type="checkbox"]:checked{background: var(--accent); border-color: var(--accent)}
+.check-row input[type="checkbox"]:checked::after{content:''; position:absolute; left:5px; top:1px; width: 6px; height: 11px; border: solid #1a0f08; border-width: 0 2px 2px 0; transform: rotate(45deg)}
+.check-row a{color: var(--ink-2); border-bottom: 1px dotted var(--ink-4)}
+.form-fine{font-size: 12px; color: var(--ink-3); text-align:center; margin: 14px 0 0}
+.form-success{text-align:center; padding: 20px; background: rgba(217,119,87,.08); border: 1px solid var(--accent); border-radius: 10px; margin-top: 18px}
+.form-success h3{margin: 0 0 8px; color: var(--accent); font-family: var(--serif); font-size: 24px}
+.form-success p{margin: 0; color: var(--ink-2); font-size: 14px}
+
+/* GUARANTEE */
+.guarantee{padding: 80px 0; background: var(--bg-0); border-top: 1px solid var(--line)}
+.guard-card{max-width: 640px; margin: 0 auto; text-align: center; padding: 48px 40px; background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 18px; position: relative}
+.guard-shield{display:inline-flex; align-items:center; justify-content:center; width: 80px; height: 80px; border-radius: 50%; background: rgba(217,119,87,.12); color: var(--accent); margin: 0 auto 20px}
+.guard-card h2{font-family: var(--serif); font-size: clamp(28px, 3vw, 40px); font-weight: 500; margin: 6px 0 20px; line-height: 1.2; letter-spacing: -.01em}
+.guard-text{color: var(--ink-2); margin: 0 0 24px; font-size: 15px}
+
+/* FAQ */
+.faq{padding: var(--pad-y) 0; border-top: 1px solid var(--line)}
+.faq .section-title{text-align:center; margin: 0 auto 50px; max-width: none}
+.faq-list{max-width: 760px; margin: 0 auto; display:flex; flex-direction:column; gap: 10px}
+.faq-list details{background: var(--bg-2); border: 1px solid var(--line); border-radius: 12px; padding: 0; transition: border-color .2s, background .2s}
+.faq-list details[open]{border-color: var(--accent)}
+.faq-list summary{list-style: none; padding: 22px 28px; cursor: pointer; display:flex; justify-content:space-between; align-items:center; gap: 24px; font-size: 17px; color: var(--ink-1); position: relative}
+.faq-list summary::-webkit-details-marker{display:none}
+.caret{width: 14px; height: 14px; flex: none; position: relative}
+.caret::before,.caret::after{content:''; position:absolute; left: 0; top: 6px; width: 14px; height: 2px; background: var(--accent); transition: transform .25s}
+.caret::after{transform: rotate(90deg)}
+details[open] .caret::after{transform: rotate(0deg)}
+.ans{padding: 0 28px 24px}
+.ans p{margin: 0; color: var(--ink-2); font-size: 16px; line-height: 1.6}
+
+/* FINAL CTA */
+.final-cta{padding: 100px 0; background: radial-gradient(ellipse at top, var(--accent-glow) 0%, transparent 60%), var(--bg-0); border-top: 1px solid var(--line); text-align:center}
+.final-wrap{max-width: 820px}
+.final-quote{margin: 0 0 60px; padding: 24px 32px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line)}
+.final-quote blockquote{font-family: var(--serif); font-size: clamp(20px, 2.4vw, 26px); font-style: italic; margin: 0 0 8px; line-height: 1.4}
+.final-quote b{color: var(--accent); font-weight: 500; font-style: normal}
+.final-quote figcaption{color: var(--ink-3); font-size: 13px}
+.final-title{font-family: var(--serif); font-weight: 500; font-size: clamp(34px, 4.6vw, 60px); line-height: 1.1; letter-spacing: -.018em; margin: 0 0 22px}
+.final-sub{color: var(--ink-3); margin: 0 0 38px; font-size: 16px}
+.final-fine{color: var(--ink-4); font-size: 13px; margin: 16px 0 0}
+
+/* FOOTER */
+.footer{padding: 80px 0 40px; background: var(--bg-0); border-top: 1px solid var(--line); font-size: 13px; color: var(--ink-3)}
+.footer-wrap{display:grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 40px; padding-bottom: 50px; border-bottom: 1px solid var(--line)}
+.foot-col p{margin: 0 0 14px; line-height: 1.7}
+.foot-links{list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap: 10px}
+.foot-links a{border-bottom: 1px dotted var(--ink-4); transition: color .2s}
+.foot-links a:hover{color: var(--accent)}
+.footer-bottom{display:flex; justify-content:space-between; align-items:center; padding-top: 24px; font-size: 12px}
+.brand-mini{font-family: var(--serif); font-size: 16px; color: var(--accent)}
+@media (max-width: 720px){
+  .footer-wrap{grid-template-columns: 1fr; gap: 30px}
+  .footer-bottom{flex-direction: column; gap: 14px; text-align:center}
+}
+
+/* STICKY MOBILE CTA */
+.sticky-cta{position: fixed; bottom: 16px; left: 16px; right: 16px; z-index: 40; display: none; background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 14px; padding: 12px 16px; align-items: center; gap: 12px; box-shadow: 0 12px 36px rgba(0,0,0,.6); backdrop-filter: blur(12px)}
+.sc-text{flex:1; font-size: 13px; color: var(--ink-2); line-height: 1.3}
+.sc-text b{color: var(--accent)}
+.sc-text span{color: var(--ink-3); font-size: 12px}
+@media (max-width: 720px){.sticky-cta{display: flex}}
+
+/* REVEAL ON SCROLL */
+.reveal{opacity: 0; transform: translateY(20px); transition: opacity .8s ease, transform .8s ease}
+.reveal.in{opacity: 1; transform: none}
+
+/* TWEAKS PANEL */
+.tw-panel{position: fixed; right: 20px; bottom: 20px; z-index: 99; width: 280px; background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 14px; box-shadow: 0 18px 60px rgba(0,0,0,.7); padding: 0; transform: translateY(20px); opacity: 0; pointer-events: none; transition: opacity .25s, transform .25s; font-size: 13px}
+.tw-panel.open{transform: none; opacity: 1; pointer-events: auto}
+.tw-head{display:flex; justify-content:space-between; align-items:center; padding: 14px 16px; border-bottom: 1px solid var(--line)}
+.tw-head h4{margin:0; font-family: var(--serif); font-size: 18px; font-weight: 500; color: var(--accent)}
+.tw-close{background:none; border:none; color: var(--ink-3); font-size: 20px; cursor: pointer; padding: 0; line-height: 1}
+.tw-close:hover{color: var(--accent)}
+.tw-body{padding: 16px}
+.tw-section{margin-bottom: 18px}
+.tw-section:last-child{margin-bottom: 0}
+.tw-label{font-size: 11px; text-transform:uppercase; letter-spacing:.14em; color: var(--ink-3); margin-bottom: 8px}
+.tw-radio{display:flex; gap: 6px}
+.tw-radio button{flex:1; padding: 10px 8px; background: var(--bg-1); border: 1px solid var(--line); border-radius: 8px; color: var(--ink-2); font-size: 12px; transition: all .2s}
+.tw-radio button.active{background: var(--accent); color: #1a0f08; border-color: var(--accent)}
+.tw-radio button:hover:not(.active){border-color: var(--accent)}
+.tw-swatches{display:flex; gap: 8px}
+.tw-swatch{width: 28px; height: 28px; border-radius: 50%; border: 2px solid transparent; cursor: pointer; transition: border-color .2s, transform .2s}
+.tw-swatch.active{border-color: var(--ink-1); transform: scale(1.12)}
+</style>
+</head>
+<body data-headline="A">
+
+<!-- HEADER -->
+<header class="site-header" id="siteHeader">
+  <div class="wrap header-wrap">
+    <a href="#top" class="brand">
+      <span class="brand-mark">AI</span>
+      <span class="brand-name">интенсив <em>для психологов</em></span>
+    </a>
+    <nav class="nav-mid" aria-label="Основная навигация">
+      <a href="#program">Программа</a>
+      <a href="#speakers">Спикеры</a>
+      <a href="#reviews">Отзывы</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+    <div class="header-cta">
+      <span class="header-date">старт 11–13 мая</span>
+      <a href="#register" class="btn btn-primary btn-sm">Зарегистрироваться</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grain" aria-hidden="true"></div>
+  <div class="hero-glow" aria-hidden="true"></div>
+  <div class="wrap hero-wrap">
+    <div class="hero-meta" style="font-size:17px">
+      <span class="dot"></span>
+      <span>Бесплатный онлайн-интенсив</span>
+      <span class="sep">·</span>
+      <span>11–13 мая · Zoom</span>
+    </div>
+
+    <h1 class="hero-title" data-variant>
+      <span class="variant variant-a">
+        За <em>3 вечера</em> — готовое позиционирование, первый пост в соцсетях и план работы на <em>10 недель</em>.
+      </span>
+      <span class="variant variant-b">
+        Перестаньте тратить по 8 часов в&nbsp;неделю на протоколы и&nbsp;посты. Три вечера — и&nbsp;у&nbsp;вас есть <em>система</em>, которая делает это за&nbsp;вас.
+      </span>
+      <span class="variant variant-c">
+        Для психологов, у&nbsp;которых куча купленных курсов — и&nbsp;<em>ни одного</em> работающего блога.
+      </span>
+    </h1>
+
+    <p class="hero-sub">
+      90 минут в&nbsp;день · Без кода<br/>· Без технического образования · Только практика
+    </p>
+
+    <div class="hero-actions">
+      <a href="#register" class="btn btn-primary btn-lg">
+        <span>Зарегистрироваться бесплатно</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+      <p class="hero-microcopy" style="color: rgb(244, 236, 224)">Сразу после регистрации — доступ в закрытый чат и первое задание</p>
+    </div>
+
+    <ul class="hero-trust">
+      <li><span class="trust-num">2 000</span><span class="trust-cap">выпускников</span></li>
+      <li><span class="trust-num">22</span><span class="trust-cap">года практики</span></li>
+      <li><span class="trust-num">2-й</span><span class="trust-cap">поток</span></li>
+    </ul>
+
+    <div class="countdown" id="countdown" aria-live="polite">
+      <span class="cd-label">До старта</span>
+      <span class="cd-cell"><b id="cd-d">--</b><i>дн.</i></span>
+      <span class="cd-cell"><b id="cd-h">--</b><i>ч.</i></span>
+      <span class="cd-cell"><b id="cd-m">--</b><i>м.</i></span>
+      <span class="cd-cell"><b id="cd-s">--</b><i>с.</i></span>
+    </div>
+  </div>
+</section>
+
+<!-- PAIN -->
+<section class="pain" id="pain" style="text-align:left">
+  <div class="wrap">
+    <p class="eyebrow" style="text-align:left">Прежде чем читать дальше</p>
+    <h2 class="section-title" style="text-align:left; margin:0 0 50px">скажите честно — <em>вы&nbsp;узнаёте&nbsp;себя</em> хотя&nbsp;бы&nbsp;в&nbsp;одном?</h2>
+    <div class="pain-grid">
+      <article class="pain-card">
+        <div class="pain-num">01</div>
+        <h3>Вечный студент</h3>
+        <p>Вы купили уже третий курс по&nbsp;ИИ. Посмотрели первые три урока.<br/>Потом жизнь. Потом следующий курс.</p>
+      </article>
+      <article class="pain-card">
+        <div class="pain-num">02</div>
+        <h3>Писать — это каторга</h3>
+        <p>Каждый пост — полдня. Сначала думаешь, потом пишешь, потом переписываешь. Выходит редко и&nbsp;через силу.</p>
+      </article>
+      <article class="pain-card">
+        <div class="pain-num">03</div>
+        <h3>То густо, то пусто</h3>
+        <p>Клиенты есть — когда работает сарафанное радио. Нет системы, нет&nbsp;предсказуемости.</p>
+      </article>
+    </div>
+    <div class="pain-conclusion">
+      <p>Это не&nbsp;про то, что вы&nbsp;мало работаете.<br/>Это про то, что у&nbsp;вас нет&nbsp;<em>системы</em>.</p>
+      <p class="pain-bridge">ИИ — это система. Именно для&nbsp;этого мы&nbsp;создали интенсив.</p>
+    </div>
+  </div>
+</section>
+
+<!-- KEY IDEA -->
+<section class="idea">
+  <div class="wrap idea-wrap">
+    <p class="eyebrow">Главная идея</p>
+    <h2 class="section-title idea-title">
+      Большинство психологов пробовали ИИ&nbsp;— и&nbsp;бросили.
+      <span class="muted">Не&nbsp;потому что он не&nbsp;работает. Потому что использовали его не&nbsp;так.</span>
+    </h2>
+    <blockquote class="big-quote">
+      «ИИ&nbsp;не&nbsp;заменяет вас. Он&nbsp;вытаскивает из&nbsp;вас то, что у&nbsp;вас уже есть.»
+    </blockquote>
+    <div class="idea-grid">
+      <div class="idea-text">
+        <h3>Режим «Вытащи из&nbsp;меня»</h3>
+        <p>Большинство пробует ИИ так: задаёшь вопрос — получаешь ответ. Текст оказывается чужим. Не&nbsp;ваш голос, не&nbsp;ваши клиенты, не&nbsp;ваша глубина.</p>
+        <p>Мы покажем другой режим. Вы говорите — ИИ слушает. Вы рассказываете о&nbsp;клиенте — ИИ собирает позиционирование. Вы делитесь случаем&nbsp;— ИИ оформляет его в&nbsp;пост вашими словами.</p>
+        <p class="idea-callout">ИИ&nbsp;— это ваш тихий помощник, который не&nbsp;устаёт, не&nbsp;осуждает и&nbsp;всегда готов работать в&nbsp;вашем темпе.</p>
+      </div>
+      <figure class="testimonial-card testimonial-inline">
+        <div class="quote-mark">&ldquo;</div>
+        <blockquote>Много раз пробовала подойти к&nbsp;ИИ. Не&nbsp;получалось. Здесь&nbsp;наконец сложился пазл — как это применять на&nbsp;практике.</blockquote>
+        <figcaption>
+          <span class="avatar avatar-svetlana" aria-hidden="true">СВ</span>
+          <span><b>Светлана Вовк</b><em>психолог, выпускница 3-го потока</em></span>
+        </figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- AI FUN FACTS -->
+<section class="funfacts" id="funfacts">
+  <div class="wrap">
+    <p class="eyebrow">Почему ИИ — это серьёзно</p>
+    <h2 class="section-title">Цифры, которые <em>меняют</em> взгляд</h2>
+  </div>
+  <div class="funfacts-stage">
+    <svg class="ff-svg" viewBox="0 0 1000 240" preserveAspectRatio="none" aria-hidden="true">
+      <path id="ff-path" d="M 0 120 C 120 40, 280 200, 500 120 S 880 40, 1000 120" fill="none" stroke="rgba(217,119,87,.12)" stroke-width="1.5"/>
+    </svg>
+    <div class="ff-particles" id="ffParticles"></div>
+    <div class="ff-card" id="ffCard">
+      <span class="ff-num"><b id="ffNum">73%</b></span>
+      <p class="ff-text" id="ffText">психологов, попробовавших ИИ, бросают в первую неделю — потому что используют его как поисковик, а не как соавтора.</p>
+      <div class="ff-dots">
+        <button class="ff-dot active" data-i="0"></button>
+        <button class="ff-dot" data-i="1"></button>
+        <button class="ff-dot" data-i="2"></button>
+        <button class="ff-dot" data-i="3"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROGRAM -->
+<section class="program" id="program">
+  <div class="wrap">
+    <p class="eyebrow">Программа</p>
+    <h2 class="section-title">Что вы унесёте <em>с&nbsp;каждого&nbsp;дня</em></h2>
+    <div class="days">
+      <article class="day" data-day="1">
+        <header class="day-head">
+          <span class="day-tag">День&nbsp;1 · 11&nbsp;мая</span>
+          <h3>Ваше позиционирование&nbsp;— готово</h3>
+        </header>
+        <ul class="day-list">
+          <li>Формулировка специализации&nbsp;— своими словами, без шаблонов</li>
+          <li>Описание идеального клиента</li>
+          <li>Готовый текст «Кто я и&nbsp;кому я&nbsp;помогаю»</li>
+        </ul>
+        <footer class="day-foot">
+          <div class="comp"><span class="comp-label">У&nbsp;копирайтера</span><span class="comp-old">от&nbsp;15&nbsp;000&nbsp;₽</span></div>
+          <div class="comp comp-now"><span class="comp-label">У&nbsp;вас</span><span class="comp-new">за&nbsp;90&nbsp;минут</span></div>
+        </footer>
+      </article>
+      <article class="day" data-day="2">
+        <header class="day-head">
+          <span class="day-tag">День&nbsp;2 · 12&nbsp;мая</span>
+          <h3>Ваш первый пост&nbsp;— опубликован</h3>
+        </header>
+        <ul class="day-list">
+          <li>Первый пост, написанный <b>вашим голосом</b></li>
+          <li>Шаблон для следующих постов</li>
+          <li>Система: голосовая заметка → готовый текст за&nbsp;15&nbsp;минут</li>
+        </ul>
+        <footer class="day-foot">
+          <div class="comp"><span class="comp-label">У&nbsp;специалиста</span><span class="comp-old">2&nbsp;000–5&nbsp;000&nbsp;₽</span></div>
+          <div class="comp comp-now"><span class="comp-label">У&nbsp;вас</span><span class="comp-new">15&nbsp;минут</span></div>
+        </footer>
+      </article>
+      <article class="day" data-day="3">
+        <header class="day-head">
+          <span class="day-tag">День&nbsp;3 · 13&nbsp;мая</span>
+          <h3>Ваш план на&nbsp;10&nbsp;недель — у&nbsp;вас в&nbsp;руках</h3>
+        </header>
+        <ul class="day-list">
+          <li>Контент-план на&nbsp;10&nbsp;недель</li>
+          <li>Настроенный поток: от&nbsp;темы к&nbsp;готовому посту</li>
+          <li>Система, которая работает без&nbsp;вашего постоянного участия</li>
+        </ul>
+        <footer class="day-foot">
+          <div class="comp"><span class="comp-label">Стратегическая сессия</span><span class="comp-old">от&nbsp;10&nbsp;000&nbsp;₽</span></div>
+          <div class="comp comp-now"><span class="comp-label">Карта</span><span class="comp-new">уносите с&nbsp;собой</span></div>
+        </footer>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- NETWORK GRAPH -->
+<section class="netgraph" id="netgraph">
+  <div class="wrap">
+    <p class="eyebrow">Ваша система</p>
+    <h2 class="section-title">ИИ становится <em>центром</em> вашей практики</h2>
+    <p class="netgraph-lede">Наведите на любой элемент — увидите, как ИИ соединяет всё вместе</p>
+  </div>
+  <div class="net-stage" id="netStage">
+    <svg class="net-svg" id="netSvg" viewBox="0 0 1000 700" aria-hidden="true">
+      <g id="netEdges"></g>
+      <g id="netParticles"></g>
+    </svg>
+    <div class="net-nodes" id="netNodes"></div>
+  </div>
+</section>
+
+<!-- FOR WHOM -->
+<section class="forwhom" id="forwhom">
+  <div class="wrap">
+    <p class="eyebrow">Для кого</p>
+    <h2 class="section-title">Этот интенсив создавался для&nbsp;<em>одного конкретного человека</em>.<span class="muted">Это вы?</span></h2>
+    <div class="forwhom-grid">
+      <div class="fw-col fw-yes">
+        <h3>Это для&nbsp;вас</h3>
+        <ul>
+          <li>Вы&nbsp;практикующий психолог, коуч или консультант</li>
+          <li>У&nbsp;вас есть клиенты — но&nbsp;нет системы привлечения новых</li>
+          <li>Вы&nbsp;хотите вести блог, но&nbsp;не&nbsp;знаете, о&nbsp;чём писать</li>
+          <li>Вы&nbsp;уже пробовали ИИ — и&nbsp;не&nbsp;смогли встроить в&nbsp;работу</li>
+          <li>Вам не&nbsp;нужен ещё один курс — нужен готовый результат за&nbsp;три вечера</li>
+          <li>У&nbsp;вас есть смартфон или компьютер с&nbsp;интернетом</li>
+        </ul>
+      </div>
+      <div class="fw-col fw-no">
+        <h3>Это <em>не</em>&nbsp;для&nbsp;вас</h3>
+        <ul>
+          <li>Если вы&nbsp;ищете результат без&nbsp;вашего участия</li>
+          <li>Если вы&nbsp;против использования технологий в&nbsp;работе</li>
+          <li>Если ожидаете, что ИИ всё сделает за&nbsp;вас</li>
+        </ul>
+      </div>
+    </div>
+    <p class="fw-final">Если вы&nbsp;дочитали до&nbsp;этой строки и&nbsp;<em>не&nbsp;нашли себя</em> в&nbsp;блоке «Не&nbsp;для&nbsp;вас»&nbsp;— значит, ваше место здесь. И&nbsp;оно бесплатно.</p>
+    <div class="center"><a href="#register" class="btn btn-primary btn-lg">Занять место →</a></div>
+  </div>
+</section>
+
+<!-- SPEAKERS -->
+<section class="speakers" id="speakers">
+  <div class="wrap">
+    <p class="eyebrow">Кто проведёт</p>
+    <h2 class="section-title">Двое, которые делают это <em>каждый&nbsp;день</em></h2>
+    <div class="speakers-grid">
+      <article class="speaker">
+        <div class="speaker-photo speaker-photo-zh" aria-label="Фото Жанны Абрамовой">
+          <span class="ph-initials">ЖА</span>
+          <span class="ph-caption">[фото · Жанна]</span>
+        </div>
+        <div class="speaker-body">
+          <h3>Жанна Абрамова</h3>
+          <p class="speaker-sub">22 года практики · 22&nbsp;000 выпускников · премия Сколково</p>
+          <p>22 года практики&nbsp;— это не&nbsp;академические знания. Это тысячи реальных клиентов, работу с&nbsp;которыми она теперь систематизирует с&nbsp;помощью&nbsp;ИИ, не&nbsp;теряя глубины.</p>
+          <p>Эксперт федеральных каналов. Автор методологии «Вытащи из&nbsp;меня».</p>
+          <ul class="speaker-tags">
+            <li>22 года практики</li><li>22 000 выпускников</li><li>Премия Сколково</li>
+          </ul>
+        </div>
+      </article>
+      <article class="speaker speaker-alt">
+        <div class="speaker-photo speaker-photo-la" aria-label="Фото Ласло">
+          <span class="ph-initials">Л</span>
+          <span class="ph-caption">[фото · Ласло]</span>
+        </div>
+        <div class="speaker-body">
+          <h3>Ласло</h3>
+          <p class="speaker-sub">30 лет в&nbsp;предпринимательстве · автоматизировал свою работу до&nbsp;того, как начал учить других</p>
+          <p>Не&nbsp;теория — личный опыт. Показывает вживую, как работает его система: голосовая заметка утром&nbsp;— готовый материал к&nbsp;вечеру.</p>
+          <p>Раньше в&nbsp;команде было 20 человек. Сейчас вдвоём делают как те 20.</p>
+          <ul class="speaker-tags">
+            <li>30 лет опыта</li><li>Своя система</li><li>Показывает вживую</li>
+          </ul>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section class="reviews" id="reviews">
+  <div class="wrap">
+    <p class="eyebrow">Отзывы</p>
+    <h2 class="section-title">Не&nbsp;верите? <em>Послушайте&nbsp;их</em></h2>
+    <div class="reviews-grid">
+      <figure class="review"><blockquote>Перевод постов занимал <b>часами</b>. Теперь — <b>10&nbsp;секунд</b>. Без преувеличений.</blockquote><figcaption><span class="avatar a-1">AT</span><span><b>Anastasia Tor</b><em>психолог, 2-й поток</em></span></figcaption></figure>
+      <figure class="review"><blockquote>Раньше <b>часами</b> искала картинки и&nbsp;подбирала оформление. Теперь это занимает <b>10&nbsp;минут</b>.</blockquote><figcaption><span class="avatar a-2">ТК</span><span><b>Татьяна Капризова</b><em>детский психолог</em></span></figcaption></figure>
+      <figure class="review"><blockquote>Главное — голос остался моим. Не&nbsp;«ИИ‑шаблон», а&nbsp;именно я. Клиенты пишут: «как&nbsp;будто вы&nbsp;со&nbsp;мной разговариваете».</blockquote><figcaption><span class="avatar a-3">МР</span><span><b>Мария Ровенская</b><em>гештальт‑терапевт</em></span></figcaption></figure>
+      <figure class="review"><blockquote>Три года вела блог через силу. После интенсива пишу пост за&nbsp;15&nbsp;минут и&nbsp;<b>хочу</b> писать ещё.</blockquote><figcaption><span class="avatar a-4">ЕП</span><span><b>Елена Прохорова</b><em>семейный психолог</em></span></figcaption></figure>
+      <figure class="review"><blockquote>Контент‑план на&nbsp;10 недель — впервые за&nbsp;всё время практики. И&nbsp;он реально работает.</blockquote><figcaption><span class="avatar a-5">ОС</span><span><b>Ольга Степина</b><em>коуч</em></span></figcaption></figure>
+      <figure class="review"><blockquote>Я скептически отношусь к&nbsp;курсам. Этот — единственный, после которого через неделю остался <b>результат</b>, а&nbsp;не&nbsp;тетрадка.</blockquote><figcaption><span class="avatar a-6">НГ</span><span><b>Наталья Г.</b><em>психоаналитик</em></span></figcaption></figure>
+    </div>
+  </div>
+</section>
+
+<!-- FORMAT TIMELINE -->
+<section class="format" id="format">
+  <div class="wrap">
+    <p class="eyebrow">Формат</p>
+    <h2 class="section-title">Мы не&nbsp;проводим вебинары. <em>Вот&nbsp;чем</em> отличается этот формат:</h2>
+    <ol class="timeline">
+      <li><span class="t-time">00:00<i>–</i>00:10</span><h3>Открытие</h3><p>Мы начинаем с&nbsp;<em>ваших</em> ответов на&nbsp;опрос — не&nbsp;с&nbsp;нашей программы.</p></li>
+      <li><span class="t-time">00:10<i>–</i>00:25</span><h3>Разбор проблемы</h3><p>Честный разговор о&nbsp;том, что реально мешает — без&nbsp;лишних слов.</p></li>
+      <li><span class="t-time">00:25<i>–</i>00:40</span><h3>Переосмысление</h3><p>Один сдвиг в&nbsp;восприятии задачи, который меняет подход целиком.</p></li>
+      <li><span class="t-time">00:40<i>–</i>01:10</span><h3>Демонстрация + практика</h3><p>Видите, как делается — и&nbsp;сразу делаете сами. Не&nbsp;дома потом. Прямо сейчас.</p></li>
+      <li><span class="t-time">01:10<i>–</i>01:30</span><h3>Результат в&nbsp;руках</h3><p>Уходите не&nbsp;с&nbsp;конспектом. Уходите с&nbsp;<em>готовым материалом</em>.</p></li>
+    </ol>
+  </div>
+</section>
+
+<!-- VALUE STACK -->
+<section class="stack" id="stack">
+  <div class="wrap">
+    <p class="eyebrow">Стек ценности</p>
+    <h2 class="section-title">Что вы получаете — и&nbsp;<em>во&nbsp;сколько</em> это обошлось бы в&nbsp;другом месте</h2>
+    <ul class="stack-list">
+      <li><span class="s-item">3&nbsp;живых эфира по&nbsp;90&nbsp;минут с&nbsp;практикой прямо на&nbsp;трансляции</span><span class="s-eq">аналог: групповая работа с&nbsp;наставником <b>от&nbsp;5&nbsp;000&nbsp;₽ / встреча</b></span></li>
+      <li><span class="s-item">Закрытый чат с&nbsp;куратором в&nbsp;режиме реального времени</span><span class="s-eq">консультация по&nbsp;инструментам <b>2&nbsp;000–5&nbsp;000&nbsp;₽ / час</b></span></li>
+      <li><span class="s-item">Готовое позиционирование к&nbsp;концу первого дня</span><span class="s-eq">у&nbsp;копирайтера <b>от&nbsp;15&nbsp;000&nbsp;₽</b></span></li>
+      <li><span class="s-item">Первый пост, написанный вашим голосом — опубликованный</span><span class="s-eq">у&nbsp;специалиста <b>2&nbsp;000–5&nbsp;000&nbsp;₽</b></span></li>
+      <li><span class="s-item">Карта работы на&nbsp;10&nbsp;недель вперёд</span><span class="s-eq">стратегическая сессия <b>от&nbsp;10&nbsp;000&nbsp;₽</b></span></li>
+      <li><span class="s-item">Записи эфиров (48&nbsp;часов доступа)</span><span class="s-eq">бонус</span></li>
+      <li><span class="s-item">Ежедневные домашние задания с&nbsp;готовым результатом</span><span class="s-eq">бонус</span></li>
+      <li><span class="s-item">Инструкция по&nbsp;установке DeepSeek и&nbsp;Claude (до&nbsp;старта)</span><span class="s-eq">бонус</span></li>
+    </ul>
+    <div class="stack-total">
+      <div class="total-line"><span>Суммарная стоимость аналогичного набора</span><span class="total-strike">от&nbsp;40&nbsp;000&nbsp;₽</span></div>
+      <div class="total-line total-now"><span>Ваши вложения</span><span class="total-now-val">0&nbsp;₽</span></div>
+      <p class="total-fine">Без карты. Без скрытых платежей.</p>
+      <a href="#register" class="btn btn-primary btn-lg">Занять место бесплатно →</a>
+    </div>
+  </div>
+</section>
+
+<!-- REGISTER -->
+<section class="register" id="register">
+  <div class="wrap register-wrap">
+    <div class="register-meta">
+      <p class="eyebrow">Регистрация</p>
+      <h2 class="section-title">Два шага. Полторы минуты. <em>Бесплатно.</em></h2>
+      <p class="register-lede">11–13 мая · 19:00 МСК · Zoom · 90 минут в&nbsp;день</p>
+      <ul class="register-bullets">
+        <li><span class="check">✓</span> Закрытый чат с&nbsp;куратором — сразу после регистрации</li>
+        <li><span class="check">✓</span> Первое задание приходит на&nbsp;почту в&nbsp;течение 5&nbsp;минут</li>
+        <li><span class="check">✓</span> Запись эфиров доступна 48&nbsp;часов</li>
+      </ul>
+    </div>
+    <form class="register-form" action="register.php" method="post" id="regForm" novalidate>
+      <div class="field">
+        <label for="f-name">Как вас зовут?</label>
+        <input type="text" id="f-name" name="name" required autocomplete="given-name" placeholder="Имя" />
+        <span class="field-err"></span>
+      </div>
+      <div class="field">
+        <label for="f-email">Куда прислать материалы?</label>
+        <input type="email" id="f-email" name="email" required autocomplete="email" placeholder="email@example.com" />
+        <span class="field-err"></span>
+      </div>
+      <div class="field">
+        <label for="f-phone">Телефон <span class="opt">для&nbsp;Telegram‑чата</span></label>
+        <div class="phone-wrap">
+          <span class="phone-flag">🇷🇺&nbsp;+7</span>
+          <input type="tel" id="f-phone" name="phone" inputmode="numeric" pattern="[0-9 ()-]*" placeholder="(___) ___‑__‑__" />
+        </div>
+        <span class="field-err"></span>
+      </div>
+      <label class="check-row">
+        <input type="checkbox" name="agree" required />
+        <span>Согласен на&nbsp;обработку персональных данных и&nbsp;условия <a href="#">Политики&nbsp;конфиденциальности</a></span>
+      </label>
+      <button type="submit" class="btn btn-primary btn-block btn-lg">
+        <span>Зарегистрироваться бесплатно</span>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </button>
+      <p class="form-fine">Без карты. Без скрытых платежей. Место в&nbsp;два клика.</p>
+      <div class="form-success" id="formSuccess" hidden>
+        <h3>Готово ✓</h3>
+        <p>Проверьте почту — первое задание уже отправлено. Ссылка на&nbsp;закрытый чат пришла на&nbsp;email.</p>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- GUARANTEE -->
+<section class="guarantee" id="guarantee">
+  <div class="wrap">
+    <div class="guard-card">
+      <div class="guard-shield" aria-hidden="true">
+        <svg viewBox="0 0 48 56" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M24 2 4 9v16c0 14 9 24 20 29 11-5 20-15 20-29V9L24 2Z"/><path d="m17 27 5 5 11-12"/></svg>
+      </div>
+      <p class="eyebrow">Гарантия</p>
+      <h2>100% возврата участия<br/><em>до&nbsp;окончания практикума</em></h2>
+      <p class="guard-text">Это бесплатный интенсив — но&nbsp;если в&nbsp;рамках платных продуктов решите, что это не&nbsp;ваше&nbsp;— верну полную сумму без&nbsp;вопросов. Достаточно написать на&nbsp;почту до&nbsp;конца последнего дня.</p>
+      <a href="#" class="link-quiet">Подробные условия возврата →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="faq" id="faq">
+  <div class="wrap">
+    <p class="eyebrow">Сомнения</p>
+    <h2 class="section-title">Честные ответы <em>на&nbsp;главное</em></h2>
+    <div class="faq-list">
+      <details>
+        <summary>Я&nbsp;не&nbsp;разбираюсь в&nbsp;технологиях. Справлюсь?<span class="caret" aria-hidden="true"></span></summary>
+        <div class="ans"><p>Да. Нам важна только одна техническая компетенция — уметь говорить вслух. Всё остальное — голосовые заметки, нейросеть, пост — мы&nbsp;настраиваем вместе, прямо на&nbsp;эфире. Если у&nbsp;вас есть смартфон — этого достаточно.</p></div>
+      </details>
+      <details>
+        <summary>Не&nbsp;скажется ли использование ИИ на&nbsp;моей репутации как психолога?<span class="caret"></span></summary>
+        <div class="ans"><p>ИИ — это инструмент, как диктофон или планировщик. Он&nbsp;помогает вам организовать и&nbsp;сформулировать то, что уже есть у&nbsp;вас. Решения, глубину, присутствие — всё это остаётся за&nbsp;вами.</p></div>
+      </details>
+      <details>
+        <summary>У&nbsp;меня нет времени на&nbsp;ещё один курс<span class="caret"></span></summary>
+        <div class="ans"><p>Это не&nbsp;курс. Три вечера по&nbsp;90&nbsp;минут. Каждый заканчивается готовым результатом — не&nbsp;домашним заданием «на потом». Если вам не&nbsp;когда — это именно тот формат, который вам нужен.</p></div>
+      </details>
+      <details>
+        <summary>Я&nbsp;уже пробовал(а) ИИ — не&nbsp;пошло<span class="caret"></span></summary>
+        <div class="ans"><p>Именно для&nbsp;вас этот интенсив и&nbsp;создан. Большинство бросает, потому что пробует в&nbsp;режиме «задай вопрос — получи ответ». Мы покажем режим, при&nbsp;котором ИИ работает с&nbsp;вашим голосом, вашими темами, вашими клиентами.</p></div>
+      </details>
+      <details>
+        <summary>Я&nbsp;не&nbsp;готов(а) — мне нужно сначала больше узнать<span class="caret"></span></summary>
+        <div class="ans"><p>Интенсив и&nbsp;есть то место, где вы&nbsp;узнаёте и&nbsp;сразу применяете. Готовность приходит не&nbsp;до, а&nbsp;<em>во&nbsp;время</em>.</p></div>
+      </details>
+      <details>
+        <summary>Что будет после интенсива? Будете продавать?<span class="caret"></span></summary>
+        <div class="ans"><p>На&nbsp;третьем дне покажем путь для&nbsp;тех, кто захочет пройти дальше с&nbsp;нашей поддержкой. Никакого давления — вы&nbsp;сами решите. Интенсив даёт законченный результат, и&nbsp;с&nbsp;ним можно двигаться самостоятельно.</p></div>
+      </details>
+      <details>
+        <summary>Что, если я&nbsp;не&nbsp;смогу попасть на&nbsp;прямой эфир?<span class="caret"></span></summary>
+        <div class="ans"><p>Ничего страшного. Записи доступны 48&nbsp;часов после трансляции. Куратор в&nbsp;чате отвечает на&nbsp;вопросы независимо от&nbsp;того, присутствовали ли&nbsp;вы&nbsp;на&nbsp;прямом эфире.</p></div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta">
+  <div class="wrap final-wrap">
+    <figure class="final-quote">
+      <blockquote>«Перевод постов занимал <b>часами</b>. Теперь — <b>10&nbsp;секунд</b>.»</blockquote>
+      <figcaption>— Anastasia&nbsp;Tor</figcaption>
+    </figure>
+    <h2 class="final-title">Три вечера. Готовое позиционирование. Первый пост.<br/>План на&nbsp;<em>10&nbsp;недель</em>.</h2>
+    <p class="final-sub">И&nbsp;всё это — бесплатно.<br/>11–13 мая · 19:00 МСК · Zoom · 90 минут в&nbsp;день</p>
+    <a href="#register" class="btn btn-primary btn-xl">
+      <span>Зарегистрироваться бесплатно</span>
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+    </a>
+    <p class="final-fine">Без карты. Без скрытых платежей. Место в&nbsp;два клика.</p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="wrap footer-wrap">
+    <div class="foot-col">
+      <p class="eyebrow">Организатор</p>
+      <p>ИП Абрамова&nbsp;Ж.&nbsp;В.<br/>ИНН: 6671349552<br/>ОГРНИП: 1269600008853</p>
+      <p>620014, г.&nbsp;Екатеринбург,<br/>ул.&nbsp;Вайнера, 19, офис&nbsp;501а</p>
+    </div>
+    <div class="foot-col">
+      <p class="eyebrow">Документы</p>
+      <ul class="foot-links">
+        <li><a href="#">Политика конфиденциальности</a></li>
+        <li><a href="#">Договор оферты</a></li>
+        <li><a href="#">Условия возврата</a></li>
+      </ul>
+    </div>
+    <div class="foot-col">
+      <p class="eyebrow">Контакт</p>
+      <p>По&nbsp;вопросам регистрации:<br/><a href="mailto:info@example.com" class="link-accent">info@example.com</a></p>
+      <p><a href="tel:+79222966926" class="link-accent">+7&nbsp;922&nbsp;296‑69‑26</a></p>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span class="brand-mini">AI · интенсив для&nbsp;психологов</span>
+    <span>© 2026 · Все права защищены</span>
+  </div>
+</footer>
+
+</main>
+
+<!-- STICKY MOBILE CTA -->
+<div class="sticky-cta">
+  <div class="sc-text">
+    <b>11–13 мая</b><br/><span>бесплатно · 90&nbsp;мин/день</span>
+  </div>
+  <a href="#register" class="btn btn-primary btn-sm">Регистрация →</a>
+</div>
+
+<script>
+/* AI Интенсив — поведение страницы */
+(() => {
+  // header scroll
+  const header = document.getElementById('siteHeader');
+  const onScroll = () => {
+    if(window.scrollY > 12) header.classList.add('scrolled');
+    else header.classList.remove('scrolled');
+  };
+  window.addEventListener('scroll', onScroll, {passive:true});
+  onScroll();
+
+  // countdown to May 11, 2026 19:00 MSK
+  const startTs = new Date('2026-05-11T19:00:00+03:00').getTime();
+  const tick = () => {
+    const diff = Math.max(0, startTs - Date.now());
+    const d = Math.floor(diff / (1000*60*60*24));
+    const h = Math.floor(diff / (1000*60*60)) % 24;
+    const m = Math.floor(diff / (1000*60)) % 60;
+    const s = Math.floor(diff / 1000) % 60;
+    const set = (id, v) => {
+      const el = document.getElementById(id);
+      if(el) el.textContent = String(v).padStart(2,'0');
+    };
+    set('cd-d', d); set('cd-h', h); set('cd-m', m); set('cd-s', s);
+  };
+  tick(); setInterval(tick, 1000);
+
+  // reveal on scroll
+  const targets = document.querySelectorAll(
+    '.pain-card, .day, .speaker, .review, .timeline li, .stack-list li, .fw-col, .testimonial-inline, .guard-card, .faq-list details, .big-quote'
+  );
+  targets.forEach(el => el.classList.add('reveal'));
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, {threshold: 0.12, rootMargin: '0px 0px -40px 0px'});
+  targets.forEach(el => io.observe(el));
+
+  // form
+  const form = document.getElementById('regForm');
+  const successBox = document.getElementById('formSuccess');
+  const phone = document.getElementById('f-phone');
+  phone.addEventListener('input', () => {
+    const digits = phone.value.replace(/\D/g,'').slice(0,10);
+    let out = '';
+    if(digits.length){
+      out = '(' + digits.slice(0,3);
+      if(digits.length >= 3) out += ') ';
+      if(digits.length >= 4) out += digits.slice(3,6);
+      if(digits.length >= 7) out += '-' + digits.slice(6,8);
+      if(digits.length >= 9) out += '-' + digits.slice(8,10);
+    }
+    phone.value = out;
+  });
+  const setErr = (input, msg) => {
+    const field = input.closest('.field');
+    if(!field) return;
+    field.classList.toggle('invalid', !!msg);
+    const err = field.querySelector('.field-err');
+    if(err) err.textContent = msg || '';
+  };
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    let ok = true;
+    const name = document.getElementById('f-name');
+    if(!name.value.trim()){ setErr(name, 'Без имени мы не сможем поздороваться'); ok = false; }
+    else setErr(name, '');
+    const email = document.getElementById('f-email');
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+    if(!emailRe.test(email.value.trim())){ setErr(email, 'Похоже на опечатку — проверьте email'); ok = false; }
+    else setErr(email, '');
+    const agree = form.querySelector('input[name="agree"]');
+    if(!agree.checked){
+      agree.parentElement.style.color = '#e08a78';
+      ok = false;
+      setTimeout(() => { agree.parentElement.style.color = ''; }, 2000);
+    }
+    if(!ok) return;
+    successBox.hidden = false;
+    form.querySelector('button[type="submit"]').disabled = true;
+    form.querySelector('button[type="submit"]').style.opacity = .6;
+    successBox.scrollIntoView({behavior:'smooth', block:'center'});
+  });
+
+  // tweaks panel
+  const tweaks = { headline: 'A', accent: 'terracotta' };
+  let panel = null;
+  const ACCENTS = {
+    terracotta: {a:'#d97757', soft:'#e89678', deep:'#b85c3f', glow:'rgba(217,119,87,.18)'},
+    sage:       {a:'#7d9a7c', soft:'#9bb89a', deep:'#5d7a5c', glow:'rgba(125,154,124,.18)'},
+    amber:      {a:'#cfa15a', soft:'#e2bc7c', deep:'#a17c3d', glow:'rgba(207,161,90,.18)'},
+    rose:       {a:'#c66e85', soft:'#dc8ea1', deep:'#9a4f64', glow:'rgba(198,110,133,.18)'},
+    indigo:     {a:'#7e84c8', soft:'#9ea3da', deep:'#5d63a2', glow:'rgba(126,132,200,.18)'},
+  };
+  const applyHeadline = (v) => {
+    document.body.dataset.headline = v;
+    if(!panel) return;
+    panel.querySelectorAll('[data-tw="headline"] button').forEach(b => b.classList.toggle('active', b.dataset.val === v));
+  };
+  const applyAccent = (v) => {
+    const c = ACCENTS[v] || ACCENTS.terracotta;
+    const r = document.documentElement.style;
+    r.setProperty('--accent', c.a);
+    r.setProperty('--accent-soft', c.soft);
+    r.setProperty('--accent-deep', c.deep);
+    r.setProperty('--accent-glow', c.glow);
+    if(!panel) return;
+    panel.querySelectorAll('[data-tw="accent"] button').forEach(b => b.classList.toggle('active', b.dataset.val === v));
+  };
+  const persist = (edits) => {
+    Object.assign(tweaks, edits);
+    try{ window.parent.postMessage({type:'__edit_mode_set_keys', edits}, '*'); }catch(_e){}
+  };
+  const buildPanel = () => {
+    if(panel) return panel;
+    panel = document.createElement('div');
+    panel.className = 'tw-panel';
+    panel.innerHTML = `
+      <div class="tw-head"><h4>Tweaks</h4><button class="tw-close" aria-label="Закрыть">×</button></div>
+      <div class="tw-body">
+        <div class="tw-section">
+          <div class="tw-label">Вариант заголовка (A/B/C)</div>
+          <div class="tw-radio" data-tw="headline">
+            <button data-val="A">А</button><button data-val="B">Б</button><button data-val="C">В</button>
+          </div>
+          <div style="margin-top:6px;font-size:11px;color:var(--ink-4)">А: по этапам · Б: про время · В: дерзкий</div>
+        </div>
+        <div class="tw-section">
+          <div class="tw-label">Акцентный цвет</div>
+          <div class="tw-swatches" data-tw="accent">
+            <button class="tw-swatch" data-val="terracotta" style="background:#d97757"></button>
+            <button class="tw-swatch" data-val="sage"       style="background:#7d9a7c"></button>
+            <button class="tw-swatch" data-val="amber"      style="background:#cfa15a"></button>
+            <button class="tw-swatch" data-val="rose"       style="background:#c66e85"></button>
+            <button class="tw-swatch" data-val="indigo"     style="background:#7e84c8"></button>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(panel);
+    panel.querySelector('.tw-close').addEventListener('click', () => {
+      panel.classList.remove('open');
+      window.parent.postMessage({type:'__edit_mode_dismissed'}, '*');
+    });
+    panel.querySelectorAll('[data-tw="headline"] button').forEach(b => {
+      b.addEventListener('click', () => { applyHeadline(b.dataset.val); persist({headline: b.dataset.val}); });
+    });
+    panel.querySelectorAll('[data-tw="accent"] button').forEach(b => {
+      b.addEventListener('click', () => { applyAccent(b.dataset.val); persist({accent: b.dataset.val}); });
+    });
+    return panel;
+  };
+  applyHeadline(tweaks.headline);
+  applyAccent(tweaks.accent);
+  window.addEventListener('message', (e) => {
+    const t = e.data && e.data.type;
+    if(t === '__activate_edit_mode'){ buildPanel().classList.add('open'); }
+    if(t === '__deactivate_edit_mode'){ if(panel) panel.classList.remove('open'); }
+  });
+  try{ window.parent.postMessage({type:'__edit_mode_available'}, '*'); }catch(_e){}
+})();
+
+const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{"headline":"A","accent":"terracotta"}/*EDITMODE-END*/;
+void TWEAK_DEFAULTS;
+
+/* AI FUN FACTS — particles flowing along SVG path */
+(() => {
+  const svg = document.querySelector('.ff-svg');
+  const path = document.getElementById('ff-path');
+  const layer = document.getElementById('ffParticles');
+  const card = document.getElementById('ffCard');
+  const numEl = document.getElementById('ffNum');
+  const txtEl = document.getElementById('ffText');
+  const dots = document.querySelectorAll('.ff-dot');
+  if(!svg || !path || !layer || !card) return;
+
+  const FACTS = [
+    { num: '73%',    text: 'психологов, попробовавших ИИ, бросают в первую неделю — потому что используют его как поисковик, а не как соавтора.' },
+    { num: '15 мин', text: 'нужно, чтобы превратить голосовую заметку в готовый пост вашим голосом — если знать правильный режим работы.' },
+    { num: '×8',     text: 'во столько раз быстрее пишется контент-план на 10 недель, когда у вас есть собственное позиционирование на руках.' },
+    { num: '0',      text: 'строк кода. Всё, что нужно — уметь говорить вслух о том, что вы и так знаете лучше всех.' },
+  ];
+
+  let current = 0;
+  const setFact = (i) => {
+    current = (i + FACTS.length) % FACTS.length;
+    card.classList.add('swap');
+    setTimeout(() => {
+      numEl.textContent = FACTS[current].num;
+      txtEl.textContent = FACTS[current].text;
+      card.classList.remove('swap');
+    }, 280);
+    dots.forEach((d, j) => d.classList.toggle('active', j === current));
+  };
+  dots.forEach((d) => d.addEventListener('click', () => setFact(parseInt(d.dataset.i,10))));
+  setInterval(() => setFact(current + 1), 5000);
+
+  const PARTICLES = 14;
+  const particles = [];
+  for(let i = 0; i < PARTICLES; i++){
+    const p = document.createElement('span');
+    p.className = 'ff-dot-p';
+    p.style.width = (3 + Math.random()*3) + 'px';
+    p.style.height = p.style.width;
+    layer.appendChild(p);
+    particles.push({ el: p, t: Math.random(), speed: 0.0009 + Math.random()*0.0014 });
+  }
+
+  let stageBox = layer.getBoundingClientRect();
+  const sync = () => { stageBox = layer.getBoundingClientRect(); };
+  window.addEventListener('resize', sync);
+  sync();
+  let pathLen = path.getTotalLength();
+
+  let lastTs = performance.now();
+  const tick = (ts) => {
+    const dt = ts - lastTs; lastTs = ts;
+    const w = stageBox.width, h = stageBox.height;
+    for(const p of particles){
+      p.t += p.speed * dt;
+      if(p.t > 1){ p.t -= 1; }
+      const pt = path.getPointAtLength(p.t * pathLen);
+      const x = (pt.x / 1000) * w;
+      const y = (pt.y / 240) * h;
+      const fade = Math.sin(p.t * Math.PI);
+      p.el.style.left = x + 'px';
+      p.el.style.top  = y + 'px';
+      p.el.style.opacity = (fade * 0.95).toFixed(3);
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(() => {
+    pathLen = path.getTotalLength();
+    sync();
+    requestAnimationFrame(tick);
+  });
+})();
+
+/* Network graph — .business interactive */
+(() => {
+  const stage = document.getElementById('netStage');
+  const svg   = document.getElementById('netSvg');
+  const edgesG    = document.getElementById('netEdges');
+  const partsG    = document.getElementById('netParticles');
+  const nodesEl   = document.getElementById('netNodes');
+  if(!stage || !svg) return;
+
+  const CENTER = {x:500, y:350};
+  const SATS = [
+    { id:'audience',  label:'audience',  caption:'аудитория' },
+    { id:'marketing', label:'marketing', caption:'маркетинг' },
+    { id:'funnel',    label:'funnel',    caption:'воронка' },
+    { id:'products',  label:'products',  caption:'продукты' },
+    { id:'kpi',       label:'kpi',       caption:'kpi' },
+    { id:'content',   label:'content',   caption:'контент' },
+    { id:'team',      label:'team',      caption:'команда' },
+    { id:'economics', label:'economics', caption:'экономика' },
+  ];
+
+  const RX = 380, RY = 250;
+  SATS.forEach((s, i) => {
+    const a = (-Math.PI/2) + (i / SATS.length) * Math.PI * 2;
+    s.x = CENTER.x + Math.cos(a) * RX;
+    s.y = CENTER.y + Math.sin(a) * RY;
+  });
+
+  const placeNode = (el, x, y) => {
+    el.style.left = (x / 1000 * 100) + '%';
+    el.style.top  = (y / 700  * 100) + '%';
+  };
+  const center = document.createElement('div');
+  center.className = 'net-node center';
+  center.dataset.id = 'business';
+  center.textContent = '.business';
+  placeNode(center, CENTER.x, CENTER.y);
+  nodesEl.appendChild(center);
+
+  SATS.forEach(s => {
+    const n = document.createElement('div');
+    n.className = 'net-node sat';
+    n.dataset.id = s.id;
+    n.textContent = '.' + s.label;
+    placeNode(n, s.x, s.y);
+    nodesEl.appendChild(n);
+  });
+
+  const edges = [];
+  const SVGNS = 'http://www.w3.org/2000/svg';
+  SATS.forEach(s => {
+    const dx = s.x - CENTER.x, dy = s.y - CENTER.y;
+    const mx = (s.x + CENTER.x) / 2, my = (s.y + CENTER.y) / 2;
+    const len = Math.hypot(dx, dy);
+    const nxp = -dy / len, nyp = dx / len;
+    const bow = 60 * (Math.random() < .5 ? 1 : -1);
+    const cx = mx + nxp * bow, cy = my + nyp * bow;
+    const d = `M ${CENTER.x} ${CENTER.y} Q ${cx} ${cy} ${s.x} ${s.y}`;
+    const path = document.createElementNS(SVGNS, 'path');
+    path.setAttribute('d', d);
+    path.setAttribute('fill', 'none');
+    path.setAttribute('class', 'edge');
+    path.setAttribute('stroke', 'rgba(217,119,87,.18)');
+    path.setAttribute('stroke-width', '1');
+    edgesG.appendChild(path);
+    edges.push({ id:s.id, path, len: path.getTotalLength(), particles: [] });
+  });
+
+  const flows = new Set();
+  const spawnParticle = (edge, baseSpeed) => {
+    const c = document.createElementNS(SVGNS, 'circle');
+    c.setAttribute('r', (1.2 + Math.random()*1.6).toFixed(2));
+    c.setAttribute('class', 'net-particle');
+    partsG.appendChild(c);
+    edge.particles.push({ el: c, t: Math.random() * 0.3, speed: baseSpeed * (0.6 + Math.random()*0.8), life: 1, decay: 0.0018 + Math.random()*0.001 });
+  };
+
+  let lastTs = performance.now();
+  const animate = (ts) => {
+    const dt = ts - lastTs; lastTs = ts;
+    edges.forEach(edge => {
+      const active = flows.has(edge.id);
+      if(active && edge.particles.length < 4){ spawnParticle(edge, 0.0007); }
+      for(let i = edge.particles.length - 1; i >= 0; i--){
+        const p = edge.particles[i];
+        p.t += p.speed * dt;
+        if(p.t > 1){ p.t -= 1; }
+        if(!active){ p.life -= p.decay * dt; }
+        else { p.life = Math.min(1, p.life + 0.004 * dt); }
+        const pt = edge.path.getPointAtLength(p.t * edge.len);
+        const fade = Math.sin(p.t * Math.PI) * p.life;
+        p.el.setAttribute('cx', pt.x);
+        p.el.setAttribute('cy', pt.y);
+        p.el.setAttribute('opacity', Math.max(0, fade).toFixed(3));
+        if(p.life <= 0){ p.el.remove(); edge.particles.splice(i, 1); }
+      }
+    });
+    requestAnimationFrame(animate);
+  };
+  requestAnimationFrame(animate);
+
+  const allNodes = nodesEl.querySelectorAll('.net-node');
+  const setHover = (id) => {
+    edges.forEach(e => {
+      const on = !id || e.id === id || id === 'business';
+      e.path.classList.toggle('active', !!id && on);
+      if(!!id && on) flows.add(e.id);
+      else flows.delete(e.id);
+    });
+    allNodes.forEach(n => {
+      const isCenter = n.dataset.id === 'business';
+      const isHover  = n.dataset.id === id;
+      const isLinked = !!id && (isCenter || (id === 'business') || isHover);
+      n.classList.toggle('linked', isLinked && !isHover);
+    });
+  };
+  allNodes.forEach(n => {
+    n.addEventListener('mouseenter', () => setHover(n.dataset.id));
+    n.addEventListener('mouseleave', () => setHover(null));
+    n.addEventListener('click', () => {
+      const id = n.dataset.id;
+      if(flows.size && [...flows][0] === id) setHover(null); else setHover(id);
+    });
+  });
+
+  let ambientI = 0;
+  setInterval(() => {
+    if(flows.size) return;
+    const e = edges[ambientI % edges.length];
+    flows.add(e.id);
+    e.path.classList.add('active');
+    setTimeout(() => {
+      if(!nodesEl.querySelector('.net-node:hover')){ flows.delete(e.id); e.path.classList.remove('active'); }
+    }, 1800);
+    ambientI++;
+  }, 2200);
+})();
+</script>
+</body>
+</html>

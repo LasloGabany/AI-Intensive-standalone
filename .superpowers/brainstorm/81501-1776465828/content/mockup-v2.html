@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mockup v2 — Club Dashboard Template</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', system-ui, sans-serif; background: #0f111a; color: #e0e0e0; }
+
+.scale-wrap { transform: scale(0.72); transform-origin: top left; width: 138.9%; }
+
+.dash { display: flex; min-height: 100vh; }
+
+/* SIDEBAR */
+.sidebar { width: 220px; background: #0d1127; padding: 16px 0; flex-shrink: 0; }
+.logo { padding: 0 16px 20px; font-size: 17px; font-weight: 700; border-bottom: 1px solid #1a1f3a; }
+.logo span { color: #e94560; }
+.nav-label { padding: 12px 16px 4px; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: #8892b0; opacity: .6; }
+.nav-link { display: flex; align-items: center; gap: 8px; padding: 10px 16px; color: #8892b0; font-size: 13px; border-left: 3px solid transparent; }
+.nav-link.active { background: rgba(233,69,96,.08); color: #fff; border-left-color: #e94560; }
+.divider { height: 1px; background: #1a1f3a; margin: 8px 16px; }
+
+/* MAIN */
+.main { flex: 1; padding: 24px 28px; overflow: hidden; }
+h1 { font-size: 22px; font-weight: 700; margin-bottom: 20px; }
+
+/* KPI ROW — 4 cards */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+.kpi { background: #16213e; border-radius: 12px; padding: 18px; position: relative; }
+.kpi-label { font-size: 10px; color: #8892b0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; display: flex; align-items: center; gap: 6px; }
+.kpi-value { font-size: 32px; font-weight: 700; line-height: 1; }
+.kpi-value.pink { color: #e94560; }
+.kpi-value.yellow { color: #ffd166; }
+.kpi-value.white { color: #fff; }
+.kpi-sub { font-size: 12px; color: #8892b0; margin-top: 6px; display: flex; align-items: center; gap: 4px; }
+.kpi-sub .arrow { color: #e94560; }
+.kpi-sub .arrow-link { color: #e94560; cursor: pointer; }
+.tag { font-size: 9px; background: #0f3460; color: #6eb5ff; padding: 2px 5px; border-radius: 3px; font-weight: 700; letter-spacing: .5px; }
+.tag-tg { background: #1a3a5c; color: #5bb3f0; }
+
+/* MINI SPARKLINE placeholder */
+.sparkline { position: absolute; right: 14px; bottom: 18px; width: 60px; height: 24px; opacity: .4; }
+
+/* ALERT BANNER */
+.alert-banner { background: linear-gradient(135deg, rgba(233,69,96,.15), rgba(233,69,96,.05)); border: 1px solid rgba(233,69,96,.3); border-radius: 12px; padding: 20px 24px; margin-bottom: 18px; }
+.alert-title { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 14px; }
+.alert-stats { display: flex; align-items: center; gap: 32px; }
+.alert-num { font-size: 36px; font-weight: 700; }
+.alert-num.red { color: #e94560; }
+.alert-num.green { color: #00d2a0; }
+.alert-num.orange { color: #ffd166; }
+.alert-lbl { font-size: 12px; color: #8892b0; margin-top: 2px; }
+.progress-wrap { flex: 1; margin-left: 16px; }
+.progress-pct { font-size: 13px; color: #8892b0; margin-bottom: 6px; }
+.progress-bar-bg { background: rgba(255,255,255,.08); border-radius: 4px; height: 6px; overflow: hidden; }
+.progress-bar-fill { background: #00d2a0; height: 100%; border-radius: 4px; width: 9.7%; }
+.alert-days { margin-left: auto; font-size: 13px; color: #8892b0; white-space: nowrap; }
+
+/* TWO COL */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.card { background: #16213e; border-radius: 12px; padding: 18px; }
+.card-title { font-size: 15px; font-weight: 600; color: #fff; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+
+/* RETENTION TABLE */
+.ret-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.ret-table th { text-align: center; padding: 8px 10px; color: #8892b0; font-weight: 500; font-size: 11px; border-bottom: 1px solid #1a1f3a; }
+.ret-table th:first-child { text-align: left; }
+.ret-table td { text-align: center; padding: 8px 6px; border-bottom: 1px solid rgba(255,255,255,.03); font-size: 12px; }
+.ret-table td:first-child { text-align: left; color: #8892b0; font-size: 12px; }
+.cell { display: inline-block; padding: 3px 8px; border-radius: 5px; font-weight: 600; min-width: 52px; }
+.c100 { background: rgba(0,210,160,.22); color: #00d2a0; }
+.chi  { background: rgba(255,209,102,.18); color: #ffd166; }
+.cmid { background: rgba(247,127,0,.18); color: #f77f00; }
+.clo  { background: rgba(239,35,60,.18); color: #ef233c; }
+.ret-note { font-size: 11px; color: #8892b0; margin-top: 10px; }
+
+/* CHAT PULSE */
+.pulse-chart { height: 120px; position: relative; margin-bottom: 16px; }
+.pulse-chart svg { width: 100%; height: 100%; }
+.pulse-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.ps { background: #0d1127; border-radius: 8px; padding: 12px; }
+.ps-val { font-size: 22px; font-weight: 700; }
+.ps-val.green { color: #00d2a0; }
+.ps-val.yellow { color: #ffd166; }
+.ps-lbl { font-size: 11px; color: #8892b0; margin-top: 3px; }
+.ps-link { color: #e94560; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<div style="padding:10px 16px; background:#0d1127; border-bottom:1px solid #1a1f3a; font-size:12px; color:#8892b0; display:flex; justify-content:space-between;">
+  <span>📐 Макет v2 — ближе к оригиналу</span>
+  <span style="color:#00d2a0">▼ Прокрути для просмотра</span>
+</div>
+
+<div class="scale-wrap">
+<div class="dash">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="logo">🐯 Клуб <span>СВОЯ</span></div>
+    <nav style="margin-top:12px">
+      <a class="nav-link active">📊 Обзор</a>
+      <a class="nav-link">🔍 Инсайты</a>
+      <a class="nav-link">🔧 Механики клуба</a>
+      <a class="nav-link">⚠️ Удержание</a>
+      <a class="nav-link">🚪 Отток</a>
+      <a class="nav-link">🔇 Молчуны</a>
+      <a class="nav-link">🏆 Лидерборд</a>
+      <a class="nav-link">⏰ Активность</a>
+      <a class="nav-link">💜 Эмоции клуба</a>
+      <div class="divider"></div>
+      <div class="nav-label">Финансы и подписки</div>
+      <a class="nav-link">💰 Финансы</a>
+      <a class="nav-link">📈 Подписки</a>
+      <a class="nav-link">🔗 Сквозная аналитика</a>
+      <div class="divider"></div>
+      <div class="nav-label">Данные</div>
+      <a class="nav-link">📋 Источники данных</a>
+    </nav>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+    <h1>Обзор клуба</h1>
+
+    <!-- 4 KPI CARDS -->
+    <div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-label">Активных подписок <span class="tag">PBI</span></div>
+        <div class="kpi-value white">374</div>
+        <div class="kpi-sub">588 всего, 214 истекли до марта</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">MRR Февраль <span class="tag">PBI</span></div>
+        <div class="kpi-value pink">385к ₽</div>
+        <div class="kpi-sub">было 933к в январе <span class="arrow">▼</span> <span class="arrow-link">→</span></div>
+        <!-- sparkline placeholder -->
+        <svg class="sparkline" viewBox="0 0 60 24" fill="none">
+          <polyline points="0,18 10,16 20,20 30,12 40,14 50,10 60,16" stroke="#e94560" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">CR Заказ→Оплата <span class="tag">PBI</span></div>
+        <div class="kpi-value yellow">79.3%</div>
+        <div class="kpi-sub">было 80.9% <span class="arrow">▼</span></div>
+        <svg class="sparkline" viewBox="0 0 60 24" fill="none">
+          <polyline points="0,8 15,10 30,9 45,12 60,14" stroke="#ffd166" stroke-width="1.5" fill="none"/>
+        </svg>
+      </div>
+      <div class="kpi">
+        <div class="kpi-label">Активность чата <span class="tag tag-tg">TG</span></div>
+        <div class="kpi-value yellow">133</div>
+        <div class="kpi-sub">73 за 7 дн / 390 в чате <span class="arrow-link">→</span></div>
+      </div>
+    </div>
+
+    <!-- ALERT BANNER -->
+    <div class="alert-banner">
+      <div class="alert-title">Март — критический месяц продлений</div>
+      <div class="alert-stats">
+        <div>
+          <div class="alert-num red">216</div>
+          <div class="alert-lbl">истекают</div>
+        </div>
+        <div>
+          <div class="alert-num green">21</div>
+          <div class="alert-lbl">продлили</div>
+        </div>
+        <div>
+          <div class="alert-num orange">195</div>
+          <div class="alert-lbl">осталось</div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-pct">9.7% продлили</div>
+          <div class="progress-bar-bg"><div class="progress-bar-fill"></div></div>
+        </div>
+        <div class="alert-days">5 дн. осталось</div>
+      </div>
+    </div>
+
+    <!-- RETENTION + CHAT PULSE -->
+    <div class="two-col">
+
+      <!-- RETENTION -->
+      <div class="card">
+        <div class="card-title">Когортный ретеншн <span class="tag">PBI</span></div>
+        <table class="ret-table">
+          <thead>
+            <tr>
+              <th>Когорта</th>
+              <th>Старт</th>
+              <th>M+1</th>
+              <th>M+2</th>
+              <th>M+3</th>
+              <th>M+4</th>
+              <th>M+5</th>
+              <th>M+6</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Сен 25 (135)</td>
+              <td><span class="cell c100">100%</span></td>
+              <td><span class="cell chi">43.7%</span></td>
+              <td><span class="cell cmid">23.7%</span></td>
+              <td><span class="cell chi">54.1% ★</span></td>
+              <td><span class="cell chi">40.7%</span></td>
+              <td><span class="cell cmid">23%</span></td>
+              <td><span class="cell clo">3.7%</span></td>
+            </tr>
+            <tr>
+              <td>Окт 25 (232)</td>
+              <td><span class="cell c100">100%</span></td>
+              <td><span class="cell chi">37.5%</span></td>
+              <td><span class="cell chi">39.7%</span></td>
+              <td><span class="cell chi">50% ★</span></td>
+              <td><span class="cell cmid">25.4%</span></td>
+              <td><span class="cell clo">1.7%</span></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td>Дек 25 (162)</td>
+              <td><span class="cell c100">100%</span></td>
+              <td><span class="cell cmid">36.4%</span></td>
+              <td><span class="cell cmid">30.9%</span></td>
+              <td><span class="cell clo">6.8%</span></td>
+              <td></td><td></td><td></td>
+            </tr>
+            <tr>
+              <td>Янв 26 (56)</td>
+              <td><span class="cell c100">100%</span></td>
+              <td><span class="cell chi">39.3%</span></td>
+              <td><span class="cell clo">1.8%</span></td>
+              <td></td><td></td><td></td><td></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="ret-note">★ скачок из-за 3-месячных подписок</div>
+      </div>
+
+      <!-- CHAT PULSE -->
+      <div class="card">
+        <div class="card-title">Пульс чата <span class="tag tag-tg">TG</span></div>
+        <!-- Area chart SVG -->
+        <div class="pulse-chart">
+          <svg viewBox="0 0 400 120" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#e94560" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#e94560" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <path d="M0,90 C20,85 30,70 50,72 C70,74 80,55 100,50 C120,45 130,75 150,70 C170,65 180,40 200,35 C220,30 230,55 250,60 C270,65 280,45 300,50 C320,55 330,30 350,25 C370,20 385,60 400,80 L400,120 L0,120 Z"
+              fill="url(#grad)"/>
+            <path d="M0,90 C20,85 30,70 50,72 C70,74 80,55 100,50 C120,45 130,75 150,70 C170,65 180,40 200,35 C220,30 230,55 250,60 C270,65 280,45 300,50 C320,55 330,30 350,25 C370,20 385,60 400,80"
+              stroke="#e94560" stroke-width="2" fill="none"/>
+          </svg>
+        </div>
+        <div class="pulse-stats">
+          <div class="ps">
+            <div class="ps-val green">73</div>
+            <div class="ps-lbl">активных за 7 дн</div>
+          </div>
+          <div class="ps">
+            <div class="ps-val green">133</div>
+            <div class="ps-lbl">активных за 30 дн</div>
+          </div>
+          <div class="ps">
+            <div class="ps-val" style="color:#e0e0e0">93</div>
+            <div class="ps-lbl">никогда не писали</div>
+          </div>
+          <div class="ps">
+            <div class="ps-val yellow">241</div>
+            <div class="ps-lbl">платят, но молчат <span class="ps-link">→</span></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="height:32px"></div>
+  </div>
+
+</div>
+</div>
+</body>
+</html>

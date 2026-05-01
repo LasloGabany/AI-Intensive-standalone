@@ -1,0 +1,9 @@
+{"type":"server-started","port":62424,"host":"127.0.0.1","url_host":"localhost","url":"http://localhost:62424","screen_dir":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/content","state_dir":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/state"}
+{"type":"screen-added","file":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/content/approaches.html"}
+{"type":"screen-added","file":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/content/architecture.html"}
+{"type":"screen-added","file":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/content/mockup-overview.html"}
+{"type":"screen-added","file":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/content/mockup-v2.html"}
+{"type":"screen-added","file":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/content/mockup-v3.html"}
+{"type":"screen-added","file":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/content/mockup-insights.html"}
+{"type":"screen-added","file":"/Users/laslogabany/Claude/.superpowers/brainstorm/81501-1776465828/content/mockup-insights-full.html"}
+{"type":"server-stopped","reason":"idle timeout"}
