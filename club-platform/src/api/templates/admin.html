@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<title>Admin — Club Platform</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#0f1117; color:#e1e4e8; }
+.sidebar { position:fixed; left:0; top:0; bottom:0; width:220px; background:#161b22; border-right:1px solid #2d3139; padding:24px 16px; display:flex; flex-direction:column; }
+.logo { font-size:15px; font-weight:600; padding:8px 12px; margin-bottom:24px; color:#58a6ff; }
+.nav a { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; font-size:14px; color:#8b949e; text-decoration:none; margin-bottom:2px; }
+.nav a:hover, .nav a.active { background:#1f2937; color:#e1e4e8; }
+.logout { margin-top:auto; }
+.logout a { color:#f85149 !important; }
+.main { margin-left:220px; padding:32px 40px; }
+.page-title { font-size:22px; font-weight:600; margin-bottom:6px; }
+.page-sub { font-size:14px; color:#8b949e; margin-bottom:32px; }
+.card { background:#1c1f26; border:1px solid #2d3139; border-radius:12px; padding:24px; margin-bottom:24px; }
+.card-title { font-size:15px; font-weight:600; margin-bottom:4px; }
+.card-sub { font-size:13px; color:#8b949e; margin-bottom:20px; }
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.field label { display:block; font-size:12px; color:#8b949e; margin-bottom:6px; font-weight:500; }
+.field input { width:100%; background:#0f1117; border:1px solid #2d3139; border-radius:8px; padding:9px 12px; color:#e1e4e8; font-size:13px; font-family:monospace; outline:none; }
+.field input:focus { border-color:#58a6ff; }
+.field-row { display:flex; gap:8px; }
+.field-row input { flex:1; }
+.btn-show { background:none; border:1px solid #2d3139; color:#8b949e; border-radius:8px; padding:0 12px; font-size:12px; cursor:pointer; white-space:nowrap; }
+.btn-primary { background:#238636; color:#fff; border:none; border-radius:8px; padding:10px 24px; font-size:13px; font-weight:500; cursor:pointer; margin-top:4px; }
+.btn-primary:hover { background:#2ea043; }
+.agents-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+.agent-card { background:#0f1117; border:1px solid #2d3139; border-radius:10px; padding:16px; }
+.agent-name { font-size:13px; font-weight:600; margin-bottom:8px; }
+.status { display:inline-flex; align-items:center; gap:5px; font-size:11px; color:#8b949e; margin-bottom:4px; }
+.dot { width:6px; height:6px; border-radius:50%; background:#8b949e; }
+.dot.ok { background:#3fb950; }
+.dot.error { background:#f85149; }
+.last-run { font-size:11px; color:#8b949e; margin-bottom:12px; }
+.cron-label { font-size:11px; color:#8b949e; margin-bottom:4px; }
+.cron-input { width:100%; background:#161b22; border:1px solid #2d3139; border-radius:6px; padding:6px 8px; color:#58a6ff; font-size:12px; font-family:monospace; margin-bottom:8px; outline:none; }
+.btn-run { width:100%; background:#1f2937; border:1px solid #2d3139; color:#e1e4e8; border-radius:6px; padding:7px; font-size:12px; cursor:pointer; }
+.btn-run:hover { background:#238636; border-color:#238636; }
+.flash { background:#0d2818; border:1px solid #3fb950; border-radius:8px; padding:10px 16px; font-size:13px; color:#3fb950; margin-bottom:20px; }
+.tab-section { display:none; }
+.tab-section.active { display:block; }
+</style>
+</head>
+<body>
+<div class="sidebar">
+  <div class="logo">⚙️ Club Admin</div>
+  <nav class="nav">
+    <a href="#" class="active" onclick="showTab('keys',this)">🔑 API Ключи</a>
+    <a href="#" onclick="showTab('agents',this)">🤖 Агенты</a>
+  </nav>
+  <div class="logout nav"><a href="/admin/logout">← Выйти</a></div>
+</div>
+
+<div class="main">
+  {% if flash %}<div class="flash">{{ flash }}</div>{% endif %}
+
+  <!-- API KEYS TAB -->
+  <div class="tab-section active" id="tab-keys">
+    <div class="page-title">API Ключи</div>
+    <div class="page-sub">Сохраняются в базе данных. Агенты читают при каждом запуске.</div>
+    <form method="post" action="/admin/settings">
+      <div class="card">
+        <div class="card-title">Anthropic (Claude API)</div>
+        <div class="card-sub">Используется для анализа инсайтов и эмоций клуба</div>
+        <div class="field">
+          <label>API KEY</label>
+          <div class="field-row">
+            <input type="password" name="anthropic_api_key" id="f_anthropic" value="{{ keys.anthropic_api_key }}" />
+            <button type="button" class="btn-show" onclick="toggle('f_anthropic')">Показать</button>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">Telegram</div>
+        <div class="card-sub">Бот для сбора сообщений из клубного чата</div>
+        <div class="grid-2">
+          <div class="field">
+            <label>BOT TOKEN</label>
+            <div class="field-row">
+              <input type="password" name="telegram_bot_token" id="f_tg_token" value="{{ keys.telegram_bot_token }}" />
+              <button type="button" class="btn-show" onclick="toggle('f_tg_token')">Показать</button>
+            </div>
+          </div>
+          <div class="field"><label>CHAT ID</label><input type="text" name="telegram_chat_id" value="{{ keys.telegram_chat_id }}" /></div>
+          <div class="field"><label>DIARY TOPIC ID (опционально)</label><input type="text" name="diary_topic_id" value="{{ keys.diary_topic_id }}" /></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">GetCourse</div>
+        <div class="card-sub">Данные о платежах и подписках</div>
+        <div class="grid-2">
+          <div class="field">
+            <label>API KEY</label>
+            <div class="field-row">
+              <input type="password" name="getcourse_api_key" id="f_gc_key" value="{{ keys.getcourse_api_key }}" />
+              <button type="button" class="btn-show" onclick="toggle('f_gc_key')">Показать</button>
+            </div>
+          </div>
+          <div class="field"><label>ACCOUNT</label><input type="text" name="getcourse_account" value="{{ keys.getcourse_account }}" /></div>
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">💾 Сохранить все ключи</button>
+    </form>
+  </div>
+
+  <!-- AGENTS TAB -->
+  <div class="tab-section" id="tab-agents">
+    <div class="page-title">Агенты</div>
+    <div class="page-sub">Запуск вручную и настройка расписания (cron)</div>
+    <div class="card">
+      <form method="post" action="/admin/schedule" id="scheduleForm">
+        <div class="agents-grid">
+          {% for agent in agents %}
+          <div class="agent-card">
+            <div class="agent-name">{{ agent.name }}</div>
+            <div class="status"><span class="dot {{ agent.status_class }}"></span>{{ agent.status_label }}</div>
+            <div class="last-run">Последний: {{ agent.last_run }}</div>
+            <div class="cron-label">Расписание (cron)</div>
+            <input class="cron-input" name="{{ agent.key }}" value="{{ agent.schedule }}" />
+            <button type="button" class="btn-run" onclick="runAgent('{{ agent.key }}')">▶ Запустить</button>
+          </div>
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn-primary" style="margin-top:16px">💾 Сохранить расписание</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+function showTab(name, el) {
+  document.querySelectorAll('.tab-section').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav a').forEach(a => a.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  el.classList.add('active');
+}
+function toggle(id) {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+}
+async function runAgent(key) {
+  const btn = event.target;
+  btn.textContent = '⏳ Запуск...';
+  btn.disabled = true;
+  try {
+    const r = await fetch('/admin/run/' + key, {method:'POST'});
+    const d = await r.json();
+    btn.textContent = d.status === 'started' ? '✅ Запущен' : '❌ Ошибка';
+  } catch {
+    btn.textContent = '❌ Ошибка';
+  }
+  setTimeout(() => { btn.textContent = '▶ Запустить'; btn.disabled = false; }, 3000);
+}
+</script>
+</body>
+</html>
