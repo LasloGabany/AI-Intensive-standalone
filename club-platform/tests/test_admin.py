@@ -41,3 +41,24 @@ def test_verify_token_wrong_secret(monkeypatch):
     token = auth.create_token()
     monkeypatch.setattr(auth, "_SECRET", "wrong-secret")
     assert auth.verify_token(token) is None
+
+@pytest.mark.asyncio
+async def test_get_setting_returns_default_when_missing(db):
+    from src.api.settings_service import get_setting
+    val = await get_setting(db, "nonexistent_key", default="fallback")
+    assert val == "fallback"
+
+@pytest.mark.asyncio
+async def test_save_and_get_setting(db):
+    from src.api.settings_service import get_setting, save_settings
+    await save_settings(db, {"my_key": "my_value"})
+    val = await get_setting(db, "my_key")
+    assert val == "my_value"
+
+@pytest.mark.asyncio
+async def test_save_settings_overwrites(db):
+    from src.api.settings_service import get_setting, save_settings
+    await save_settings(db, {"ow_key": "first"})
+    await save_settings(db, {"ow_key": "second"})
+    val = await get_setting(db, "ow_key")
+    assert val == "second"
