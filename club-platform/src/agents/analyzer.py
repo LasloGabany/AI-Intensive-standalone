@@ -12,7 +12,6 @@ from src.db.models import MessageRaw, AnalyzedOutput
 logger = logging.getLogger(__name__)
 
 PROMPT_VERSION = "1.0"
-client = AsyncAnthropic(api_key=settings.anthropic_api_key)
 
 INSIGHTS_SCHEMA = """{
   "totalMessages": int,
@@ -30,6 +29,9 @@ async def analyze_insights(db: AsyncSession, days: int = 30) -> dict:
     LLM is NOT used for numeric KPI metrics (PRD §6.8).
     Results stored with prompt_version for reproducibility.
     """
+    from src.api.settings_service import get_setting
+    api_key = await get_setting(db, "anthropic_api_key", settings.anthropic_api_key)
+    client = AsyncAnthropic(api_key=api_key)
     since = date.today() - timedelta(days=days)
     result = await db.execute(
         select(MessageRaw.text)

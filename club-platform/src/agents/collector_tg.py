@@ -7,9 +7,6 @@ from src.config import settings
 from src.db.models import MessageRaw, MemberRaw
 
 
-TG_API = f"https://api.telegram.org/bot{settings.telegram_bot_token}"
-
-
 async def upsert_messages(db: AsyncSession, messages: list[dict]) -> int:
     if not messages:
         return 0
@@ -38,10 +35,13 @@ async def upsert_member(db: AsyncSession, user: dict) -> None:
     await db.commit()
 
 
-async def fetch_updates(offset: int = 0) -> list[dict]:
+async def fetch_updates(db: AsyncSession, offset: int = 0) -> list[dict]:
+    from src.api.settings_service import get_setting
+    token = await get_setting(db, "telegram_bot_token", settings.telegram_bot_token)
+    tg_api = f"https://api.telegram.org/bot{token}"
     async with httpx.AsyncClient(timeout=30) as client:
         r = await client.get(
-            f"{TG_API}/getUpdates",
+            f"{tg_api}/getUpdates",
             params={"offset": offset, "limit": 100, "timeout": 0}
         )
         r.raise_for_status()
@@ -50,7 +50,7 @@ async def fetch_updates(offset: int = 0) -> list[dict]:
 
 async def run(db: AsyncSession, checkpoint: int = 0) -> int:
     """Fetch messages since checkpoint, upsert into messages_raw. Returns new checkpoint."""
-    updates = await fetch_updates(offset=checkpoint)
+    updates = await fetch_updates(db, offset=checkpoint)
     to_insert = []
     new_checkpoint = checkpoint
     for update in updates:

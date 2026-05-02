@@ -7,14 +7,15 @@ from src.config import settings
 from src.db.models import PaymentRaw, MemberRaw
 
 
-GC_BASE = f"https://{settings.getcourse_account}.getcourse.ru/pl/api"
-
-
-async def fetch_orders(page: int = 1) -> list[dict]:
+async def fetch_orders(db: AsyncSession, page: int = 1) -> list[dict]:
+    from src.api.settings_service import get_setting
+    api_key = await get_setting(db, "getcourse_api_key", settings.getcourse_api_key)
+    account = await get_setting(db, "getcourse_account", settings.getcourse_account)
+    gc_base = f"https://{account}.getcourse.ru/pl/api"
     async with httpx.AsyncClient(timeout=60) as client:
         r = await client.get(
-            f"{GC_BASE}/account/orders",
-            params={"key": settings.getcourse_api_key, "page": page, "per_page": 100}
+            f"{gc_base}/account/orders",
+            params={"key": api_key, "page": page, "per_page": 100}
         )
         r.raise_for_status()
         data = r.json()
@@ -76,7 +77,7 @@ async def run(db: AsyncSession) -> int:
     """Paginate through all GetCourse orders, upsert into payments_raw."""
     page, total = 1, 0
     while True:
-        orders = await fetch_orders(page)
+        orders = await fetch_orders(db, page=page)
         if not orders:
             break
         total += await upsert_payments(db, orders)
