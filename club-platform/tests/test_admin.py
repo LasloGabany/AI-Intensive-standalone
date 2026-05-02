@@ -1,5 +1,7 @@
 import pytest
 from sqlalchemy import text
+from httpx import AsyncClient, ASGITransport
+from src.api.main import app
 
 @pytest.mark.asyncio
 async def test_platform_settings_table_exists(db):
@@ -62,3 +64,45 @@ async def test_save_settings_overwrites(db):
     await save_settings(db, {"ow_key": "second"})
     val = await get_setting(db, "ow_key")
     assert val == "second"
+
+@pytest.mark.asyncio
+async def test_admin_login_page_returns_200():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        r = await c.get("/admin/login")
+    assert r.status_code == 200
+    assert "Вход" in r.text
+
+@pytest.mark.asyncio
+async def test_admin_login_wrong_password():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        r = await c.post("/admin/login", data={"username": "admin", "password": "wrong"})
+    assert r.status_code == 200
+    assert "Неверный" in r.text
+
+@pytest.mark.asyncio
+async def test_admin_redirects_to_login_when_not_authenticated():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test", follow_redirects=False) as c:
+        r = await c.get("/admin")
+    assert r.status_code in (307, 302)
+    assert "/admin/login" in r.headers.get("location", "")
+
+@pytest.mark.asyncio
+async def test_run_unknown_agent_returns_404():
+    from src.api.auth import create_token, _COOKIE_NAME
+    token = create_token()
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        c.cookies.set(_COOKIE_NAME, token)
+        r = await c.post("/admin/run/nonexistent_agent")
+    assert r.status_code == 404
+
+@pytest.mark.asyncio
+async def test_run_known_agent_returns_started():
+    from src.api.auth import create_token, _COOKIE_NAME
+    from unittest.mock import patch, AsyncMock
+    token = create_token()
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
+        c.cookies.set(_COOKIE_NAME, token)
+        with patch("src.api.routes.admin._run_agent_task", new_callable=AsyncMock):
+            r = await c.post("/admin/run/collector_tg")
+    assert r.status_code == 200
+    assert r.json()["status"] == "started"

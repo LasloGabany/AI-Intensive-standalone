@@ -7,6 +7,14 @@ from src.agents import collector_tg, collector_gc, core_builder, etl, analyzer
 scheduler = AsyncIOScheduler()
 _tg_checkpoint = 0
 
+_DEFAULT_SCHEDULES = {
+    "collector_tg":  "0 */6 * * *",
+    "collector_gc":  "0 */6 * * *",
+    "core_builder":  "0 */2 * * *",
+    "etl":           "0 4 * * *",
+    "analyzer":      "0 3 * * *",
+}
+
 
 async def run_collectors():
     global _tg_checkpoint
@@ -43,10 +51,29 @@ async def run_analyzer():
         await analyzer.run(db)
 
 
+AGENT_JOBS: dict[str, object] = {
+    "collector_tg":  run_collectors,
+    "collector_gc":  run_collectors,
+    "core_builder":  run_core_builder,
+    "etl":           run_full_etl,
+    "analyzer":      run_analyzer,
+}
+
+
+def reschedule_job(job_id: str, cron_str: str) -> None:
+    parts = cron_str.split()
+    if len(parts) != 5:
+        raise ValueError(f"Invalid cron: {cron_str}")
+    minute, hour, day, month, dow = parts
+    trigger = CronTrigger(minute=minute, hour=hour, day=day, month=month, day_of_week=dow)
+    scheduler.reschedule_job(job_id, trigger=trigger)
+
+
 def start():
-    scheduler.add_job(run_collectors,   CronTrigger(hour="*/6"))
-    scheduler.add_job(run_core_builder, CronTrigger(hour="*/2"))
-    scheduler.add_job(run_kpi_etl,      CronTrigger(hour="*/2", minute=30))
-    scheduler.add_job(run_full_etl,     CronTrigger(hour=4))
-    scheduler.add_job(run_analyzer,     CronTrigger(hour=3))
+    scheduler.add_job(run_collectors,   CronTrigger(hour="*/6"), id="collector_tg", replace_existing=True)
+    scheduler.add_job(run_collectors,   CronTrigger(hour="*/6"), id="collector_gc", replace_existing=True)
+    scheduler.add_job(run_core_builder, CronTrigger(hour="*/2"), id="core_builder", replace_existing=True)
+    scheduler.add_job(run_kpi_etl,      CronTrigger(hour="*/2", minute=30), id="kpi_etl", replace_existing=True)
+    scheduler.add_job(run_full_etl,     CronTrigger(hour=4), id="etl", replace_existing=True)
+    scheduler.add_job(run_analyzer,     CronTrigger(hour=3), id="analyzer", replace_existing=True)
     scheduler.start()
