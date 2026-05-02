@@ -23,3 +23,21 @@ async def test_platform_setting_upsert(db):
     row = await db.get(PlatformSetting, "test_key")
     assert row is not None
     assert row.value == "test_val"
+
+
+def test_create_and_verify_token():
+    from src.api.auth import create_token, verify_token
+    token = create_token()
+    payload = verify_token(token)
+    assert payload is not None
+    assert payload.get("sub") == "admin"
+
+def test_verify_invalid_token():
+    from src.api.auth import verify_token
+    assert verify_token("not-a-token") is None
+
+def test_verify_token_wrong_secret(monkeypatch):
+    from src.api import auth
+    token = auth.create_token()
+    monkeypatch.setattr(auth, "_SECRET", "wrong-secret")
+    assert auth.verify_token(token) is None
