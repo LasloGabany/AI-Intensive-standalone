@@ -34,18 +34,19 @@ _AGENT_NAMES = {
 
 @router.get("/login", response_class=HTMLResponse)
 async def login_page(request: Request, error: Optional[str] = None):
-    return templates.TemplateResponse("login.html", {"request": request, "error": error})
+    return templates.TemplateResponse(request, "login.html", {"error": error})
 
 
 @router.post("/login")
-async def login_submit(username: str = Form(...), password: str = Form(...)):
+async def login_submit(request: Request, username: str = Form(...), password: str = Form(...)):
     if username == "admin" and password == settings.admin_password:
         response = RedirectResponse(url="/admin", status_code=303)
         response.set_cookie(_COOKIE_NAME, create_token(), httponly=True, max_age=86400)
         return response
     return templates.TemplateResponse(
+        request,
         "login.html",
-        {"request": {}, "error": "Неверный логин или пароль"},
+        {"error": "Неверный логин или пароль"},
         status_code=200,
     )
 
@@ -76,8 +77,8 @@ async def admin_home(
             "status_label": "Ожидает",
             "last_run": await get_setting(db, f"last_run_{key}", "—"),
         })
-    return templates.TemplateResponse("admin.html", {
-        "request": request, "keys": keys, "agents": agents, "flash": flash,
+    return templates.TemplateResponse(request, "admin.html", {
+        "keys": keys, "agents": agents, "flash": flash,
     })
 
 

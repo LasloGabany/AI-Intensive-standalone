@@ -106,3 +106,9 @@ async def test_run_known_agent_returns_started():
             r = await c.post("/admin/run/collector_tg")
     assert r.status_code == 200
     assert r.json()["status"] == "started"
+
+@pytest.mark.asyncio
+async def test_admin_root_requires_auth():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test", follow_redirects=False) as c:
+        r = await c.get("/admin")
+    assert r.status_code in (302, 307)
