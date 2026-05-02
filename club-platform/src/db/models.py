@@ -189,3 +189,10 @@ class AnalyzedOutput(Base):
     json_data: Mapped[dict] = mapped_column(JSON, nullable=False)
     prompt_version: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(default=datetime.utcnow)
+
+
+class PlatformSetting(Base):
+    __tablename__ = "platform_settings"
+    key: Mapped[str] = mapped_column(Text, primary_key=True)
+    value: Mapped[str] = mapped_column(Text, nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(default=datetime.utcnow, onupdate=datetime.utcnow)
