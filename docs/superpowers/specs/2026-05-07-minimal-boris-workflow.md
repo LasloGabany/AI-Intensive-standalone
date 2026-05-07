@@ -1,6 +1,6 @@
-# Minimal Boris Workflow
+# Minimal Boris Cherny Workflow
 
-**Дата:** 2026-05-07  
+**Дата:** 2026-04-27  
 **Статус:** Approved  
 **Контекст:** Full-stack разработка клубной платформы (FastAPI + JS + data pipelines)
 
