@@ -431,6 +431,11 @@ const FINANCES = {
     { label: 'Мар 26', n: 163, payments: { 'Мар 26': { orders: 163, revenue: 993870 } } },
   ],
 };
+let _crossanalyticsData = null;
+let _financesData = null;
+let _emotionsData = null;
+let _insightsData = null;
+let _silentData = null;
 </script>
 
 <!-- ═══════════════════════════════════════════
@@ -452,6 +457,8 @@ const FINANCES = {
   <div class="nav-section">Финансы и подписки</div>
   <a class="nav-link" onclick="showSection('finances')">💰 Финансы</a>
   <a class="nav-link" onclick="showSection('subscriptions')">📋 Подписки</a>
+  <a class="nav-link" onclick="showSection('gc-subscriptions')">🎓 GetCourse подписки</a>
+  <a class="nav-link" onclick="showSection('gc-orders')">🛒 GetCourse заказы</a>
   <a class="nav-link" onclick="showSection('crossanalytics')">🔗 Сквозная аналитика</a>
   <div class="nav-divider"></div>
   <div class="nav-section">Данные</div>
@@ -555,6 +562,18 @@ const FINANCES = {
 
 <h3 style="font-size:15px;margin:24px 0 14px">🔥 Драйверы вовлечения</h3>
 <div id="insights-drivers" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px"></div>
+
+<h3 style="font-size:15px;margin:28px 0 14px">⚠️ Болевые точки</h3>
+<div id="insights-painpoints" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px"></div>
+
+<h3 style="font-size:15px;margin-bottom:14px">📈 Тренды вовлечённости</h3>
+<div class="card" id="insights-trends"></div>
+
+<h3 style="font-size:15px;margin:24px 0 14px">🚨 Маркеры риска оттока</h3>
+<div class="card" id="insights-churn-markers"></div>
+
+<h3 style="font-size:15px;margin:24px 0 14px">👥 Кластеры участниц</h3>
+<div id="insights-clusters" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px"></div>
 </div>
   <div id="mechanics" class="section">
 <div class="page-title">⚙️ Механики клуба</div>
@@ -671,7 +690,7 @@ const FINANCES = {
   </div>
   <div class="table-wrap"><table><thead><tr>
     <th><input type="checkbox" id="sil-select-all" onchange="toggleSelectAll(this)"></th>
-    <th>УЧАСТНИЦА</th><th>ПОДПИСКА</th><th>ДО</th><th>ПОСТОВ</th><th>ПОСЛЕДНЕЕ</th><th>МОЛЧИТ</th><th>РИСК</th><th>МИНИАП</th><th>ДЕЙСТВИЯ</th>
+    <th>УЧАСТНИЦА</th><th>ПОДПИСКА</th><th>ДО</th><th>МОЛЧИТ</th><th>РИСК</th><th>ПРИОРИТЕТ</th><th>ДЕЙСТВИЯ</th>
   </tr></thead><tbody id="sil-table"></tbody></table></div>
   <div class="pagination" id="sil-pagin"></div>
 </div>
@@ -748,8 +767,142 @@ const FINANCES = {
   <div class="table-wrap" id="cohort-revenue-wrap"></div>
 </div>
 </div>
-  <div id="subscriptions" class="section"><div class="page-title">📋 Подписки</div><p style="color:var(--text2);margin-top:12px">Раздел будет добавлен в следующей версии.</p></div>
-  <div id="crossanalytics" class="section"><div class="page-title">🔗 Сквозная аналитика</div><p style="color:var(--text2);margin-top:12px">Раздел будет добавлен в следующей версии.</p></div>
+  <div id="subscriptions" class="section">
+<div class="page-title">📋 Подписки</div>
+<div class="page-subtitle">Полный реестр участниц — статус подписки, тарифы, история оплат</div>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+  <select id="subs-filter-status" onchange="filterSubscriptions()" style="background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px">
+    <option value="">Все статусы</option>
+  </select>
+  <select id="subs-filter-source" onchange="filterSubscriptions()" style="background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px">
+    <option value="">Все потоки</option>
+  </select>
+  <span id="subs-count" style="color:var(--text2);font-size:13px;margin-left:4px"></span>
+  <button class="btn btn-orange" style="margin-left:auto" onclick="downloadSubscriptionsCSV()">📥 Скачать CSV</button>
+</div>
+<div id="subs-loader" style="text-align:center;padding:60px 0;color:var(--text2);font-size:14px">Загрузка…</div>
+<div class="card" id="subs-card" style="display:none">
+  <div class="table-wrap">
+    <table><thead><tr>
+      <th>УЧАСТНИЦА</th><th>СТАТУС</th><th>ТАРИФ</th>
+      <th style="text-align:right">₽/МЕС</th><th style="text-align:right">ПОСЛЕДНИЙ ПЛАТЁЖ</th>
+      <th style="text-align:right">ВСЕГО ОПЛАЧЕНО</th><th>ДЕЙСТВУЕТ ДО</th><th>ПОТОК</th>
+    </tr></thead><tbody id="subs-tbody"></tbody></table>
+  </div>
+  <div class="pagination" id="subs-pagin"></div>
+</div>
+</div>
+  <div id="gc-subscriptions" class="section">
+<div class="page-title">🎓 GetCourse подписки</div>
+<div class="page-subtitle">Активные, истекающие и истёкшие подписки из GetCourse — фильтры, Mini App, CSV экспорт</div>
+<div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-bottom:16px">
+  <select id="gcsubs-filter-status" onchange="filterGcSubscriptions()" style="background:var(--card);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:6px 10px;font-size:12px">
+    <option value="all">Все</option>
+    <option value="active">Активные</option>
+    <option value="expiring">Истекают (14 дн)</option>
+    <option value="expired">Истекли</option>
+  </select>
+  <span id="gcsubs-count" style="color:var(--text2);font-size:13px;margin-left:4px"></span>
+  <button class="btn btn-orange" style="margin-left:auto" onclick="downloadGcSubscriptionsCSV()">📥 Скачать CSV</button>
+</div>
+<div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap">
+  <div class="card" style="flex:1;min-width:120px;text-align:center;padding:16px 12px">
+    <div style="font-size:24px;font-weight:700" id="gcsubs-stat-active">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">АКТИВНЫХ</div>
+  </div>
+  <div class="card" style="flex:1;min-width:120px;text-align:center;padding:16px 12px">
+    <div style="font-size:24px;font-weight:700;color:#f59e0b" id="gcsubs-stat-expiring">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">ИСТЕКАЮТ</div>
+  </div>
+  <div class="card" style="flex:1;min-width:120px;text-align:center;padding:16px 12px">
+    <div style="font-size:24px;font-weight:700;color:#ef4444" id="gcsubs-stat-expired">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">ИСТЕКЛИ</div>
+  </div>
+  <div class="card" style="flex:1;min-width:120px;text-align:center;padding:16px 12px">
+    <div style="font-size:24px;font-weight:700" id="gcsubs-stat-total">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">ВСЕГО</div>
+  </div>
+</div>
+<div id="gcsubs-loader" style="text-align:center;padding:60px 0;color:var(--text2);font-size:14px">Загрузка…</div>
+<div class="card" id="gcsubs-card" style="display:none">
+  <div class="table-wrap">
+    <table><thead><tr>
+      <th>УЧАСТНИЦА</th><th>СТАТУС</th><th>ТАРИФ</th>
+      <th>ДЕЙСТВУЕТ ДО</th><th>MINI APP</th>
+    </tr></thead><tbody id="gcsubs-tbody"></tbody></table>
+  </div>
+  <div class="pagination" id="gcsubs-pagin"></div>
+</div>
+</div>
+  <div id="gc-orders" class="section">
+<div class="page-title">🛒 GetCourse заказы</div>
+<div class="page-subtitle">Аналитика по потокам П1/П2/П3/Продления — KPI карточки, разбивка по потокам, выручка по месяцам, последние сделки</div>
+<div style="display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap">
+  <div class="card" style="flex:1;min-width:120px;text-align:center;padding:16px 12px">
+    <div style="font-size:24px;font-weight:700" id="gco-total-orders">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">ВСЕГО ЗАКАЗОВ</div>
+  </div>
+  <div class="card" style="flex:1;min-width:120px;text-align:center;padding:16px 12px">
+    <div style="font-size:24px;font-weight:700;color:#00d2a0" id="gco-total-revenue">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">ОБЩАЯ ВЫРУЧКА</div>
+  </div>
+  <div class="card" style="flex:1;min-width:120px;text-align:center;padding:16px 12px">
+    <div style="font-size:24px;font-weight:700" id="gco-avg-order">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">СРЕДНИЙ ЧEКЁЖ</div>
+  </div>
+  <div class="card" style="flex:1;min-width:120px;text-align:center;padding:16px 12px">
+    <div style="font-size:24px;font-weight:700;color:#f59e0b" id="gco-orders-30d">—</div>
+    <div style="font-size:11px;color:var(--text2);margin-top:4px">ЗАКАЗОВ ЗА 30 ДНЕЙ</div>
+  </div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+  <div class="card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px">Разбивка по потокам</div>
+    <div style="height:220px"><canvas id="gcoStreamsChart"></canvas></div>
+  </div>
+  <div class="card">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px">Выручка по месяцам</div>
+    <div style="height:220px"><canvas id="gcoMonthlyChart"></canvas></div>
+  </div>
+</div>
+<div class="card">
+  <div style="font-size:14px;font-weight:700;margin-bottom:14px">Последние сделки</div>
+  <div class="table-wrap">
+    <table><thead><tr><th>ДАТА</th><th>ПОТОК</th><th style="text-align:right">СУММА</th><th>СТАТУС</th></tr></thead><tbody id="gco-recent-tbody"></tbody></table>
+  </div>
+</div>
+<div id="gco-loader" style="text-align:center;padding:60px 0;color:var(--text2);font-size:14px">Загрузка…</div>
+</div>
+  <div id="crossanalytics" class="section">
+  <div class="page-title">🔗 Сквозная аналитика</div>
+  <div class="page-subtitle">Связи между активностью, выручкой и оттоком</div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px">ARPU по сегментам активности</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Средний доход на участницу в зависимости от уровня активности</div>
+    <table class="cohort-table" id="ca-arpu-table"><thead><tr><th>Сегмент</th><th>Средний доход</th><th>Участниц</th><th>Средний срок (дн)</th></tr></thead><tbody id="ca-arpu-tbody"></tbody></table>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px">Удержание по уровню активности</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Retention M+1 (30d) и M+3 (90d) для каждого бакета активности</div>
+    <div style="height:280px"><canvas id="caRetentionChart"></canvas></div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px">Молчание → Отток</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Вероятность оттока в зависимости от периода молчания</div>
+    <div id="ca-funnel"></div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px">Активность → Доход</div>
+    <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Каждая точка — участница с активной подпиской</div>
+    <div style="height:300px"><canvas id="caScatterChart"></canvas></div>
+  </div>
+
+  <div id="ca-loader" style="text-align:center;padding:40px;color:var(--text2)">Загрузка данных…</div>
+  </div>
   <div id="datasources" class="section">
 <div class="page-title">📂 Источники данных</div>
 <div class="page-subtitle">Справочник по DATA ZONE — где брать данные для каждой переменной и как генерировать через LLM.</div>
@@ -766,35 +919,89 @@ const FINANCES = {
      CORE JS
 ═══════════════════════════════════════════ -->
 <script>
-const API_URL = 'https://your-app.railway.app';  // ← update after Railway deploy
+const API_URL = '';
+let _subsData = null;
+let _gcSubsData = null;
+let _gcOrdersData = null;
+
+const _EN_RU_MONTHS = { Jan:'Янв', Feb:'Фев', Mar:'Мар', Apr:'Апр', May:'Май',
+  Jun:'Июн', Jul:'Июл', Aug:'Авг', Sep:'Сен', Oct:'Окт', Nov:'Ноя', Dec:'Дек' };
+function _ruMonth(s) {
+  return s.replace(/^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)/, m => _EN_RU_MONTHS[m] || m);
+}
 
 async function loadData() {
   try {
-    const res = await fetch(`${API_URL}/api/dashboard`, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(`${API_URL}/api/dashboard`, { signal: AbortSignal.timeout(10000) });
     if (!res.ok) throw new Error(`API ${res.status}`);
     const data = await res.json();
-    if (data.KPI) Object.assign(KPI, data.KPI);
+    if (data.KPI) {
+      const k = data.KPI;
+      if (k.active_subscriptions != null) KPI.activeSubscriptions = k.active_subscriptions;
+      if (k.mrr != null) KPI.mrr = Math.round(k.mrr).toLocaleString('ru-RU');
+      if (k.chat_active_30 != null) KPI.chatActive30 = k.chat_active_30;
+      if (k.chat_active_7 != null) KPI.chatActive7 = k.chat_active_7;
+      if (k.chat_never_wrote != null) KPI.chatNeverWrote = k.chat_never_wrote;
+      if (k.chat_silent_paying != null) KPI.chatSilentPaying = k.chat_silent_paying;
+    }
     if (data.RETENTION?.cohorts?.length) Object.assign(RETENTION, data.RETENTION);
-    if (data.FINANCES?.revenueByMonth?.length) Object.assign(FINANCES, data.FINANCES);
-    if (data.SILENT_DATA?.length) SILENT_DATA.splice(0, SILENT_DATA.length, ...data.SILENT_DATA);
+    if (data.FINANCES?.revenueByMonth?.length) {
+      Object.assign(FINANCES, {
+        ...data.FINANCES,
+        revenueByMonth: data.FINANCES.revenueByMonth.map(m => ({ ...m, month: _ruMonth(m.month) })),
+        cohorts: data.FINANCES.cohorts.map(c => ({
+          ...c,
+          payments: Object.fromEntries(
+            Object.entries(c.payments).map(([k, v]) => [_ruMonth(k), v])
+          )
+        })),
+      });
+    }
+    // SILENT_DATA loaded lazily via /api/silent when user opens that section
     if (data.LEADERBOARD_DATA?.length) LEADERBOARD_DATA.splice(0, LEADERBOARD_DATA.length, ...data.LEADERBOARD_DATA);
-    if (data.EMOTIONS_DATA?.months) Object.assign(EMOTIONS_DATA, data.EMOTIONS_DATA);
+    // INSIGHTS loaded lazily via /api/insights when user opens that section
+    if (data.ACTIVITY_DATA?.heatmap) Object.assign(ACTIVITY_DATA, data.ACTIVITY_DATA);
+    if (data.CHURN_DATA?.summary) {
+      Object.assign(CHURN_DATA, {
+        ...data.CHURN_DATA,
+        churnByMonth: data.CHURN_DATA.churnByMonth.map(m => ({ ...m, month: _ruMonth(m.month) })),
+      });
+    }
+    if (data.RETENTION_DATA) {
+      Object.assign(RETENTION_DATA, {
+        riskGroup: data.RETENTION_DATA.riskGroup ?? RETENTION_DATA.riskGroup,
+        funnel: data.RETENTION_DATA.funnel ?? RETENTION_DATA.funnel,
+      });
+    }
+    if (data.MECHANICS && (data.MECHANICS.microGroups || data.MECHANICS.toRemove)) {
+      window.__MECHANICS_API__ = data.MECHANICS;
+    }
+    initAll();
   } catch (e) {
     console.warn('[Dashboard] API unavailable, using local DATA ZONE:', e.message);
-  } finally {
-    document.getElementById('logo-text').innerHTML = `${CLUB.emoji} <span>${CLUB.name}</span>`;
-    document.title = `${CLUB.name} — Дашборд`;
-    initAll();
   }
 }
 
-document.addEventListener('DOMContentLoaded', loadData);
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('logo-text').innerHTML = `${CLUB.emoji} <span>${CLUB.name}</span>`;
+  document.title = `${CLUB.name} — Дашборд`;
+  initAll();
+  loadData();
+});
 
 function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll(`.nav-link[onclick="showSection('${id}')"]`).forEach(a => a.classList.add('active'));
+  if (id === 'subscriptions' && !_subsData) loadSubscriptions();
+  if (id === 'crossanalytics' && !_crossanalyticsData) loadCrossanalytics();
+  if (id === 'finances' && !_financesData) loadFinances();
+  if (id === 'gc-subscriptions' && !_gcSubsData) loadGcSubscriptions();
+  if (id === 'gc-orders' && !_gcOrdersData) loadGcOrders();
+  if (id === 'emotions' && !_emotionsData) loadEmotions();
+  if (id === 'insights' && !_insightsData) loadInsights();
+  if (id === 'silent' && !_silentData) loadSilent();
 }
 
 // ── HELPERS ──
@@ -909,7 +1116,7 @@ function initOverview() {
   let th = '<tr><th>КОГОРТА</th><th>СТАРТ</th>' + months.slice(1).map(m => `<th>${m}</th>`).join('') + '</tr>';
   let rows = RETENTION.cohorts.map(c => {
     let tds = c.values.map((v, i) => {
-      const star = c.anomaly.includes(i) ? '★' : '';
+      const star = (c.anomaly || []).includes(i) ? '★' : '';
       const cls = i === 0 ? 'heat-pivot' : cohortHeatClass(v);
       const disp = i === 0 ? '100%' : v + '%' + star;
       return `<td class="${cls}">${disp}</td>`;
@@ -948,40 +1155,115 @@ function initOverview() {
   }
 }
 
-function initInsights() {
-  document.getElementById('insights-subtitle').textContent =
-    `Консолидированный анализ ${fmt(INSIGHTS.totalMessages)} сообщений. Темы ранжированы по критичности.`;
+async function loadInsights() {
+  try {
+    const res = await fetch('/api/insights');
+    const data = await res.json();
+    if (data && (data.topics?.length || data.painPoints?.length)) {
+      Object.assign(INSIGHTS, data);
+      _insightsData = data;
+    } else {
+      _insightsData = INSIGHTS;
+    }
+  } catch (e) {
+    _insightsData = INSIGHTS;
+  }
+  initInsights();
+}
 
-  document.getElementById('insights-topics').innerHTML = INSIGHTS.topics.map(t => `
-    <div class="insight-card" style="border-left-color:${t.borderColor}">
+function initInsights() {
+  const d = _insightsData || INSIGHTS;
+  document.getElementById('insights-subtitle').textContent =
+    d.totalMessages
+      ? `Консолидированный анализ ${fmt(d.totalMessages)} сообщений. Темы ранжированы по критичности.`
+      : 'Данные анализа ещё не загружены. Запустите analyzer в Admin панели.';
+
+  document.getElementById('insights-topics').innerHTML = (d.topics || []).map(t => `
+    <div class="insight-card" style="border-left-color:${t.borderColor || '#e94560'}">
       <div class="insight-header">
         <div class="insight-title">${t.title}</div>
         <span class="badge badge-pink">${fmt(t.mentions)} упоминаний</span>
       </div>
       <div class="insight-desc">${t.description}</div>
       <div class="ai-block">${t.aiInsight}</div>
-      <div class="quotes">${t.quotes.map(q => `<div class="quote">${q}</div>`).join('')}</div>
-    </div>`).join('');
+      <div class="quotes">${(t.quotes || []).map(q => `<div class="quote">${q}</div>`).join('')}</div>
+    </div>`).join('') || '<div class="c-muted">Нет данных</div>';
 
   const impactMap = { high: ['high','c-red','ВЫСШИЙ ИМПАКТ'], medium: ['medium','c-yellow','СРЕДНИЙ ИМПАКТ'], low: ['low','c-muted','НИЗКИЙ ИМПАКТ'] };
-  document.getElementById('insights-needs').innerHTML = INSIGHTS.hiddenNeeds.map(n => {
+  document.getElementById('insights-needs').innerHTML = (d.hiddenNeeds || []).map(n => {
     const [cls, col, lbl] = impactMap[n.impact] || impactMap.low;
     return `<div class="need-card ${cls}"><div class="need-impact ${col}">${lbl}</div><div class="need-title">${n.title}</div><div class="need-signal">${n.signal}</div></div>`;
-  }).join('');
+  }).join('') || '<div class="c-muted">Нет данных</div>';
 
-  document.getElementById('insights-recs').innerHTML = INSIGHTS.recommendations.map(r => `
+  document.getElementById('insights-recs').innerHTML = (d.recommendations || []).map(r => `
     <div class="rec-item">
       <div class="rec-num${r.rank > 1 ? ' orange' : ''}">${r.rank}</div>
       <div><div class="rec-title">${r.title}</div><div class="rec-desc">${r.description}</div>
       <div class="rec-tags"><span class="badge badge-${r.priority === 'high' ? 'red' : 'orange'}">${r.priority}</span><span class="badge badge-gray">${r.effort}</span></div></div>
-    </div>`).join('');
+    </div>`).join('') || '<div class="c-muted" style="padding:16px">Нет данных</div>';
 
-  document.getElementById('insights-drivers').innerHTML = INSIGHTS.engagementDrivers.map(d => `
-    <div class="driver-card"><div class="driver-title">${d.title}</div><div class="driver-desc">${d.description}</div></div>`).join('');
+  document.getElementById('insights-drivers').innerHTML = (d.engagementDrivers || []).map(dr => `
+    <div class="driver-card"><div class="driver-title">${dr.title}</div><div class="driver-desc">${dr.description}</div></div>`).join('') || '<div class="c-muted">Нет данных</div>';
+
+  // ── New fields ──
+  const sevColor = { high: '#e94560', medium: '#ffd166', low: '#6b7280' };
+  document.getElementById('insights-painpoints').innerHTML = (d.painPoints || []).map(p => `
+    <div class="driver-card" style="border-top:3px solid ${sevColor[p.severity] || '#6b7280'}">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span style="font-weight:600;font-size:13px">${p.title}</span>
+        <span class="badge badge-${p.severity === 'high' ? 'red' : p.severity === 'medium' ? 'orange' : 'gray'}" style="margin-left:auto">${p.severity}</span>
+      </div>
+      <div class="driver-desc">${p.evidence}</div>
+      ${p.affected_count ? `<div style="font-size:11px;color:var(--c-muted);margin-top:6px">~${fmt(p.affected_count)} участниц</div>` : ''}
+    </div>`).join('') || '<div class="c-muted">Нет данных</div>';
+
+  const dirIcon = { up: '↑', down: '↓', stable: '→' };
+  const dirColor = { up: '#00d2a0', down: '#e94560', stable: '#ffd166' };
+  document.getElementById('insights-trends').innerHTML = (d.engagementTrends || []).length
+    ? `<div style="display:flex;flex-direction:column;gap:12px;padding:16px">${(d.engagementTrends || []).map(tr => `
+      <div style="display:flex;align-items:flex-start;gap:12px">
+        <span style="font-size:20px;color:${dirColor[tr.direction] || '#fff'};flex-shrink:0;width:20px">${dirIcon[tr.direction] || '→'}</span>
+        <div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:3px">${tr.trend}</div>
+          <div class="c-muted" style="font-size:12px">${tr.description}</div>
+          ${tr.metric ? `<span class="badge badge-gray" style="margin-top:4px">${tr.metric}</span>` : ''}
+        </div>
+      </div>`).join('')}</div>`
+    : '<div class="c-muted" style="padding:16px">Нет данных</div>';
+
+  document.getElementById('insights-churn-markers').innerHTML = (d.churnRiskMarkers || []).length
+    ? `<div style="display:flex;flex-direction:column;gap:12px;padding:16px">${(d.churnRiskMarkers || []).map(mk => `
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <span style="color:#e94560;flex-shrink:0">⚠</span>
+        <div>
+          <div style="font-weight:600;font-size:13px;margin-bottom:3px">${mk.marker}</div>
+          <div class="c-muted" style="font-size:12px;margin-bottom:4px">${mk.description}</div>
+          <div>${(mk.affected_segments || []).map(s => `<span class="badge badge-gray">${s}</span>`).join(' ')}</div>
+        </div>
+      </div>`).join('')}</div>`
+    : '<div class="c-muted" style="padding:16px">Нет данных</div>';
+
+  document.getElementById('insights-clusters').innerHTML = (d.participantClusters || []).map(cl => `
+    <div class="driver-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <span style="font-weight:600;font-size:13px">${cl.name}</span>
+        <span class="badge badge-gray">~${fmt(cl.size)} чел.</span>
+      </div>
+      <div class="driver-desc" style="margin-bottom:8px">${cl.description}</div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px">${(cl.key_traits || []).map(t => `<span class="badge badge-gray" style="font-size:10px">${t}</span>`).join('')}</div>
+    </div>`).join('') || '<div class="c-muted">Нет данных</div>';
 }
 
 function initMechanics() {
-  renderMechanics(MECHANICS);
+  const stored = localStorage.getItem('MECHANICS_OVERRIDE');
+  if (stored) {
+    try { renderMechanics(JSON.parse(stored)); return; } catch(e) {}
+  }
+  if (window.__MECHANICS_API__) {
+    renderMechanics(window.__MECHANICS_API__);
+  } else {
+    renderMechanics(MECHANICS);
+  }
 
   document.getElementById('reportInput').addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -1085,7 +1367,7 @@ function initRetention() {
   const f = RETENTION_DATA.funnel;
   document.getElementById('ret-risk').textContent = fmt(data.length);
   document.getElementById('ret-lost').textContent = fmt(data.reduce((s,r) => s + r.messageCount, 0));
-  document.getElementById('ret-avg').textContent = fmt(Math.round(data.reduce((s,r) => s + r.activeDays, 0) / data.length));
+  document.getElementById('ret-avg').textContent = data.length ? fmt(Math.round(data.reduce((s,r) => s + r.activeDays, 0) / data.length)) : '0';
   document.getElementById('ret-never').textContent = fmt(f.neverWrote);
   makePaginator(data, 25, (slice, offset) => {
     document.getElementById('ret-table').innerHTML = slice.map((r, i) => `
@@ -1156,48 +1438,69 @@ function filterChurnAll() {
 let silentCurrentData = [];
 let silentCurrentFilter = 'priority';
 
-function initSilent() {
-  const data = SILENT_DATA;
-  document.getElementById('sil-red').textContent = fmt(data.filter(r => r.risk === 'red').length);
-  document.getElementById('sil-ghost').textContent = fmt(data.filter(r => r.risk === 'ghost').length);
-  document.getElementById('sil-yellow').textContent = fmt(data.filter(r => r.risk === 'yellow').length);
-  document.getElementById('sil-total').textContent = fmt(data.length);
-  filterSilent('priority', document.querySelector('[data-filter="priority"]'));
+// Filter → API query params mapping
+const _silentFilters = {
+  priority: {},
+  red:     { status: 'active', min_silent_days: 30 },
+  ghost:   { status: 'never' },
+  yellow:  { min_silent_days: 14, max_silent_days: 30 },
+  paying:  { status: 'active' },
+  expired: { status: 'expired' },
+  all:     {},
+};
+
+async function loadSilent(filter = 'priority') {
+  const params = _silentFilters[filter] || {};
+  const qs = new URLSearchParams(params).toString();
+  const url = '/api/silent' + (qs ? '?' + qs : '');
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    _silentData = data;
+    initSilent(data);
+  } catch (e) {
+    console.warn('Silent API error', e);
+    _silentData = { summary: { red: 0, ghost: 0, yellow: 0, total: 0 }, users: [] };
+    initSilent(_silentData);
+  }
 }
 
-const riskOrder = { ghost: 0, red: 1, yellow: 2, expired: 3 };
-function filterSilent(type, btn) {
+function initSilent(data) {
+  data = data || _silentData;
+  if (!data) return;
+  const s = data.summary || {};
+  document.getElementById('sil-red').textContent = fmt(s.red ?? 0);
+  document.getElementById('sil-ghost').textContent = fmt(s.ghost ?? 0);
+  document.getElementById('sil-yellow').textContent = fmt(s.yellow ?? 0);
+  document.getElementById('sil-total').textContent = fmt(s.total ?? 0);
+  silentCurrentData = data.users || [];
+  renderSilentTable(silentCurrentData);
+}
+
+async function filterSilent(type, btn) {
   silentCurrentFilter = type;
   document.querySelectorAll('#sil-pills .pill').forEach(p => p.classList.remove('active'));
   if (btn) btn.classList.add('active');
-  let data = [...SILENT_DATA];
-  if (type === 'priority') data.sort((a,b) => (riskOrder[a.risk]??9) - (riskOrder[b.risk]??9));
-  else if (type === 'red') data = data.filter(r => r.subscriptionActive && r.silentDays >= 30 && r.postCount > 0);
-  else if (type === 'ghost') data = data.filter(r => r.subscriptionActive && r.postCount === 0);
-  else if (type === 'yellow') data = data.filter(r => r.subscriptionActive && r.silentDays >= 14 && r.silentDays < 30);
-  else if (type === 'paying') data = data.filter(r => r.subscriptionActive);
-  else if (type === 'expired') data = data.filter(r => !r.subscriptionActive);
-  silentCurrentData = data;
-  renderSilentTable(data);
+  await loadSilent(type);
 }
 
 function renderSilentTable(data) {
   const riskBadge = { ghost: ['badge-gray','👻 Призрак'], red: ['badge-red','🔴 Высокий'], yellow: ['badge-orange','🟡 Средний'], expired: ['badge-gray','❌ Истекла'] };
-  makePaginator(data, 25, (slice, offset) => {
+  makePaginator(data, 25, (slice) => {
     document.getElementById('sil-table').innerHTML = slice.map((r) => {
-      const [rcls, rlbl] = riskBadge[r.risk] || ['badge-gray', r.risk];
+      const [rcls, rlbl] = riskBadge[r.risk] || ['badge-gray', r.risk || '—'];
       const subCls = r.subscriptionActive ? 'badge-green' : 'badge-red';
       const silCol = r.silentDays >= 30 ? 'c-red' : r.silentDays >= 14 ? 'c-yellow' : 'c-muted';
+      const scoreColor = r.triageScore >= 70 ? 'c-red' : r.triageScore >= 40 ? 'c-orange' : 'c-muted';
       return `<tr>
         <td><input type="checkbox" class="sil-cb"></td>
         <td><div style="font-size:13px;font-weight:600">${r.name}</div>${r.username ? `<div style="font-size:11px;color:var(--orange)">@${r.username}</div>` : ''}</td>
         <td><span class="badge ${subCls}">${r.subscriptionActive ? 'Активна' : 'Истекла'}</span></td>
         <td style="font-size:12px">${fmtDate(r.subscriptionUntil)}</td>
-        <td class="${r.postCount === 0 ? 'c-muted' : ''}">${fmt(r.postCount)}</td>
-        <td style="font-size:12px">${fmtDate(r.lastMessage)}</td>
         <td class="${silCol}">${r.silentDays}д</td>
         <td><span class="badge ${rcls}">${rlbl}</span></td>
-        <td style="text-align:center">${r.miniApp ? '✅' : '—'}</td>
+        <td class="${scoreColor}" style="font-weight:600">${r.triageScore}</td>
         <td>${r.username ? `<a href="https://t.me/${r.username}" target="_blank" class="btn btn-secondary" style="padding:4px 8px;font-size:11px">✉️ TG</a>` : '—'}</td>
       </tr>`;
     }).join('');
@@ -1208,12 +1511,22 @@ function toggleSelectAll(cb) {
   document.querySelectorAll('.sil-cb').forEach(c => c.checked = cb.checked);
 }
 
-function exportSilentCSV() {
-  const date = new Date().toISOString().slice(0,10);
-  downloadCSV(silentCurrentData,
-    ['name','username','subscriptionActive','subscriptionUntil','postCount','lastMessage','silentDays','risk','miniApp'],
-    ['Имя','Username','Подписка активна','До','Постов','Последнее','Молчит (дн)','Риск','МиниАпп'],
-    `silent-${silentCurrentFilter}-${date}.csv`);
+async function exportSilentCSV() {
+  const params = _silentFilters[silentCurrentFilter] || {};
+  const qs = new URLSearchParams(params).toString();
+  const url = '/api/silent/export' + (qs ? '?' + qs : '');
+  try {
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(res.status);
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `silent-${silentCurrentFilter}-${new Date().toISOString().slice(0,10)}.csv`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+  } catch (e) {
+    console.warn('Export error', e);
+  }
 }
 
 function initLeaderboard() {
@@ -1263,6 +1576,22 @@ function initActivity() {
 }
 
 let emoIdx = 0, emoPlay = null;
+
+async function loadEmotions() {
+  try {
+    const res = await fetch('/api/emotions');
+    const data = await res.json();
+    if (data && data.months?.length) {
+      Object.assign(EMOTIONS_DATA, data);
+      _emotionsData = data;
+    } else {
+      _emotionsData = EMOTIONS_DATA;
+    }
+  } catch (e) {
+    _emotionsData = EMOTIONS_DATA;
+  }
+  initEmotions();
+}
 
 function initEmotions() {
   const ed = EMOTIONS_DATA;
@@ -1423,6 +1752,7 @@ const DATASOURCES = [
   { var: 'ACTIVITY_DATA', section: 'Активность', source: 'TG экспорт', how: 'heatmap: matrix[7][24] — подсчёт сообщений по дню недели и часу (UTC+3). byDayOfWeek: суммы по дням.' },
   { var: 'EMOTIONS_DATA', section: 'Эмоции', source: 'Claude AI', how: 'Экспорт TG-чата помесячно → анализ Claude с методологией Плутчик + Рассел + Прохаска + раскрытие. Схема: months[].{kpi, portrait, plutchik, prochaska, disclosure, growth, support}.' },
   { var: 'FINANCES', section: 'Финансы', source: 'GetCourse', how: 'revenueByMonth — выгрузка продаж из GC по месяцам. cohorts — сводная таблица когортных платежей: cohortKey × месяц оплаты × {orders, revenue}.' },
+  { var: 'CROSSANALYTICS', section: 'Сквозная аналитика', source: 'ETL', how: 'arpuBySegment — ARPU по risk_segment из user_health × subscriptions. retentionByActivity — retention M+1/M+3 по бакетам активности из retention_by_activity. silentToChurn — вероятность оттока по бакетам тишины из churn_probability. activityRevenue — скаттер activity_score × monthly_price из user_health × subscriptions.' },
 ];
 
 function initDatasources() {
@@ -1435,8 +1765,325 @@ function initDatasources() {
     </tr>`).join('');
 }
 
+// ── SUBSCRIPTIONS ──
+async function loadSubscriptions() {
+  try {
+    const res = await fetch('/api/subscriptions', { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    _subsData = await res.json();
+    const statusSel = document.getElementById('subs-filter-status');
+    _subsData.filters.statuses.forEach(s => {
+      const o = document.createElement('option'); o.value = s; o.textContent = s;
+      statusSel.appendChild(o);
+    });
+    const sourceSel = document.getElementById('subs-filter-source');
+    _subsData.filters.sources.forEach(s => {
+      const o = document.createElement('option'); o.value = s; o.textContent = s;
+      sourceSel.appendChild(o);
+    });
+    document.getElementById('subs-loader').style.display = 'none';
+    document.getElementById('subs-card').style.display = '';
+    renderSubscriptionsTable();
+  } catch(err) {
+    document.getElementById('subs-loader').textContent = 'Ошибка загрузки данных. Попробуйте обновить страницу.';
+  }
+}
+
+function _subsBadge(status) {
+  const m = { active: ['badge-green','Активна'], expired: ['badge-gray','Истекла'], cancelled: ['badge-red','Отменена'] };
+  const [cls, lbl] = m[status] || ['badge-orange', status || '—'];
+  return `<span class="badge ${cls}">${lbl}</span>`;
+}
+
+function renderSubscriptionsTable() {
+  if (!_subsData) return;
+  const statusVal = document.getElementById('subs-filter-status').value;
+  const sourceVal = document.getElementById('subs-filter-source').value;
+  let items = _subsData.items;
+  if (statusVal) items = items.filter(i => i.status === statusVal);
+  if (sourceVal) items = items.filter(i => i.source === sourceVal);
+  document.getElementById('subs-count').textContent = `Показано ${items.length} из ${_subsData.total}`;
+  makePaginator(items, 50, (slice) => {
+    document.getElementById('subs-tbody').innerHTML = slice.map(r => `
+      <tr>
+        <td><div style="font-weight:500">${r.name}</div><div style="font-size:11px;color:var(--text2)">${tgLink(r.username)}</div></td>
+        <td>${_subsBadge(r.status)}</td>
+        <td style="font-size:12px">${r.planInterval ? `${r.planIntervalCount||1} ${r.planInterval}` : '—'}</td>
+        <td style="text-align:right">${r.monthlyPrice != null ? fmtRub(r.monthlyPrice) : '—'}</td>
+        <td style="text-align:right">
+          <div>${r.amountLastPayment != null ? fmtRub(r.amountLastPayment) : '—'}</div>
+          <div style="font-size:11px;color:var(--text2)">${r.lastPaymentDate ? fmtDate(r.lastPaymentDate) : ''}</div>
+        </td>
+        <td style="text-align:right">${r.totalPaid > 0 ? fmtRub(r.totalPaid) : '—'}</td>
+        <td style="font-size:12px">${r.periodEnd ? fmtDate(r.periodEnd) : '—'}</td>
+        <td><span style="font-size:12px;color:var(--text2)">${r.source || '—'}</span></td>
+      </tr>`).join('');
+  }, 'subs-tbody', 'subs-pagin');
+}
+
+function filterSubscriptions() { renderSubscriptionsTable(); }
+
+function downloadSubscriptionsCSV() {
+  const status = document.getElementById('subs-filter-status').value;
+  const source = document.getElementById('subs-filter-source').value;
+  const params = new URLSearchParams();
+  if (status) params.set('status', status);
+  if (source) params.set('source', source);
+  window.location.href = `/api/subscriptions/export${params.toString() ? '?' + params.toString() : ''}`;
+}
+
+// ── FINANCES COHORTS ──
+async function loadFinances() {
+  try {
+    const res = await fetch('/api/finance', { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    _financesData = await res.json();
+    renderCohortTables();
+  } catch(err) {
+    document.getElementById('cohort-orders-wrap').textContent = 'Ошибка загрузки данных.';
+  }
+}
+
+function renderCohortTables() {
+  const cohorts = _financesData?.cohorts;
+  if (!cohorts || !cohorts.length) {
+    document.getElementById('cohort-orders-wrap').innerHTML = '<p style="color:var(--text2);padding:12px">Нет данных</p>';
+    document.getElementById('cohort-revenue-wrap').innerHTML = '<p style="color:var(--text2);padding:12px">Нет данных</p>';
+    return;
+  }
+  const allMonths = [...new Set(cohorts.flatMap(c => c.months.map(m => m.payment_month)))].sort();
+  const header = '<tr><th>Когорта</th><th>Размер</th>' + allMonths.map(m => {
+    const found = cohorts[0].months.find(x => x.payment_month === m);
+    return `<th>${found ? found.label : m.slice(0,7)}</th>`;
+  }).join('') + '</tr>';
+  const ordersRows = cohorts.map(c => {
+    const byMonth = Object.fromEntries(c.months.map(m => [m.payment_month, m]));
+    return '<tr><td class="cohort-label">' + c.label + '</td><td>' + (c.months[0]?.cohort_size ?? '—') + '</td>' +
+      allMonths.map(m => `<td>${byMonth[m] ? fmt(byMonth[m].orders) : '—'}</td>`).join('') + '</tr>';
+  }).join('');
+  const revenueRows = cohorts.map(c => {
+    const byMonth = Object.fromEntries(c.months.map(m => [m.payment_month, m]));
+    return '<tr><td class="cohort-label">' + c.label + '</td><td>' + (c.months[0]?.cohort_size ?? '—') + '</td>' +
+      allMonths.map(m => `<td>${byMonth[m] ? fmtRub(byMonth[m].revenue) : '—'}</td>`).join('') + '</tr>';
+  }).join('');
+  document.getElementById('cohort-orders-wrap').innerHTML = `<table><thead>${header}</thead><tbody>${ordersRows}</tbody></table>`;
+  document.getElementById('cohort-revenue-wrap').innerHTML = `<table><thead>${header}</thead><tbody>${revenueRows}</tbody></table>`;
+}
+// ── GC-SUBSCRIPTIONS ──
+const _GC_STATUS_LABELS = { active: 'Активна', expiring: 'Истекает', expired: 'Истекла', unknown: '—' };
+const _GC_STATUS_COLORS = { active: '#00d2a0', expiring: '#f59e0b', expired: '#ef4444', unknown: '#6c7a89' };
+let _gcSubsPage = 1;
+const _GC_PAGE_SIZE = 50;
+
+async function loadGcSubscriptions() {
+  try {
+    const res = await fetch(`${API_URL}/api/gc-subscriptions`, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    const data = await res.json();
+    _gcSubsData = data;
+    document.getElementById('gcsubs-stat-active').textContent = fmt(data.counts?.active ?? 0);
+    document.getElementById('gcsubs-stat-expiring').textContent = fmt(data.counts?.expiring ?? 0);
+    document.getElementById('gcsubs-stat-expired').textContent = fmt(data.counts?.expired ?? 0);
+    document.getElementById('gcsubs-stat-total').textContent = fmt(data.counts?.total ?? 0);
+    _gcSubsPage = 1;
+    renderGcSubscriptions(data.items);
+  } catch(e) {
+    document.getElementById('gcsubs-loader').textContent = 'Ошибка загрузки';
+  }
+}
+
+function renderGcSubscriptions(items) {
+  document.getElementById('gcsubs-loader').style.display = 'none';
+  const card = document.getElementById('gcsubs-card');
+  card.style.display = '';
+  document.getElementById('gcsubs-count').textContent = `${fmt(items.length)} записей`;
+  const tbody = document.getElementById('gcsubs-tbody');
+  const start = (_gcSubsPage - 1) * _GC_PAGE_SIZE;
+  const page = items.slice(start, start + _GC_PAGE_SIZE);
+  tbody.innerHTML = page.map(r => {
+    const bs = r.bucketStatus || 'unknown';
+    const color = _GC_STATUS_COLORS[bs] || '#6c7a89';
+    const label = _GC_STATUS_LABELS[bs] || bs;
+    const badge = `<span class="badge" style="background:${color}20;color:${color};border:1px solid ${color}40">${label}</span>`;
+    const name = r.username ? `<a href="https://t.me/${r.username}" target="_blank">${r.name}</a>` : r.name;
+    const tariff = r.planInterval ? `${r.planIntervalCount || 1} ${r.planInterval}` : '—';
+    const price = r.monthlyPrice ? fmtRub(r.monthlyPrice) : '—';
+    const end = r.periodEnd ? fmtDate(r.periodEnd) : '—';
+    const miniApp = r.hasMiniApp ? '✅' : '—';
+    return `<tr><td>${name}${r.monthlyPrice ? `<br><small style="color:var(--text2)">${price}/мес</small>` : ''}</td><td>${badge}</td><td>${tariff}</td><td>${end}</td><td style="text-align:center">${miniApp}</td></tr>`;
+  }).join('');
+  const totalPages = Math.ceil(items.length / _GC_PAGE_SIZE);
+  const pagin = document.getElementById('gcsubs-pagin');
+  pagin.innerHTML = totalPages > 1 ? Array.from({length: totalPages}, (_, i) =>
+    `<button class="btn ${i+1===_gcSubsPage?'btn-orange':''}" onclick="_gcSubsPage=${i+1};filterGcSubscriptions()" style="min-width:32px;padding:4px 8px">${i+1}</button>`
+  ).join('') : '';
+}
+
+function filterGcSubscriptions() {
+  if (!_gcSubsData) return;
+  const status = document.getElementById('gcsubs-filter-status').value;
+  const items = status === 'all' || !status
+    ? _gcSubsData.items
+    : _gcSubsData.items.filter(i => i.bucketStatus === status);
+  _gcSubsPage = 1;
+  renderGcSubscriptions(items);
+}
+
+function downloadGcSubscriptionsCSV() {
+  const status = document.getElementById('gcsubs-filter-status').value;
+  const params = new URLSearchParams();
+  if (status && status !== 'all') params.set('status', status);
+  window.location.href = `/api/gc-subscriptions/export${params.toString() ? '?' + params.toString() : ''}`;
+}
+
+// ── GC-ORDERS ──
+const _GCO_STREAM_COLORS = ['#00d2a0', '#6c63ff', '#f59e0b', '#ef4444', '#8892b0'];
+
+async function loadGcOrders() {
+  try {
+    const res = await fetch(`${API_URL}/api/orders`, { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+    _gcOrdersData = await res.json();
+    document.getElementById('gco-loader').style.display = 'none';
+    const s = _gcOrdersData.summary;
+    document.getElementById('gco-total-orders').textContent = fmt(s.totalOrders);
+    document.getElementById('gco-total-revenue').textContent = fmtRub(s.totalRevenue);
+    document.getElementById('gco-avg-order').textContent = fmtRub(s.avgOrder);
+    document.getElementById('gco-orders-30d').textContent = fmt(s.orders30d);
+    _renderGcoStreams(_gcOrdersData.streams);
+    _renderGcoMonthly(_gcOrdersData.monthly);
+    _renderGcoRecent(_gcOrdersData.recent);
+  } catch(e) {
+    document.getElementById('gco-loader').textContent = 'Ошибка загрузки';
+  }
+}
+
+function _renderGcoStreams(streams) {
+  if (!streams || !streams.length) return;
+  mkChart('gcoStreamsChart', { type: 'doughnut', data: {
+    labels: streams.map(s => s.name),
+    datasets: [{ data: streams.map(s => s.count), backgroundColor: _GCO_STREAM_COLORS, borderWidth: 2, borderColor: 'var(--bg)' }]
+  }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { color: 'var(--text)', font: { size: 11 } } } } } });
+}
+
+function _renderGcoMonthly(monthly) {
+  if (!monthly || !monthly.length) return;
+  mkChart('gcoMonthlyChart', { type: 'bar', data: {
+    labels: monthly.map(m => m.month),
+    datasets: [{ label: 'Выручка', data: monthly.map(m => m.revenue), backgroundColor: 'rgba(0,210,160,0.7)', borderRadius: 4 }]
+  }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } },
+    scales: { y: { ticks: { callback: v => (v/1000).toFixed(0) + 'к' } } } } });
+}
+
+function _renderGcoRecent(recent) {
+  if (!recent) return;
+  const tbody = document.getElementById('gco-recent-tbody');
+  tbody.innerHTML = recent.map(r => {
+    const status = r.status ? `<span class="badge badge-gray">${r.status}</span>` : '—';
+    return `<tr><td>${r.date ? fmtDate(r.date) : '—'}</td><td>${r.stream}</td><td style="text-align:right">${fmtRub(r.amount)}</td><td>${status}</td></tr>`;
+  }).join('') || '<tr><td colspan="4" style="color:var(--text2);padding:12px">Нет данных</td></tr>';
+}
+
+// ── CROSSANALYTICS ──
+const _SEGMENT_LABELS = { ghost: 'Призрак', low: 'Низкий', medium: 'Средний', high: 'Высокий' };
+const _SEGMENT_COLORS = { ghost: '#6c7a89', low: '#f77f00', medium: '#ffd166', high: '#00d2a0' };
+const _RISK_COLORS = { healthy: '#00d2a0', medium: '#ffd166', high_risk: '#f77f00', ghost: '#6c7a89' };
+const _FUNNEL_COLORS = ['#00d2a0', '#ffd166', '#f77f00', '#e94560'];
+
+async function loadCrossanalytics() {
+  try {
+    const res = await fetch('/api/crossanalytics', { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    _crossanalyticsData = await res.json();
+    document.getElementById('ca-loader').style.display = 'none';
+    initCrossanalytics();
+  } catch(err) {
+    document.getElementById('ca-loader').textContent = 'Ошибка загрузки данных. Попробуйте обновить страницу.';
+  }
+}
+
+function initCrossanalytics() {
+  initArpuTable();
+  initRetentionByActivityChart();
+  initSilentToChurnFunnel();
+  initActivityRevenueScatter();
+}
+
+function initArpuTable() {
+  const data = _crossanalyticsData.arpuBySegment;
+  if (!data || !data.length) {
+    document.getElementById('ca-arpu-tbody').innerHTML = '<tr><td colspan="4" style="color:var(--text2);padding:12px">Нет данных</td></tr>';
+    return;
+  }
+  document.getElementById('ca-arpu-tbody').innerHTML = data.map(r => `
+    <tr>
+      <td class="cohort-label"><span class="badge" style="background:${_SEGMENT_COLORS[r.segment] || '#8892b0'}22;color:${_SEGMENT_COLORS[r.segment] || '#8892b0'}">${_SEGMENT_LABELS[r.segment] || r.segment}</span></td>
+      <td>${r.avgRevenue != null ? fmtRub(r.avgRevenue) : '—'}</td>
+      <td>${fmt(r.userCount)}</td>
+      <td>${r.avgTenure != null ? fmt(r.avgTenure) : '—'}</td>
+    </tr>`).join('');
+}
+
+function initRetentionByActivityChart() {
+  const data = _crossanalyticsData.retentionByActivity;
+  if (!data || !data.length) return;
+
+  const buckets = ['high', 'medium', 'low', 'ghost'];
+  const cohorts = [...new Set(data.map(r => r.cohortMonth))].sort();
+  const latestCohort = cohorts[cohorts.length - 1];
+  const latestData = data.filter(r => r.cohortMonth === latestCohort);
+
+  const r30 = buckets.map(b => { const r = latestData.find(d => d.bucket === b); return r && r.retention30d != null ? r.retention30d : 0; });
+  const r90 = buckets.map(b => { const r = latestData.find(d => d.bucket === b); return r && r.retention90d != null ? r.retention90d : null; });
+  const labels = buckets.map(b => _SEGMENT_LABELS[b] || b);
+
+  mkChart('caRetentionChart', { type: 'bar', data: {
+    labels,
+    datasets: [
+      { label: 'M+1 (30д)', data: r30, backgroundColor: 'rgba(0,210,160,0.7)', borderRadius: 6 },
+      { label: 'M+3 (90д)', data: r90, backgroundColor: 'rgba(100,160,220,0.7)', borderRadius: 6 }
+    ]
+  }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'top' } },
+    scales: { y: { max: 100, ticks: { callback: v => v + '%' } } } } });
+}
+
+function initSilentToChurnFunnel() {
+  const buckets = _crossanalyticsData.silentToChurn?.buckets;
+  if (!buckets || !buckets.length) return;
+
+  const maxCount = Math.max(...buckets.map(b => b.count), 1);
+  document.getElementById('ca-funnel').innerHTML = buckets.map((b, i) => `
+    <div style="display:flex;align-items:center;margin-bottom:10px;gap:12px">
+      <div style="width:80px;font-size:12px;color:var(--text2);text-align:right">${b.range}</div>
+      <div style="flex:1;position:relative;height:32px;background:rgba(255,255,255,0.04);border-radius:6px;overflow:hidden">
+        <div style="position:absolute;left:0;top:0;height:100%;width:${Math.max(b.count / maxCount * 100, 3)}%;background:${_FUNNEL_COLORS[i]};border-radius:6px;opacity:0.8"></div>
+        <div style="position:absolute;left:12px;top:50%;transform:translateY(-50%);font-size:12px;font-weight:600;color:#fff">${b.label}</div>
+      </div>
+      <div style="width:80px;font-size:13px"><span style="font-weight:700;color:${_FUNNEL_COLORS[i]}">${(b.avgProbability * 100).toFixed(0)}%</span></div>
+      <div style="width:60px;font-size:12px;color:var(--text2)">${fmt(b.count)} чел.</div>
+    </div>`).join('');
+}
+
+function initActivityRevenueScatter() {
+  const data = _crossanalyticsData.activityRevenue;
+  if (!data || !data.length) return;
+
+  const datasets = {};
+  for (const r of data) {
+    const seg = r.riskSegment || 'unknown';
+    if (!datasets[seg]) datasets[seg] = { label: _SEGMENT_LABELS[seg] || seg, data: [], backgroundColor: _RISK_COLORS[seg] || '#8892b0', pointRadius: 4 };
+    datasets[seg].data.push({ x: r.activityScore, y: r.monthlyPrice });
+  }
+
+  mkChart('caScatterChart', { type: 'scatter', data: { datasets: Object.values(datasets) },
+  options: { responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: true, position: 'top' } },
+    scales: { x: { title: { display: true, text: 'Активность (score)' } }, y: { title: { display: true, text: 'Месячная оплата (₽)' }, ticks: { callback: v => (v/1000).toFixed(0) + 'к' } } } } });
+}
+
 function initAll() {
   initOverview();
+  // insights loaded lazily on first section open via loadInsights()
   initInsights();
   initMechanics();
   initRetention();
@@ -1444,7 +2091,6 @@ function initAll() {
   initSilent();
   initLeaderboard();
   initActivity();
-  initEmotions();
   initFinances();
   initDatasources();
 }
