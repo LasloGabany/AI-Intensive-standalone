@@ -1,0 +1,31 @@
+{
+  "name": "yromanova-landing",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "tsc --noEmit",
+    "test": "vitest run",
+    "scan": "bash scripts/secret-scan.sh",
+    "gate": "vitest run && next build && bash scripts/secret-scan.sh",
+    "replay:leads": "node scripts/replay-leads.mjs",
+    "prod:check": "node scripts/prod-readiness.mjs",
+    "launch:check": "npm run prod:check && npm run gate"
+  },
+  "dependencies": {
+    "@keystatic/core": "^0.5.50",
+    "@keystatic/next": "^5.0.4",
+    "next": "^16.2.7",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.7",
+    "@types/react": "19.0.7",
+    "@types/react-dom": "19.0.3",
+    "typescript": "5.7.3",
+    "vitest": "^3.2.6"
+  }
+}
